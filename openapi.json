@@ -1,0 +1,1 @@
+{"openapi":"3.0.0","paths":{"/api":{"get":{"operationId":"getData","parameters":[],"responses":{"200":{"description":""}}}}},"info":{"title":"Code Judge","description":"An API to do awesome things","version":"1.0.0","contact":{}},"tags":[],"servers":[],"components":{"securitySchemes":{"bearer":{"scheme":"bearer","bearerFormat":"JWT","type":"http"}},"schemas":{}}}
