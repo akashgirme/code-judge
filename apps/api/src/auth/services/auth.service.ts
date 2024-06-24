@@ -2,12 +2,12 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { MailService } from '../../mail/mail.service';
 
 import {
-  SignInUserDto,
+  SignInDto,
   ResendVerificationEmailDto,
   OAuthSignUpDto,
   AuthProviderDto,
-  VerifyOtpDto,
   VerifyTokenDto,
+  SignInWithOtpDto,
 } from '../dto';
 import { ConfigService } from '@nestjs/config';
 import { UserOtpService } from './user-otp.service';
@@ -19,6 +19,7 @@ import { User } from '../../user/entities';
 import { UserService } from '../../user/services';
 import { AuthProvider, TokenType } from '../types';
 import { AuthCacheService } from './auth-cache.service';
+import { decrypt, encrypt } from '../utility/hash-jwt-token';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +32,7 @@ export class AuthService {
     private cacheservice: AuthCacheService
   ) {}
 
-  async signIn({ email }: SignInUserDto) {
+  async signIn({ email }: SignInDto) {
     const user = await this.usersService.findAccountByEmail(email);
     if (!user) {
       await this.signUp(email);
@@ -44,7 +45,6 @@ export class AuthService {
       'AUTH_UI_URL'
     )}/sign-in-with-token?token=${validationToken}`;
 
-    //TODO: Date is in ISO seconds format, Convert it to normal string
     await this.mailService.sendMail({
       to: email,
       subject: `Secure link to log in to example.com | ${new Date().toLocaleString()} `,
@@ -163,7 +163,7 @@ export class AuthService {
     await this.authenticateUser(user, res);
   }
 
-  async signInWithOtp({ email, otp }: VerifyOtpDto, res: Response) {
+  async signInWithOtp({ email, otp }: SignInWithOtpDto, res: Response) {
     const user = await this.usersService.findAccountByEmail(email);
 
     if (!user) {
@@ -185,7 +185,12 @@ export class AuthService {
 
       const user = await this.usersService.findAccountById(id);
 
-      if (!user) {
+      const retrievedRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
+        user
+      );
+      const decrypedRefreshToken = decrypt(retrievedRefreshToken);
+
+      if (!user || decrypedRefreshToken !== refreshToken) {
         throw new UnauthorizedException('Invalid Token');
       }
 
@@ -193,8 +198,8 @@ export class AuthService {
         await this.tokenService.generateRefreshToken(user);
 
       this.tokenService.setRefreshTokenCookie(newRefreshToken, res);
-
-      await this.cacheservice.setRefreshToken(newRefreshToken, user);
+      await this.cacheservice.storeRefreshTokenInCache(newRefreshToken, user);
+      await this.cacheservice.setUserCache(user);
 
       const { accessToken } = await this.tokenService.generateAccessToken(user);
 
@@ -220,7 +225,7 @@ export class AuthService {
     }
 
     this.tokenService.clearRefreshTokenCookie(res);
-    await this.cacheservice.clearRefreshToken(user);
+    await this.cacheservice.removeRefreshTokenFromCache(user);
 
     return res.status(200).json({ message: 'Successfully logged out' });
   }
@@ -229,12 +234,12 @@ export class AuthService {
     const { accessToken } = await this.tokenService.generateAccessToken(user);
     const { refreshToken } = await this.tokenService.generateRefreshToken(user);
 
-    // TODO: Hash the token before saving into DB
-    await this.cacheservice.setRefreshToken(refreshToken, user);
+    const encryptedRefreshToken = encrypt(refreshToken);
+    await this.cacheservice.storeRefreshTokenInCache(encryptedRefreshToken, user);
 
     this.tokenService.setRefreshTokenCookie(refreshToken, res);
 
-    await this.cacheservice.setUser(user);
+    await this.cacheservice.setUserCache(user);
 
     const safeUser = instanceToPlain(user);
 

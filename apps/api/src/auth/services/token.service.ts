@@ -49,7 +49,7 @@ export class TokenService {
   }
 
   async generateValidationToken(user: User) {
-    const validationToken = await this.generateToken(user, TokenType.VALIDATION, '1h');
+    const validationToken = await this.generateToken(user, TokenType.VALIDATION, '10m');
     return { validationToken };
   }
 

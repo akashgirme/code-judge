@@ -1,6 +1,6 @@
 export { RefreshedSessionDto } from './refreshed-session.dto';
-export { SignInUserDto } from './sign-in-user.dto';
-export { VerifyOtpDto } from './verify-otp.dto';
+export { SignInDto } from './sign-in-user.dto';
+export { SignInWithOtpDto } from './verify-otp.dto';
 export { VerifyTokenDto } from './verify-token.dto';
 export { ResendVerificationEmailDto } from './resend-verification-email.dto';
 export { SignedInUserDto } from './signed-in-user.dto';

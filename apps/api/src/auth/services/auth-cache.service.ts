@@ -11,39 +11,41 @@ const TEN_MINUTES_IN_SECONDS = 10 * 60;
 export class AuthCacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  async setUser(user: User): Promise<void> {
+  async setUserCache(user: User): Promise<void> {
     await this.cacheManager.set(`user:${user.id}`, user, {
       ttl: SEVEN_DAYS_IN_SECONDS,
     } as any);
   }
 
-  async getUser(userId: string): Promise<User> {
+  async fetchUserFromCache(userId: string): Promise<User> {
     return this.cacheManager.get(`user:${userId}`);
   }
 
-  async removeUser(user: User): Promise<void> {
+  async deleteUserFromCache(user: User): Promise<void> {
     await this.cacheManager.del(`user:${user.id}`);
   }
 
-  async setRefreshToken(refreshToken: string, user: User): Promise<void> {
+  async storeRefreshTokenInCache(refreshToken: string, user: User): Promise<void> {
     await this.cacheManager.set(`refresh-token:${user.id}`, refreshToken, {
       ttl: SEVEN_DAYS_IN_SECONDS,
     } as any);
   }
 
-  async clearRefreshToken(user: User): Promise<void> {
+  async retrieveRefreshTokenFromCache(user: User): Promise<string> {
+    return this.cacheManager.get(`refresh-token:${user.id}`);
+  }
+
+  async removeRefreshTokenFromCache(user: User): Promise<void> {
     await this.cacheManager.del(`refresh-token:${user.id}`);
   }
 
-  //TODO: Though ttl is over but still value in not expiring in cache
-  // Persisted with No Limit
-  async setOtp(otpDetails: OtpDetails, user: User): Promise<void> {
+  async storeOtpDetailsInCache(otpDetails: OtpDetails, user: User): Promise<void> {
     await this.cacheManager.set(`user-otp:${user.id}`, otpDetails, {
       ttl: TEN_MINUTES_IN_SECONDS,
     } as any);
   }
 
-  async getOtp(user: User): Promise<OtpDetails> {
+  async fetchOtpDetailsFromCache(user: User): Promise<OtpDetails> {
     return this.cacheManager.get(`user-otp:${user.id}`);
   }
 }

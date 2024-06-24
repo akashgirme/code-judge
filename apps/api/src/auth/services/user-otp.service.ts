@@ -20,17 +20,13 @@ export class UserOtpService {
       otpAttempts: 0,
     };
 
-    /**
-     * If entry for user already exists cacheManger simply update this entry.
-     * No need to delete previous entry explicitly.
-     */
-    await this.cacheService.setOtp(otpDetails, user);
+    await this.cacheService.storeOtpDetailsInCache(otpDetails, user);
 
     return { otp };
   }
 
   async validateOtp(otp: string, user: User) {
-    const otpDetails = await this.cacheService.getOtp(user);
+    const otpDetails = await this.cacheService.fetchOtpDetailsFromCache(user);
 
     if (!otpDetails) {
       throw new BadRequestException('Otp expired! Please resend otp');
@@ -43,7 +39,7 @@ export class UserOtpService {
     const match = await bcrypt.compare(otp, otpDetails.otp);
 
     otpDetails.otpAttempts++;
-    await this.cacheService.setOtp(otpDetails, user);
+    await this.cacheService.storeOtpDetailsInCache(otpDetails, user);
 
     if (!match) {
       throw new BadRequestException('Incorrect otp');

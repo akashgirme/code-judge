@@ -2,12 +2,12 @@ import { Body, Controller, Post, Get, UseGuards, Req, Res } from '@nestjs/common
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../services';
 import {
-  SignInUserDto,
   SignedInUserDto,
   SuccessMessageDto,
-  VerifyOtpDto,
   VerifyTokenDto,
   RefreshedSessionDto,
+  SignInDto,
+  SignInWithOtpDto,
 } from '../dto';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { Response, Request } from 'express';
@@ -32,13 +32,16 @@ export class AuthController {
 
   @Post('/sign-in')
   @ApiOkResponse({ type: SignedInUserDto })
-  async signIn(@Body() body: SignInUserDto): Promise<SuccessMessageDto> {
+  async signIn(@Body() body: SignInDto): Promise<SuccessMessageDto> {
     return this.authService.signIn(body);
   }
 
   @ApiOkResponse({ type: SignedInUserDto })
   @Post('/sign-in-with-otp')
-  async signInWithOtp(@Res() res: Response, @Body() body: VerifyOtpDto): Promise<void> {
+  async signInWithOtp(
+    @Res() res: Response,
+    @Body() body: SignInWithOtpDto
+  ): Promise<void> {
     return this.authService.signInWithOtp(body, res);
   }
 
