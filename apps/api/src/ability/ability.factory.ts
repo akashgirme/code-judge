@@ -35,14 +35,14 @@ export class AbilityFactory {
     switch (user.role) {
       case UserRole.ADMIN:
         can(Action.Manage, 'all');
+      // eslint-disable-next-line no-fallthrough
       case UserRole.USER:
         can(Action.Read, User);
         cannot(Action.Delete, User);
     }
 
     return build({
-      detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
+      detectSubjectType: (item) => item.constructor as ExtractSubjectType<Subjects>,
     });
   }
 }

@@ -20,13 +20,13 @@ export class UserOtpService {
       otpAttempts: 0,
     };
 
-    await this.cacheService.storeOtpDetailsInCache(otpDetails, user);
+    await this.cacheService.storeOtpDetailsInCache(otpDetails, user.id);
 
     return { otp };
   }
 
   async validateOtp(otp: string, user: User) {
-    const otpDetails = await this.cacheService.fetchOtpDetailsFromCache(user);
+    const otpDetails = await this.cacheService.fetchOtpDetailsFromCache(user.id);
 
     if (!otpDetails) {
       throw new BadRequestException('Otp expired! Please resend otp');
@@ -39,7 +39,7 @@ export class UserOtpService {
     const match = await bcrypt.compare(otp, otpDetails.otp);
 
     otpDetails.otpAttempts++;
-    await this.cacheService.storeOtpDetailsInCache(otpDetails, user);
+    await this.cacheService.storeOtpDetailsInCache(otpDetails, user.id);
 
     if (!match) {
       throw new BadRequestException('Incorrect otp');

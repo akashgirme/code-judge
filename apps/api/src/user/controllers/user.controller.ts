@@ -14,40 +14,39 @@ import { PaginationDto } from '../../common/dto';
 export class UserController {
   constructor(private usersService: UserService) {}
 
-  //TODO: There issue with both whoami and onboard route may in @currentuser decorator
-  // Or in JWT startegy
-  @ApiOkResponse({ type: User })
   @Get('/whoami')
+  @ApiOkResponse({ type: User })
   @UseGuards(AuthGuard())
   whoAmI(@CurrentUser() user: User) {
     return { user };
   }
 
-  @ApiOkResponse({ type: User })
   @Put('/onboard')
+  @ApiOkResponse({ type: User })
   @UseGuards(AuthGuard())
   onboard(@CurrentUser() user: User, @Body() body: OnboardUserDto) {
     return this.usersService.onboard(user, body);
   }
 
-  @ApiOkResponse({ type: User })
   @Put('/profile/edit')
+  @ApiOkResponse({ type: User })
   @UseGuards(AuthGuard())
   editProfile(@CurrentUser() user: User, @Body() body: EditProfileDto) {
     return this.usersService.editProfile(user, body);
   }
 
   // Internal User Controllers
-  @ApiOkResponse({ type: AllUsersDto })
+
   @Get('/admin/users')
+  @ApiOkResponse({ type: AllUsersDto })
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.Manage, subject: User })
   getAllUsers(@Query() query: PaginationDto): Promise<AllUsersDto> {
     return this.usersService.getAllUsers(query);
   }
 
-  @ApiOkResponse({ type: User })
   @Put('/admin/:userId/change-role')
+  @ApiOkResponse({ type: User })
   @UseGuards(AuthGuard())
   @CheckAbilities({ action: Action.Manage, subject: User })
   changeUserRole(@Param('userId') userId: string, @Body() body: ChangeUserRoleDto) {

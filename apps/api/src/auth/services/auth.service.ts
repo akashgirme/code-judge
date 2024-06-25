@@ -186,7 +186,7 @@ export class AuthService {
       const user = await this.usersService.findAccountById(id);
 
       const retrievedRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
-        user
+        user.id
       );
       const decrypedRefreshToken = decrypt(retrievedRefreshToken);
 
@@ -198,7 +198,7 @@ export class AuthService {
         await this.tokenService.generateRefreshToken(user);
 
       this.tokenService.setRefreshTokenCookie(newRefreshToken, res);
-      await this.cacheservice.storeRefreshTokenInCache(newRefreshToken, user);
+      await this.cacheservice.storeRefreshTokenInCache(newRefreshToken, user.id);
       await this.cacheservice.setUserCache(user);
 
       const { accessToken } = await this.tokenService.generateAccessToken(user);
@@ -225,7 +225,7 @@ export class AuthService {
     }
 
     this.tokenService.clearRefreshTokenCookie(res);
-    await this.cacheservice.removeRefreshTokenFromCache(user);
+    await this.cacheservice.removeRefreshTokenFromCache(user.id);
 
     return res.status(200).json({ message: 'Successfully logged out' });
   }
@@ -235,7 +235,7 @@ export class AuthService {
     const { refreshToken } = await this.tokenService.generateRefreshToken(user);
 
     const encryptedRefreshToken = encrypt(refreshToken);
-    await this.cacheservice.storeRefreshTokenInCache(encryptedRefreshToken, user);
+    await this.cacheservice.storeRefreshTokenInCache(encryptedRefreshToken, user.id);
 
     this.tokenService.setRefreshTokenCookie(refreshToken, res);
 

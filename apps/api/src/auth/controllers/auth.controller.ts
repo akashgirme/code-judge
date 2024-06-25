@@ -12,16 +12,21 @@ import {
 import { ApiOkResponse } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 import { AuthProvider } from '../types';
+import { Throttle } from '@nestjs/throttler';
+
+const RATE_LIMIT_TIME_IN_MILISECONDS = 30 * 1000;
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('google')
+  @Throttle({ default: { limit: 3, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}
 
   @Get('google/callback')
+  @Throttle({ default: { limit: 3, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const { redirectUrl } = await this.authService.oAuthSignUp(req.user, {
@@ -31,13 +36,15 @@ export class AuthController {
   }
 
   @Post('/sign-in')
+  @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @ApiOkResponse({ type: SignedInUserDto })
   async signIn(@Body() body: SignInDto): Promise<SuccessMessageDto> {
     return this.authService.signIn(body);
   }
 
-  @ApiOkResponse({ type: SignedInUserDto })
   @Post('/sign-in-with-otp')
+  @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
+  @ApiOkResponse({ type: SignedInUserDto })
   async signInWithOtp(
     @Res() res: Response,
     @Body() body: SignInWithOtpDto
@@ -45,8 +52,9 @@ export class AuthController {
     return this.authService.signInWithOtp(body, res);
   }
 
-  @ApiOkResponse({ type: SignedInUserDto })
   @Post('/sign-in-with-token')
+  @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
+  @ApiOkResponse({ type: SignedInUserDto })
   async signInWithToken(
     @Res() res: Response,
     @Body() body: VerifyTokenDto
@@ -55,6 +63,8 @@ export class AuthController {
   }
 
   @Get('/refresh')
+  @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
+  @ApiOkResponse({ type: SignedInUserDto })
   @ApiOkResponse({ type: RefreshedSessionDto })
   async refreshSession(@Req() req: Request, @Res() res: Response) {
     return this.authService.refreshSession(req.cookies['refreshToken'], res);

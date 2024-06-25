@@ -22,7 +22,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
         },
       }),
     }),
-    // forwardRef(() => UserModule),
     UserModule,
     MailModule,
   ],

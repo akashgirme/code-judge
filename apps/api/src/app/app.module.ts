@@ -10,6 +10,7 @@ import { AbilityModule } from '../ability/ability.module';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
 import { PassportModule } from '@nestjs/passport';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -24,6 +25,12 @@ import { PassportModule } from '@nestjs/passport';
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     CacheModule.registerAsync(RedisOptions),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 30 * 1000,
+        limit: 10,
+      },
+    ]),
     AbilityModule,
     AuthModule,
     UserModule,
