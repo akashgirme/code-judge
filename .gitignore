@@ -45,3 +45,10 @@ Thumbs.db
 .env.*
 .env.local
 .env
+
+# Certificates
+*.crt
+
+#Migrations
+db/*
+db
