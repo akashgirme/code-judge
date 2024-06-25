@@ -10,7 +10,7 @@ import { CheckAbilities } from '../../ability/ability.decorator';
 import { Action } from '../../ability/ability.factory';
 import { PaginationDto } from '../../common/dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private usersService: UserService) {}
 
