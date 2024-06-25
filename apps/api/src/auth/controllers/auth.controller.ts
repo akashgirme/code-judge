@@ -35,7 +35,7 @@ export class AuthController {
     res.redirect(redirectUrl);
   }
 
-  @Post('/sign-in')
+  @Post('/initiate-sign-in')
   @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @ApiOkResponse({ type: SignedInUserDto })
   async signIn(@Body() body: SignInDto): Promise<SuccessMessageDto> {
