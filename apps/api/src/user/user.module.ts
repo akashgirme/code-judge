@@ -6,6 +6,7 @@ import { User } from './entities';
 import { AbilityModule } from '../ability/ability.module';
 import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from '../auth/auth.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from '../auth/auth.module';
     forwardRef(() => AuthModule),
     AbilityModule,
     PassportModule,
+    MailModule,
   ],
   controllers: [UserController],
   providers: [UserService],

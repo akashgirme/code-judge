@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { MailService } from '../../mail/mail.service';
 
 import {
@@ -23,6 +28,7 @@ import { decrypt, encrypt } from '../utility/hash-jwt-token';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger(AuthService.name);
   constructor(
     private usersService: UserService,
     private otpService: UserOtpService,
@@ -33,9 +39,14 @@ export class AuthService {
   ) {}
 
   async signIn({ email }: SignInDto) {
-    const user = await this.usersService.findAccountByEmail(email);
+    let user = await this.usersService.findAccountByEmail(email);
+
     if (!user) {
-      await this.signUp(email);
+      this.logger.log('User not found! Creating new user.');
+      user = await this.usersService.create({
+        email,
+        provider: AuthProvider.EMAIL,
+      });
     }
 
     const { otp } = await this.otpService.createOtp(user);
@@ -95,38 +106,13 @@ export class AuthService {
     return { redirectUrl };
   }
 
-  async signUp(email: string) {
-    const user = await this.usersService.create({
-      email,
-      provider: AuthProvider.EMAIL,
-    });
-
-    console.log(user);
-
-    const { otp } = await this.otpService.createOtp(user);
-    const { validationToken } = await this.tokenService.generateValidationToken(user);
-
-    const validationUrl = `${this.configService.get(
-      'AUTH_UI_URL'
-    )}/sign-in-with-token?token=${validationToken}`;
-
-    await this.mailService.sendMail({
-      to: email,
-      subject: `Secure link to log in to example.com | ${new Date().toLocaleString()}`,
-      htmlBody: verifyEmailWithOtpMjml,
-      data: { otp, validationUrl },
-    });
-
-    return {
-      message: `To continue click the link send to ${email} or enter otp`,
-    };
-  }
-
   async resendVerificationEmail({ email }: ResendVerificationEmailDto) {
     const user = await this.usersService.findAccountByEmail(email);
 
     if (!user) {
-      throw new NotFoundException(`No User found with email ${email}`);
+      throw new NotFoundException(
+        `No user found with email ${email}, Please login again.`
+      );
     }
 
     const { otp } = await this.otpService.createOtp(user);

@@ -5,10 +5,15 @@ import { User } from '../entities';
 import { getPaginationMeta } from '../../common/utility';
 import { PaginationDto } from '../../common/dto';
 import { ChangeUserRoleDto, CreateUserDto, EditProfileDto, OnboardUserDto } from '../dto';
+import { MailService } from '../../mail/mail.service';
+import { welcomeMjml } from '../../mail/mjml';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private repo: Repository<User>,
+    private mailService: MailService
+  ) {}
 
   findAccountByEmail(email: string) {
     return this.repo.findOne({
@@ -38,12 +43,15 @@ export class UserService {
 
     const updatedUser = await this.repo.save(user);
 
-    // await this.mailService.sendMail({
-    //   to: updatedUser.email,
-    //   subject: 'Welcome to example.com!',
-    //   htmlBody: welcomeMjml,
-    //   data: { firstName: updatedUser.firstName },
-    // });
+    this.mailService.sendMail({
+      to: updatedUser.email,
+      subject: 'Welcome to example.com!',
+      htmlBody: welcomeMjml,
+      data: {
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+      },
+    });
 
     return updatedUser;
   }
