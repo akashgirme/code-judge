@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -9,6 +9,7 @@ import { AuthCacheService } from '../services';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private logger = new Logger(JwtStrategy.name);
   constructor(
     private usersService: UserService,
     private configService: ConfigService,
@@ -26,6 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     let user = await this.cacheService.fetchUserFromCache(id);
     if (!user) {
+      this.logger.log('User Cache Miss');
       user = await this.usersService.findAccountById(id);
       await this.cacheService.setUserCache(user);
     }
