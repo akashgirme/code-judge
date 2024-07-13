@@ -11,6 +11,8 @@ import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ProblemModule } from '../problem/problem.module';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
     AbilityModule,
     AuthModule,
     UserModule,
+    ProblemModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

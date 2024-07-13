@@ -1,12 +1,13 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
+import { Problem, Topic } from '../problem/entities';
 import { User } from '../user/entities';
 
 const commonTypeOrmConfig: DataSourceOptions = {
   logging: true,
   type: 'postgres',
-  entities: [User],
+  entities: [User, Problem, Topic],
   synchronize: false,
   ssl: true,
 };

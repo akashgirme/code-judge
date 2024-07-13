@@ -9,16 +9,18 @@ import {
 import { User } from '../user/entities';
 import { Injectable } from '@nestjs/common';
 import { UserRole } from '../user/types';
+import { Problem, Topic } from '../problem/entities';
 
 export enum Action {
   Manage = 'manage',
   Create = 'create',
   Read = 'read',
   Update = 'update',
+  Publish = 'publish',
   Delete = 'delete',
 }
 
-export type Subjects = InferSubjects<typeof User> | 'all';
+export type Subjects = InferSubjects<typeof User | typeof Problem | typeof Topic> | 'all';
 
 type PossibleAbilities = [Action, Subjects];
 type Conditions = MongoQuery;
@@ -38,6 +40,8 @@ export class AbilityFactory {
       // eslint-disable-next-line no-fallthrough
       case UserRole.USER:
         can(Action.Read, User);
+        can(Action.Create, Problem);
+        can(Action.Update, Problem);
         cannot(Action.Delete, User);
     }
 

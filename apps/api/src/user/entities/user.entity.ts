@@ -3,11 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../types';
 import { AuthProvider } from '../../auth/types';
+import { Problem } from '../../problem/entities';
 
 @Entity()
 export class User {
@@ -44,6 +46,10 @@ export class User {
     default: UserRole.USER,
   })
   role: UserRole;
+
+  @ApiProperty({ type: [Problem] })
+  @OneToMany(() => Problem, (problem) => problem.author)
+  problems: Problem[];
 
   @ApiProperty()
   @CreateDateColumn()
