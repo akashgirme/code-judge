@@ -3,11 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import { Problem, Topic } from '../problem/entities';
 import { User } from '../user/entities';
+import { Submission } from '../submission/entities';
 
 const commonTypeOrmConfig: DataSourceOptions = {
   logging: true,
   type: 'postgres',
-  entities: [User, Problem, Topic],
+  entities: [User, Problem, Topic, Submission],
   synchronize: false,
   ssl: true,
 };
