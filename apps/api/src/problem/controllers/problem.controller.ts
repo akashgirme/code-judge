@@ -41,6 +41,7 @@ export class ProblemController {
     return this.problemService.createProblem(user, body);
   }
 
+  //TODO: Add Sorting by Difficulty, Topic and Search by Title in Query.
   @Get('/')
   @ApiOkResponse({ type: AllProblemsResponseDto })
   @ApiQuery({ type: () => AllProblemsQueryDto })

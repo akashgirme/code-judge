@@ -16,10 +16,6 @@ import { getPaginationMeta } from '../../common/utility';
 import { ProblemStatus } from '../types';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
 
-interface ProblemWithDescription extends Problem {
-  description: string;
-}
-
 @Injectable()
 export class ProblemService {
   constructor(
@@ -140,13 +136,7 @@ export class ProblemService {
   }: AllProblemsQueryDto): Promise<AllProblemsResponseDto> {
     const [problems, totalItems] = await this.problemRepo
       .createQueryBuilder('problem')
-      .select([
-        'problem.id',
-        'problem.title',
-        'problem.difficulty',
-        'problem.slug',
-        'problem.createdAt',
-      ])
+      .select(['problem.id', 'problem.title', 'problem.difficulty', 'problem.slug'])
       .where('problem.status = :status', { status: ProblemStatus.UNPUBLISHED }) //Change this to APPROVED
       .orderBy('problem.createdAt', 'DESC')
       .take(pageSize)
@@ -171,7 +161,6 @@ export class ProblemService {
         'problem.title',
         'problem.difficulty',
         'problem.slug',
-        'problem.createdAt',
         'author.id',
         'author.firstName',
         'author.lastName',

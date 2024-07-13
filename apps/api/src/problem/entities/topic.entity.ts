@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Problem } from './problem.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Topic {
@@ -23,15 +24,15 @@ export class Topic {
   @ManyToMany(() => Problem, (problem) => problem.topics)
   problems: Problem[];
 
-  @ApiProperty()
   @CreateDateColumn()
+  @Exclude({ toPlainOnly: true })
   createdAt: Date;
 
-  @ApiProperty()
   @UpdateDateColumn()
+  @Exclude({ toPlainOnly: true })
   updatedAt: Date;
 
-  @ApiProperty()
   @DeleteDateColumn()
+  @Exclude({ toPlainOnly: true })
   deletedAt: Date;
 }
