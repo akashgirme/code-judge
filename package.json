@@ -5,7 +5,7 @@
   "scripts": {
     "start:auth": "node ./dist/apps/api/main",
     "start:debug": "npx nx serve api --inspect",
-    "start:dev": "npx nx serve api --watch",
+    "start:dev": "npx nx serve api",
     "compile-typeorm-config": "npx tsc -p apps/api/tsconfig.app.json  --outDir ./dist",
     "typeorm": "npm run compile-typeorm-config && npx typeorm -d dist/apps/api/src/configs/typeorm.config.js",
     "migration:generate": "npm run typeorm -- migration:generate --outputJs",
@@ -14,7 +14,9 @@
   },
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.608.0",
     "@aws-sdk/client-ses": "^3.600.0",
+    "@aws-sdk/lib-storage": "^3.614.0",
     "@casl/ability": "^6.7.1",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.0.2",

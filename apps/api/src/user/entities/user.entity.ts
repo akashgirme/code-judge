@@ -3,11 +3,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../types';
 import { AuthProvider } from '../../auth/types';
+import { Problem } from '../../problem/entities';
+import { Exclude } from 'class-transformer';
+import { Submission } from '../../submission/entities';
 
 @Entity()
 export class User {
@@ -27,6 +31,7 @@ export class User {
   @Column()
   email: string;
 
+  @ApiProperty()
   @Column({ default: false })
   hasOnboarded: boolean;
 
@@ -35,6 +40,7 @@ export class User {
     enum: AuthProvider,
     default: AuthProvider.EMAIL,
   })
+  @Exclude({ toPlainOnly: true })
   provider: AuthProvider;
 
   @ApiProperty({ enum: UserRole, enumName: 'UserRole' })
@@ -45,11 +51,17 @@ export class User {
   })
   role: UserRole;
 
-  @ApiProperty()
+  @OneToMany(() => Problem, (problem) => problem.author)
+  problems: Problem[];
+
+  @OneToMany(() => Submission, (submission) => submission.user)
+  submissions: Submission[];
+
   @CreateDateColumn()
+  @Exclude({ toPlainOnly: true })
   createdAt: Date;
 
-  @ApiProperty()
   @UpdateDateColumn()
+  @Exclude({ toPlainOnly: true })
   updatedAt: Date;
 }
