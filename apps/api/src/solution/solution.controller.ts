@@ -7,6 +7,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../ability/ability.guard';
 import { CheckAbilities } from '../ability/ability.decorator';
 import { Action } from '../ability/ability.factory';
+import { CurrentUser } from '../auth/decorators';
+import { User } from '../user/entities';
 
 @UseGuards(AuthGuard, AbilityGuard)
 @Controller('solutions')
@@ -20,11 +22,13 @@ export class SolutionController {
     return this.solutionService.getSolution(query);
   }
 
-  //TODO: Add ability check, Only author of problem and admin can add solution
   @Post('/')
   @CheckAbilities({ action: Action.Create, subject: null })
   @ApiOkResponse({ type: SuccessMessageDto })
-  addSolution(@Body() body: AddSolutionDto): Promise<SuccessMessageDto> {
-    return this.solutionService.addSolution(body);
+  addSolution(
+    @CurrentUser() user: User,
+    @Body() body: AddSolutionDto
+  ): Promise<SuccessMessageDto> {
+    return this.solutionService.addSolution(user, body);
   }
 }

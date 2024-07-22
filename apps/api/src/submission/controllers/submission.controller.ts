@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SubmissionService } from '../services/submission.service';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { CurrentUser } from '../../auth/decorators';

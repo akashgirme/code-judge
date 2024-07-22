@@ -36,6 +36,7 @@ export class SubmissionService {
       slug: submissionSlug,
       language,
       user,
+      status: SubmissionStatus.PENDING,
       problem: { id: problemId },
     });
 
@@ -103,7 +104,7 @@ export class SubmissionService {
 
     const executionServerUrl = `${this.configService.get<string>(
       'CODE_EXECUTION_SERVER_URL'
-    )}/submissions`;
+    )}/api/submissions`;
 
     return this.HttpService.post(executionServerUrl, {
       submissionId,
