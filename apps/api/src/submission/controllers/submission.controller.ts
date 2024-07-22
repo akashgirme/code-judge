@@ -8,12 +8,12 @@ import { Submission } from '../entities';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
 
-@UseGuards(AuthGuard(), AbilityGuard)
 @Controller('submissions')
 export class SubmissionController {
   constructor(private readonly submissionService: SubmissionService) {}
 
   @Post('/')
+  @UseGuards(AuthGuard(), AbilityGuard)
   @ApiOkResponse({ type: Submission })
   async createSubmission(
     @CurrentUser() user: User,
@@ -32,6 +32,7 @@ export class SubmissionController {
   }
 
   @Post('/rejudge/:submissionId')
+  @UseGuards(AuthGuard(), AbilityGuard)
   async rejudgeSubmission() {
     //...
   }
@@ -42,6 +43,7 @@ export class SubmissionController {
   }
 
   @Get('/problem/:problemId')
+  @UseGuards(AuthGuard(), AbilityGuard)
   @ApiOkResponse({ type: [Submission] })
   getSubmissionsByProblemId(
     @CurrentUser() user: User,
@@ -51,6 +53,7 @@ export class SubmissionController {
   }
 
   @Get('/:submissionId')
+  @UseGuards(AuthGuard(), AbilityGuard)
   @ApiOkResponse({ type: GetSubmissionDto })
   findSubmissionById(
     @Param('submissionId') submissionId: string
