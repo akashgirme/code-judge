@@ -181,7 +181,7 @@ export class ProblemService {
     return { ...problem, description };
   }
 
-  convertTitletoSlug(title: string) {
+  private convertTitletoSlug(title: string) {
     return title.toLowerCase().replace(/\s/g, '-');
   }
 }

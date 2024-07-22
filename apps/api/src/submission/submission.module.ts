@@ -6,6 +6,7 @@ import { ProblemModule } from '../problem/problem.module';
 import { SubmissionController } from './controllers/submission.controller';
 import { SubmissionService } from './services/submission.service';
 import { StorageModule } from '../storage/storage.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { StorageModule } from '../storage/storage.module';
     AbilityModule,
     ProblemModule,
     StorageModule,
+    HttpModule,
   ],
   controllers: [SubmissionController],
   providers: [SubmissionService],
