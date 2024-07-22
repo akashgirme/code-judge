@@ -42,7 +42,9 @@ export class ProblemService {
   ) {
     const { topics } = await this.topicService.findTopics(topicIds);
 
-    const slug = this.convertTitletoSlug(title);
+    const slug = `${this.convertTitletoSlug(title)}-${
+      Math.floor(Math.random() * 10) + 1
+    }`;
 
     // Save the problem description to the storage
     await this.storageService.putObject(`problems/${slug}/description.md`, description);
