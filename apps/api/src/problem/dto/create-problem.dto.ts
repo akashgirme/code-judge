@@ -1,12 +1,14 @@
-import { IsString, IsNotEmpty, IsEnum, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsArray, Matches } from 'class-validator';
 import { ProblemDifficulty, SupportedLanguages } from '../types';
 import { ApiProperty } from '@nestjs/swagger';
-import internal from 'stream';
 
 export class CreateProblemDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @Matches(/^[a-zA-Z0-9 ]+$/, {
+    message: 'Title can only contain alphabets, numbers, and spaces',
+  })
   title: string;
 
   @ApiProperty()
