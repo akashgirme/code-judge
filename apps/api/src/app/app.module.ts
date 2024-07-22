@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Controller, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -13,6 +13,8 @@ import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ProblemModule } from '../problem/problem.module';
 import { StorageModule } from '../storage/storage.module';
+import { SubmissionModule } from '../submission/submission.module';
+import { SolutionModule } from '../solution/solution.module';
 
 @Module({
   imports: [
@@ -38,6 +40,10 @@ import { StorageModule } from '../storage/storage.module';
     UserModule,
     ProblemModule,
     StorageModule,
+    SubmissionModule,
+    // SolutionModule
+    // There is constructor metatype issue in solution Controller.
+    // So, Solve it and then uncomment the SolutionModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,13 +1,18 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ProblemService } from '../problem/services';
-import { StorageService } from '../storage/storage.service';
-import { AddSolutionDto } from './dto';
-import { User } from '../user/entities';
-import { AbilityFactory, Action } from '../ability/ability.factory';
-import { Problem } from '../problem/entities';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { ProblemService } from '../../problem/services';
+import { AbilityFactory, Action } from '../../ability/ability.factory';
+import { StorageService } from '../../storage/storage.service';
+import { User } from '../../user/entities';
+import { AddSolutionDto } from '../dto';
 
 @Injectable()
 export class SolutionService {
+  private readonly logger = new Logger(SolutionService.name);
   constructor(
     private readonly problemService: ProblemService,
     private readonly storageService: StorageService,
@@ -33,7 +38,7 @@ export class SolutionService {
     const problem = await this.problemService.getProblemById(problemId);
 
     // If user doesn't have access to update problem & is trying to update a different person blog post
-    if (!ability.can(Action.Update, Problem) && problem.author.id !== user.id) {
+    if (!ability.can(Action.Update, null) && problem.author.id !== user.id) {
       throw new ForbiddenException(
         'You do not have permission to add solution/s to this problem'
       );

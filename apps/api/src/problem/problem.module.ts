@@ -16,6 +16,6 @@ import { ProblemController, TopicController } from './controllers';
   ],
   controllers: [ProblemController, TopicController],
   providers: [ProblemService, TopicService, TestCaseService],
-  exports: [],
+  exports: [ProblemService],
 })
 export class ProblemModule {}
