@@ -73,7 +73,7 @@ export class QueueService {
         `[${Queues.CODE_EXECUTION}] Completed job with data\n
           Data: ${job.asJSON().data}\n
           ID: ${job.id}\n
-          Value: ${value}
+          value: ${value}\n
         `
       );
     });
@@ -83,7 +83,7 @@ export class QueueService {
         `[${Queues.CODE_EXECUTION}] Failed job with data\n
           Data: ${job.asJSON().data}\n
           ID: ${job.id}\n
-          Value: ${value}
+          value: ${value}\n
         `
       );
     });

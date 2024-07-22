@@ -17,6 +17,7 @@ export class ExecutionController {
 
   async addJobToExecutionQueue(req: Request, res: Response) {
     const {
+      submissionId,
       sourceCodeSlug,
       inputTestCasesSlug,
       expectedOutputSlug,
@@ -26,6 +27,7 @@ export class ExecutionController {
     const queue = this.queueService.getQueue(Queues.CODE_EXECUTION);
 
     queue.add(CodeExecutionQueueJobTypes.EXECUTE_CODE, {
+      submissionId,
       sourceCodeSlug,
       inputTestCasesSlug,
       expectedOutputSlug,
@@ -39,6 +41,13 @@ export class ExecutionController {
     this.router.post(
       '/',
       [
+        body('submissionId')
+          .isString()
+          .withMessage('submissionId should be a valid string')
+          .isUUID()
+          .withMessage('submissionId should be a valid UUID')
+          .notEmpty()
+          .withMessage('submissionId is required'),
         body('sourceCodeSlug')
           .notEmpty()
           .withMessage('sourceCodeSlug is required')
@@ -69,6 +78,11 @@ export class ExecutionController {
         await this.addJobToExecutionQueue(req, res);
       }
     );
+
+    this.router.get('/supported-languages', (req: Request, res: Response) =>
+      res.json(SupportedLanguages)
+    );
+
     return this.router;
   }
 }
