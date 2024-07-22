@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { SubmissionService } from '../services/submission.service';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
-import { CreateSubmissionDto, GetSubmissionDto } from '../dto';
+import { CreateSubmissionDto, GetSubmissionDto, UpdateSubmissionResultDto } from '../dto';
 import { Submission } from '../entities';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
@@ -15,11 +15,30 @@ export class SubmissionController {
 
   @Post('/')
   @ApiOkResponse({ type: Submission })
-  createSubmission(
+  async createSubmission(
     @CurrentUser() user: User,
     @Body() body: CreateSubmissionDto
   ): Promise<Submission> {
-    return this.submissionService.createSubmission(user, body);
+    const submission = await this.submissionService.createSubmission(user, body);
+
+    await this.submissionService.sendCodeToExecutionServer({
+      submissionId: submission.id,
+      problemId: body.problemId,
+      sourceCodeSlug: submission.slug,
+      language: body.language,
+    });
+
+    return submission;
+  }
+
+  @Post('/rejudge/:submissionId')
+  async rejudgeSubmission() {
+    //...
+  }
+
+  @Post('/callback')
+  async handleExecutionCallback(@Body() body: UpdateSubmissionResultDto) {
+    await this.submissionService.updateSubmissionResult(body);
   }
 
   @Get('/problem/:problemId')

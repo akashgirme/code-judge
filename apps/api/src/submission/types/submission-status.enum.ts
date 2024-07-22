@@ -1,6 +1,6 @@
 export enum SubmissionStatus {
   PENDING = 'PENDING',
   RUNNING = 'RUNNING',
-  COMPLETED = 'COMPLETED',
+  ACCEPTED = 'ACCEPTED',
   FAILED = 'FAILED',
 }

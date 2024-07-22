@@ -34,6 +34,14 @@ export class Submission {
   status: SubmissionStatus;
 
   @ApiProperty()
+  @Column('int', { nullable: true })
+  testCasesPassed: number;
+
+  @ApiProperty()
+  @Column('int', { nullable: true })
+  totalTestCases: number;
+
+  @ApiProperty()
   @ManyToOne(() => Problem, (problem) => problem.submissions, { eager: true })
   problem: Problem;
 
