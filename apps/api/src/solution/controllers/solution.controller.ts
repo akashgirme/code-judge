@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { AddSolutionDto, GetSolutionQueryDto } from '../dto';
+import { AddSolutionDto, SolutionQueryDto, SolutionQueryValidatorDto } from '../dto';
 import { SuccessMessageDto } from '../../auth/dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
@@ -10,17 +10,18 @@ import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import { SolutionService } from '../services';
 
-@UseGuards(AuthGuard, AbilityGuard)
+@UseGuards(AuthGuard(), AbilityGuard)
 @Controller('solutions')
 export class SolutionController {
   constructor(private readonly solutionService: SolutionService) {}
 
   @Get('/')
   @ApiOkResponse({ type: String })
-  @ApiQuery({ type: () => GetSolutionQueryDto })
-  getSolution(@Query() query: GetSolutionQueryDto): Promise<string> {
+  @ApiQuery({ type: () => SolutionQueryDto })
+  getSolution(@Query() query: SolutionQueryValidatorDto): Promise<string> {
     return this.solutionService.getSolution(query);
   }
+
   @Post('/')
   @CheckAbilities({ action: Action.Create, subject: null })
   @ApiOkResponse({ type: SuccessMessageDto })

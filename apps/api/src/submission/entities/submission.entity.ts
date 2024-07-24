@@ -6,12 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { SupportedLanguages } from '../../problem/types';
+import { SupportedLanguages } from '../../problem/enums';
 import { Problem } from '../../problem/entities';
 import { User } from '../../user/entities';
-import { SubmissionStatus } from '../types';
+import { SubmissionStatus } from '../enums';
 
-//TODO: Add Memeory and Execution_time to Submission Entity
 @Entity()
 export class Submission {
   @ApiProperty()

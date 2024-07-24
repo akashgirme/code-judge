@@ -20,16 +20,6 @@ export class TopicController {
     return this.topicService.createTopic(body);
   }
 
-  @Put('/:topicId')
-  @CheckAbilities({ action: Action.Update, subject: Topic })
-  @ApiOkResponse({ type: Topic })
-  updateTopic(
-    @Param('topicId') tagId: string,
-    @Body() body: CreateTopicDto
-  ): Promise<Topic> {
-    return this.topicService.updateTopic(tagId, body);
-  }
-
   @Get('/')
   @CheckAbilities({ action: Action.Read, subject: Topic })
   @ApiOkResponse({ type: [Topic] })
@@ -42,5 +32,15 @@ export class TopicController {
   @ApiOkResponse({ type: Topic })
   getTopic(@Param('topicId') tagId: string): Promise<Topic> {
     return this.topicService.findTopic(tagId);
+  }
+
+  @Put('/:topicId')
+  @CheckAbilities({ action: Action.Update, subject: Topic })
+  @ApiOkResponse({ type: Topic })
+  updateTopic(
+    @Param('topicId') tagId: string,
+    @Body() body: CreateTopicDto
+  ): Promise<Topic> {
+    return this.topicService.updateTopic(tagId, body);
   }
 }

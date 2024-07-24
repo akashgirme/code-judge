@@ -1,5 +1,5 @@
 import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
-import { AuthProvider } from '../../auth/types';
+import { AuthProvider } from '../../auth/enums';
 
 export class CreateUserDto {
   @IsString()

@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
-import { SupportedLanguages } from '../../problem/types';
+import { SupportedLanguages } from '../../problem/enums';
 
 export class SendCodeToExecutionServerDto {
   @IsString()

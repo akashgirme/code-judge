@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { AuthProvider } from '../types';
+import { AuthProvider } from '../enums';
 
 export class AuthProviderDto {
   @IsEnum(AuthProvider)

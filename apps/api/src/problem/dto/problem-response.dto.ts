@@ -2,7 +2,7 @@ import { Exclude } from 'class-transformer';
 import { Problem } from '../entities';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetProblemResponseDto extends Problem {
+export class ProblemResponseDto extends Problem {
   @Exclude()
   internalNotes: string;
 

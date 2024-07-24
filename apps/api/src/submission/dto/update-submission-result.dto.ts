@@ -1,6 +1,6 @@
 import { IsNumber, IsString } from 'class-validator';
 
-export class UpdateSubmissionResultDto {
+export class UpdateSubmissionDto {
   @IsString()
   submissionId: string;
 

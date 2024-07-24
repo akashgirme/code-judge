@@ -17,24 +17,26 @@ export class AuthCacheService {
     try {
       await this.cacheManager.set(`user:${user.id}`, user, {
         ttl: USER_CACHING_TTL_IN_SECONDS,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
     } catch (error) {
       this.logger.error(`Failed to set user cache: ${error}`);
     }
   }
 
-  async fetchUserFromCache(userId: string): Promise<User> {
+  fetchUserFromCache(userId: string): Promise<User> {
     return this.cacheManager.get(`user:${userId}`);
   }
 
-  async deleteUserFromCache(userId: string): Promise<void> {
-    await this.cacheManager.del(`user:${userId}`);
+  deleteUserFromCache(userId: string): Promise<void> {
+    return this.cacheManager.del(`user:${userId}`);
   }
 
   async storeRefreshTokenInCache(refreshToken: string, userId: string): Promise<void> {
     try {
       await this.cacheManager.set(`refresh-token:${userId}`, refreshToken, {
         ttl: REFRESH_TOKEN_CACHING_TTL_IN_SECONDS,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
     } catch (error) {
       this.logger.error(`Failed to store refreshToken in cache ${error}`);
@@ -46,21 +48,22 @@ export class AuthCacheService {
     return this.cacheManager.get(`refresh-token:${userId}`);
   }
 
-  async removeRefreshTokenFromCache(userId: string): Promise<void> {
-    await this.cacheManager.del(`refresh-token:${userId}`);
+  removeRefreshTokenFromCache(userId: string): Promise<void> {
+    return this.cacheManager.del(`refresh-token:${userId}`);
   }
 
   async storeOtpDetailsInCache(otpDetails: OtpDetails, userId: string): Promise<void> {
     try {
       await this.cacheManager.set(`user-otp:${userId}`, otpDetails, {
         ttl: OTP_CACHING_TTL_IN_SECONDS,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
     } catch (error) {
       this.logger.error(`Failed to store otpDetails ${error}`);
     }
   }
 
-  async fetchOtpDetailsFromCache(userId: string): Promise<OtpDetails> {
+  fetchOtpDetailsFromCache(userId: string): Promise<OtpDetails> {
     return this.cacheManager.get(`user-otp:${userId}`);
   }
 }

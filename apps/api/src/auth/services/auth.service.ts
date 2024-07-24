@@ -22,7 +22,7 @@ import { TokenService } from './token.service';
 import { verifyEmailWithOtpMjml } from '../../mail/mjml';
 import { User } from '../../user/entities';
 import { UserService } from '../../user/services';
-import { AuthProvider, TokenType } from '../types';
+import { AuthProvider, TokenType } from '../enums';
 import { AuthCacheService } from './auth-cache.service';
 import { decrypt, encrypt } from '../utility/hash-jwt-token';
 

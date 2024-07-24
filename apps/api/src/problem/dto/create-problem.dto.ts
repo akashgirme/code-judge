@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsEnum, IsArray, Matches } from 'class-validator';
-import { ProblemDifficulty, SupportedLanguages } from '../types';
+import { ProblemDifficulty, SupportedLanguages } from '../enums';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProblemDto {
