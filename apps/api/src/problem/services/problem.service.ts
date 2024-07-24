@@ -3,18 +3,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Problem } from '../entities';
 import { Repository } from 'typeorm';
 import {
-  AllProblemsQueryDto,
-  AllProblemsResponseDto,
   CreateProblemDto,
+  ProblemsQueryDto,
+  ProblemsResponseDto,
   UpdateProblemDto,
 } from '../dto';
-import { StorageService } from '../../storage/storage.service';
+import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { TopicService } from './topic.service';
 import { TestCaseService } from './testcase.service';
 import { getPaginationMeta } from '../../common/utility';
-import { ProblemStatus } from '../types';
+import { ProblemStatus } from '../enums';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
+import { SortOrder } from '../../common/types';
 
 @Injectable()
 export class ProblemService {
@@ -46,16 +47,16 @@ export class ProblemService {
       Math.floor(Math.random() * 10) + 1
     }`;
 
-    // Save the problem description to the storage
+    // Storing the problem description(markdown file) in the object store (S3 Bucket.)
     await this.storageService.putObject(`problems/${slug}/description.md`, description);
 
-    // Save the solution provided by user to the storage
+    // Storing the problem solution(langauge specific) in the object store (S3 Bucket.)
     await this.storageService.putObject(
       `problems/${slug}/solutions/solution.${solutionLanguage}`,
       solution
     );
 
-    // Save the test case input and output to the storage
+    // Storing the input, output testcases in the object store (S3 Bucket.)
     await this.testCaseService.saveTestCases(testCasesInput, testCasesOutput, slug);
 
     const problem = this.problemRepo.create({
@@ -90,28 +91,37 @@ export class ProblemService {
 
     const problem = await this.getProblemById(problemId);
 
-    // If user doesn't have access to update problem & is trying to update a different person blog post
+    // If user doesn't have access to update problem & is trying to update a different persons problem
     if (!ability.can(Action.Update, Problem) && problem.author.id !== user.id) {
-      throw new ForbiddenException('You do not have permission to edit this problem');
+      throw new ForbiddenException(
+        'Permission Error',
+        `You do not have permission edit problem: ${problemId}`
+      );
     }
 
-    const slug = problem.slug;
-    // Save the problem description to the storage
+    // Store/update the problem description in object store (S3 Bucket).
     if (description) {
-      await this.storageService.putObject(`problems/${slug}/description.md`, description);
+      await this.storageService.putObject(
+        `problems/${problem.slug}/description.md`,
+        description
+      );
     }
 
-    // Save the solution provided by user to the storage
+    // Store/update the solution provided by user in object store (S3 Bucket).
     if (solution && solutionLanguage) {
       await this.storageService.putObject(
-        `problems/${slug}/solutions/solution.${solutionLanguage}`,
+        `problems/${problem.slug}/solutions/solution.${solutionLanguage}`,
         solution
       );
     }
 
-    // Save the test case input and output to the storage
+    // Store/update the testcases in object store (S3 Bucket).
     if (testCasesInput && testCasesOutput) {
-      await this.testCaseService.saveTestCases(testCasesInput, testCasesOutput, slug);
+      await this.testCaseService.saveTestCases(
+        testCasesInput,
+        testCasesOutput,
+        problem.slug
+      );
     }
 
     Object.assign(problem, {
@@ -132,18 +142,82 @@ export class ProblemService {
     return this.problemRepo.save(problem);
   }
 
-  async getAllProblems({
-    pageIndex = 0,
-    pageSize = 10,
-  }: AllProblemsQueryDto): Promise<AllProblemsResponseDto> {
-    const [problems, totalItems] = await this.problemRepo
+  getProblemForPublic(body: ProblemsQueryDto) {
+    return this.getAllProblems(body);
+  }
+
+  getProblemForAdmin(user: User, body: ProblemsQueryDto) {
+    return this.getAllProblems(body, user);
+  }
+
+  async getAllProblems(
+    body: ProblemsQueryDto,
+    user?: User
+  ): Promise<ProblemsResponseDto> {
+    const { pageIndex = 0, pageSize = 10 } = body;
+    const query = this.problemRepo
       .createQueryBuilder('problem')
-      .select(['problem.id', 'problem.title', 'problem.difficulty', 'problem.slug'])
-      .where('problem.status = :status', { status: ProblemStatus.UNPUBLISHED }) //Change this to APPROVED
-      .orderBy('problem.createdAt', 'DESC')
+      .leftJoinAndSelect('problem.author', 'author')
+      .leftJoinAndSelect('problem.topics', 'topic')
+      .select([
+        'problem.id',
+        'problem.title',
+        'problem.difficulty',
+        'problem.slug',
+        'author.id',
+        'author.firstName',
+        'author.lastName',
+        'topic.id',
+        'topic.name',
+      ])
       .take(pageSize)
-      .skip(pageSize * pageIndex)
-      .getManyAndCount();
+      .skip(pageSize * pageIndex);
+
+    // Common filters
+    if (body.order) {
+      query.orderBy('problem.updatedAt', body.order);
+    } else {
+      query.orderBy('problem.updatedAt', SortOrder.DESC);
+    }
+
+    if (body.difficulty) {
+      // add difficulty filter
+    }
+
+    if (body.status) {
+      query.andWhere('status = :status', { status: body.status });
+    }
+
+    if (body.title) {
+      query.where('problem.title ILIKE :title', { title: `%${body.title}%` });
+    }
+
+    if (body.authorId) {
+      query.andWhere('author.id = :authorId', {
+        authorId: body.authorId,
+      });
+    }
+
+    if (body.topicIds && body.topicIds.length > 0) {
+      query.andWhere('filterTopics.id IN (:...topicIds)', {
+        topicIds: body.topicIds,
+      });
+    }
+
+    if (!user) {
+      query.andWhere('status = :status', { status: ProblemStatus.APPROVED });
+    } else {
+      const ability = this.abilityFactory.defineAbilityForUser(user);
+      if (ability.can(Action.Manage, Problem)) {
+        // No additional filters for problem admin
+      } else if (ability.can(Action.ReadOwn, Problem)) {
+        query.andWhere('author.id = :authorId', {
+          authorId: user.id,
+        });
+      }
+    }
+
+    const [problems, totalItems] = await query.getManyAndCount();
 
     const paginationMeta = getPaginationMeta(
       { pageIndex, pageSize },

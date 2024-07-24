@@ -3,10 +3,12 @@ import { SubmissionService } from '../services/submission.service';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
-import { CreateSubmissionDto, GetSubmissionDto, UpdateSubmissionResultDto } from '../dto';
+import { CreateSubmissionDto, SubmissionResponseDto, UpdateSubmissionDto } from '../dto';
 import { Submission } from '../entities';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
+import { CheckAbilities } from '../../ability/ability.decorator';
+import { Action } from '../../ability/ability.factory';
 
 @Controller('submissions')
 export class SubmissionController {
@@ -38,26 +40,28 @@ export class SubmissionController {
   }
 
   @Post('/callback')
-  async handleExecutionCallback(@Body() body: UpdateSubmissionResultDto) {
+  async handleExecutionCallback(@Body() body: UpdateSubmissionDto) {
     await this.submissionService.updateSubmissionResult(body);
   }
 
   @Get('/problem/:problemId')
   @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: [Submission] })
-  getSubmissionsByProblemId(
+  getSubmissionsByProblemAndUser(
     @CurrentUser() user: User,
     @Param('problemId') problemId: string
   ): Promise<Submission[]> {
-    return this.submissionService.getSubmissionsByProblemId(user, problemId);
+    return this.submissionService.getSubmissionsByProblemAndUser(user, problemId);
   }
 
   @Get('/:submissionId')
   @UseGuards(AuthGuard(), AbilityGuard)
-  @ApiOkResponse({ type: GetSubmissionDto })
+  @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
+  @ApiOkResponse({ type: SubmissionResponseDto })
   findSubmissionById(
     @Param('submissionId') submissionId: string
-  ): Promise<GetSubmissionDto> {
+  ): Promise<SubmissionResponseDto> {
     return this.submissionService.findSubmissionById(submissionId);
   }
 }

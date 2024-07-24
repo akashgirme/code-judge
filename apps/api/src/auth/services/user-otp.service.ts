@@ -1,10 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-
 import { generateOtp, hashOtp } from '../utility/generate-otp';
 import { User } from '../../user/entities';
-import { OtpDetails } from '../types';
 import { AuthCacheService } from './auth-cache.service';
+import { OtpDetails } from '../types';
 
 @Injectable()
 export class UserOtpService {
@@ -29,11 +28,14 @@ export class UserOtpService {
     const otpDetails = await this.cacheService.fetchOtpDetailsFromCache(user.id);
 
     if (!otpDetails) {
-      throw new BadRequestException('Otp expired! Please resend otp');
+      throw new ForbiddenException('Otp expired! Please resend otp');
     }
 
     if (otpDetails.otpAttempts > 5) {
-      throw new ForbiddenException('Too Many attempts! Please send new otp to continue.');
+      throw new ForbiddenException(
+        'Cannot validate otp',
+        'Too Many Attempts, Please send new otp to continue.'
+      );
     }
 
     const match = await bcrypt.compare(otp, otpDetails.otp);
@@ -42,7 +44,7 @@ export class UserOtpService {
     await this.cacheService.storeOtpDetailsInCache(otpDetails, user.id);
 
     if (!match) {
-      throw new BadRequestException('Incorrect otp');
+      throw new ForbiddenException('Incorrect otp', `Provided otp is incorrect ${otp}`);
     }
   }
 }

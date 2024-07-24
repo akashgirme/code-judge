@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProblemDifficulty, ProblemStatus } from '../types';
+import { ProblemDifficulty, ProblemStatus } from '../enums';
 import { User } from '../../user/entities';
 import { Topic } from './topic.entity';
 import { Submission } from '../../submission/entities';

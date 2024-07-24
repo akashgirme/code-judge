@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
-import { SubmissionStatus } from '../types';
-import { SupportedLanguages } from '../../problem/types';
+import { SubmissionStatus } from '../enums';
+import { SupportedLanguages } from '../../problem/enums';
 
 export class CreateSubmissionDto {
   @ApiProperty()

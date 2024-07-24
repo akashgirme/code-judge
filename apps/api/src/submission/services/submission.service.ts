@@ -1,5 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { StorageService } from '../../storage/storage.service';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from '../entities';
@@ -7,14 +12,13 @@ import { Repository } from 'typeorm';
 import {
   CreateSubmissionDto,
   SendCodeToExecutionServerDto,
-  UpdateSubmissionResultDto,
+  UpdateSubmissionDto,
 } from '../dto';
 import { ProblemService } from '../../problem/services';
-import { Observable } from 'rxjs';
-import { AxiosResponse } from 'axios';
+import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { SubmissionStatus } from '../types';
+import { SubmissionStatus } from '../enums';
 
 @Injectable()
 export class SubmissionService {
@@ -47,12 +51,8 @@ export class SubmissionService {
     submissionId,
     totalTestCases,
     testCasesPassed,
-  }: UpdateSubmissionResultDto) {
+  }: UpdateSubmissionDto) {
     const submission = await this.findSubmissionById(submissionId);
-
-    if (!submission) {
-      throw new Error('Submission not found');
-    }
 
     const status =
       totalTestCases === testCasesPassed
@@ -66,7 +66,7 @@ export class SubmissionService {
     return this.submissionRepo.save(submission);
   }
 
-  async getSubmissionsByProblemId(user: User, problemId: string) {
+  async getSubmissionsByProblemAndUser(user: User, problemId: string) {
     const submissions = await this.submissionRepo
       .createQueryBuilder('submission')
       .where('submission.user = :userId', { userId: user.id })
@@ -81,7 +81,10 @@ export class SubmissionService {
     const submission = await this.submissionRepo.findOneBy({ id });
 
     if (!submission) {
-      throw new Error('Submission not found');
+      throw new NotFoundException(
+        'Submission not found',
+        `Submission with id ${id} not found`
+      );
     }
 
     const code = await this.storageService.getObject(submission.slug);
@@ -94,9 +97,7 @@ export class SubmissionService {
     problemId,
     sourceCodeSlug,
     language,
-  }: SendCodeToExecutionServerDto): Promise<
-    Observable<AxiosResponse<{ message: string }>>
-  > {
+  }: SendCodeToExecutionServerDto): Promise<void> {
     const { slug } = await this.problemService.getProblemById(problemId);
 
     const inputTestCasesSlug = `problems/${slug}/testcases/input.txt`;
@@ -106,12 +107,29 @@ export class SubmissionService {
       'CODE_EXECUTION_SERVER_URL'
     )}/api/submissions`;
 
-    return this.HttpService.post(executionServerUrl, {
-      submissionId,
-      sourceCodeSlug,
-      inputTestCasesSlug,
-      expectedOutputSlug,
-      language,
-    });
+    try {
+      await firstValueFrom(
+        this.HttpService.post(executionServerUrl, {
+          submissionId,
+          sourceCodeSlug,
+          inputTestCasesSlug,
+          expectedOutputSlug,
+          language,
+        })
+      );
+    } catch (error) {
+      if (error.response) {
+        // Axios error with response
+        throw new InternalServerErrorException(
+          'Execution server error',
+          `${error.response.data.message}`
+        );
+      } else {
+        // Axios error without response
+        throw new ServiceUnavailableException(
+          'Failed to communicate with execution server'
+        );
+      }
+    }
   }
 }

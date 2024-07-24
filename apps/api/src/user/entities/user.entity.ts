@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserRole } from '../types';
-import { AuthProvider } from '../../auth/types';
+import { UserRole } from '../enums';
+import { AuthProvider } from '../../auth/enums';
 import { Problem } from '../../problem/entities';
 import { Exclude } from 'class-transformer';
 import { Submission } from '../../submission/entities';

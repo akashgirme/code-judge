@@ -8,19 +8,23 @@ import {
 } from '@casl/ability';
 import { User } from '../user/entities';
 import { Injectable } from '@nestjs/common';
-import { UserRole } from '../user/types';
+import { UserRole } from '../user/enums';
 import { Problem, Topic } from '../problem/entities';
+import { Submission } from '../submission/entities';
 
 export enum Action {
   Manage = 'manage',
   Create = 'create',
   Read = 'read',
+  ReadOwn = 'readOwn',
   Update = 'update',
   Publish = 'publish',
   Delete = 'delete',
 }
 
-export type Subjects = InferSubjects<typeof User | typeof Problem | typeof Topic> | 'all';
+export type Subjects =
+  | InferSubjects<typeof User | typeof Problem | typeof Topic | typeof Submission>
+  | 'all';
 
 type PossibleAbilities = [Action, Subjects];
 type Conditions = MongoQuery;
@@ -35,14 +39,20 @@ export class AbilityFactory {
     );
 
     switch (user.role) {
-      case UserRole.ADMIN:
+      case UserRole.SUPER_ADMIN:
         can(Action.Manage, 'all');
       // eslint-disable-next-line no-fallthrough
+      case UserRole.PROBLEM_ADMIN:
+        can(Action.Manage, Problem);
+        can(Action.Manage, Topic);
+        can(Action.Manage, Submission);
+      // eslint-disable-next-line no-fallthrough
       case UserRole.USER:
-        can(Action.Read, User);
+        can(Action.ReadOwn, Problem);
         can(Action.Create, Problem);
         can(Action.Update, Problem);
-        cannot(Action.Delete, User);
+        can(Action.ReadOwn, Submission);
+        cannot(Action.Delete, Problem);
     }
 
     return build({

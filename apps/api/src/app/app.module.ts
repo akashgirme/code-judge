@@ -1,4 +1,4 @@
-import { Controller, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -9,12 +9,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AbilityModule } from '../ability/ability.module';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
-import { PassportModule } from '@nestjs/passport';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ProblemModule } from '../problem/problem.module';
-import { StorageModule } from '../storage/storage.module';
+import { StorageModule } from '../object-store/storage.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { SolutionModule } from '../solution/solution.module';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -27,7 +27,6 @@ import { SolutionModule } from '../solution/solution.module';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => getTypeOrmConfig(configService),
     }),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
     CacheModule.registerAsync(RedisOptions),
     ThrottlerModule.forRoot([
       {
@@ -41,11 +40,15 @@ import { SolutionModule } from '../solution/solution.module';
     ProblemModule,
     StorageModule,
     SubmissionModule,
-    // SolutionModule
-    // There is constructor metatype issue in solution Controller.
-    // So, Solve it and then uncomment the SolutionModule
+    SolutionModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { ProblemService } from '../../problem/services';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
-import { StorageService } from '../../storage/storage.service';
+import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { AddSolutionDto } from '../dto';
+import { Problem } from '../../problem/entities';
 
 @Injectable()
 export class SolutionService {
@@ -38,9 +39,10 @@ export class SolutionService {
     const problem = await this.problemService.getProblemById(problemId);
 
     // If user doesn't have access to update problem & is trying to update a different person blog post
-    if (!ability.can(Action.Update, null) && problem.author.id !== user.id) {
+    if (!ability.can(Action.Update, Problem) && problem.author.id !== user.id) {
       throw new ForbiddenException(
-        'You do not have permission to add solution/s to this problem'
+        'Permission Error',
+        `You do not have permission to add solutions to problem with id: ${problemId}`
       );
     }
 

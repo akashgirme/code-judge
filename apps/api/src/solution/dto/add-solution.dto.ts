@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { SupportedLanguages } from '../../problem/types';
+import { SupportedLanguages } from '../../problem/enums';
 
 export class AddSolutionDto {
   @ApiProperty()

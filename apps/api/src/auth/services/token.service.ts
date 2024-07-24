@@ -2,8 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { JwtPayload, TokenType } from '../types';
+import { TokenType } from '../enums';
 import { User } from '../../user/entities';
+import { JwtPayload } from '../types';
 
 const SEVEN_DAYS_IN_MILISECONDS = 7 * 24 * 60 * 60 * 1000;
 

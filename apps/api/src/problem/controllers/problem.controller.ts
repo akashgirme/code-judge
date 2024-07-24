@@ -12,11 +12,11 @@ import { ProblemService } from '../services';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import {
-  AllProblemsQueryDto,
-  AllProblemsQueryValidatorDto,
-  AllProblemsResponseDto,
   CreateProblemDto,
-  GetProblemResponseDto,
+  ProblemResponseDto,
+  ProblemsQueryDto,
+  ProblemsQueryValidatorDto,
+  ProblemsResponseDto,
   UpdateProblemDto,
 } from '../dto';
 import { Problem } from '../entities';
@@ -41,19 +41,30 @@ export class ProblemController {
     return this.problemService.createProblem(user, body);
   }
 
-  //TODO: Add Sorting by Difficulty, Topic and Search by Title in Query.
   @Get('/')
-  @ApiOkResponse({ type: AllProblemsResponseDto })
-  @ApiQuery({ type: () => AllProblemsQueryDto })
-  getAllProblems(
-    @Query() query: AllProblemsQueryValidatorDto
-  ): Promise<AllProblemsResponseDto> {
-    return this.problemService.getAllProblems(query);
+  @ApiOkResponse({ type: ProblemsResponseDto })
+  @ApiQuery({ type: () => ProblemsQueryDto })
+  getProblemsForPublicUsers(
+    @Query() query: ProblemsQueryValidatorDto
+  ): Promise<ProblemsResponseDto> {
+    return this.problemService.getProblemForPublic(query);
+  }
+
+  @Get('/admin')
+  @ApiOkResponse({ type: ProblemsResponseDto })
+  @ApiQuery({ type: () => ProblemsQueryDto })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.ReadOwn, subject: Problem })
+  getProblemsForAdmins(
+    @CurrentUser() user: User,
+    @Query() query: ProblemsQueryValidatorDto
+  ): Promise<ProblemsResponseDto> {
+    return this.problemService.getProblemForAdmin(user, query);
   }
 
   @Get('/:problemId')
-  @ApiOkResponse({ type: Problem })
-  getProblemById(@Param('problemId') problemId: string): Promise<GetProblemResponseDto> {
+  @ApiOkResponse({ type: ProblemResponseDto })
+  getProblemById(@Param('problemId') problemId: string): Promise<ProblemResponseDto> {
     return this.problemService.getProblemById(problemId);
   }
 
