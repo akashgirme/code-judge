@@ -11,8 +11,6 @@ export class TopicService {
   async createTopic({ topicName }: CreateTopicDto) {
     await this.isTopicUnique(topicName);
 
-    console.log('Creating topic with name:', topicName);
-
     const newtopic = this.topicRepo.create({
       name: topicName,
     });
@@ -22,15 +20,12 @@ export class TopicService {
   }
 
   async isTopicUnique(topicName: string): Promise<void> {
-    console.log('Checking if topic is unique:', topicName);
-
     const topic = await this.topicRepo.findOneBy({ name: topicName });
-
-    console.log('topic:', topic);
 
     if (topic) {
       throw new BadRequestException(
-        `A topic already exists for the given topicName = ${topicName}`
+        'Duplicate Topic Error',
+        `A topic with name '${topicName}' already exists.`
       );
     }
   }
@@ -52,7 +47,10 @@ export class TopicService {
     const topic = await this.topicRepo.findOne({ where: { id: topicId } });
 
     if (!topic) {
-      throw new NotFoundException(`No topic found for topic id = ${topicId}`);
+      throw new NotFoundException(
+        'Topic Not Found',
+        ` Topic not exist with topic id '${topicId}'`
+      );
     }
     return topic;
   }
@@ -65,7 +63,10 @@ export class TopicService {
         (topicId) => !topics.some((topic) => topic.id === topicId)
       );
 
-      throw new BadRequestException(`topics '${missingtopicIds.join(', ')}' not found.`);
+      throw new NotFoundException(
+        'Topics Not Found',
+        `Topics with ids '${missingtopicIds.join(', ')}' not found.`
+      );
     }
 
     return { topics };

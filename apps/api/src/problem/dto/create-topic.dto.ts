@@ -9,6 +9,6 @@ export class CreateTopicDto {
   @Matches(/^[A-Za-z\s]+$/, {
     message: 'Only alphabetical characters and white spaces are allowed.',
   })
-  @Transform(({ value }) => (value as string).trim())
+  @Transform(({ value }) => (value as string).trim().toLowerCase())
   topicName: string;
 }
