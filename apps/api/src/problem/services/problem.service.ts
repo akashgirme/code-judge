@@ -47,17 +47,14 @@ export class ProblemService {
       Math.floor(Math.random() * 10) + 1
     }`;
 
-    // Storing the problem description(markdown file) in the object store (S3 Bucket.)
-    await this.storageService.putObject(`problems/${slug}/description.md`, description);
-
-    // Storing the problem solution(langauge specific) in the object store (S3 Bucket.)
-    await this.storageService.putObject(
-      `problems/${slug}/solutions/solution.${solutionLanguage}`,
-      solution
-    );
-
-    // Storing the input, output testcases in the object store (S3 Bucket.)
-    await this.testCaseService.saveTestCases(testCasesInput, testCasesOutput, slug);
+    await Promise.all([
+      this.storageService.putObject(`problems/${slug}/description.md`, description),
+      this.storageService.putObject(
+        `problems/${slug}/solutions/solution.${solutionLanguage}`,
+        solution
+      ),
+      this.testCaseService.saveTestCases(testCasesInput, testCasesOutput, slug),
+    ]);
 
     const problem = this.problemRepo.create({
       title,
@@ -95,7 +92,7 @@ export class ProblemService {
     if (!ability.can(Action.Update, Problem) && problem.author.id !== user.id) {
       throw new ForbiddenException(
         'Permission Error',
-        `You do not have permission edit problem: ${problemId}`
+        `You do not have permission edit problem '${problemId}'`
       );
     }
 
@@ -247,7 +244,10 @@ export class ProblemService {
       .getOne();
 
     if (!problem) {
-      throw new NotFoundException('Problem not found');
+      throw new NotFoundException(
+        'Problem not found',
+        `Problem with id '${problemId}' not found`
+      );
     }
 
     const description = await this.storageService.getObject(
