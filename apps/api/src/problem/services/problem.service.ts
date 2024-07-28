@@ -41,6 +41,8 @@ export class ProblemService {
       topicIds,
     }: CreateProblemDto
   ) {
+    //TODO: Before creating the problem validate the problem wth inputTestCases and expectedOutput
+    // If validated then n' then save problem or change its state from invalid-> valid etc.
     const { topics } = await this.topicService.findTopics(topicIds);
 
     const slug = `${this.convertTitletoSlug(title)}-${
@@ -83,6 +85,7 @@ export class ProblemService {
       status,
     }: UpdateProblemDto
   ) {
+    //TODO: Validate problem before updating it.
     const ability = this.abilityFactory.defineAbilityForUser(user);
     const { topics } = await this.topicService.findTopics(topicIds);
 
