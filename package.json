@@ -42,7 +42,6 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.1",
-    "express-validator": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mjml": "^4.15.3",
     "nest-openapi-tools": "^6.0.3",
@@ -57,7 +56,8 @@
     "rxjs": "^7.8.0",
     "tslib": "^2.3.0",
     "tsyringe": "^4.8.0",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@nestjs/schematics": "^10.0.1",
