@@ -551,7 +551,18 @@
     "/api/submissions/rejudge/{submissionId}": {
       "post": {
         "operationId": "rejudgeSubmission",
+<<<<<<< HEAD
         "parameters": [],
+=======
+        "parameters": [
+          {
+            "name": "submissionId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+>>>>>>> 7e44caf (RTK-Query Generation)
         "responses": { "201": { "description": "" } }
       }
     },
