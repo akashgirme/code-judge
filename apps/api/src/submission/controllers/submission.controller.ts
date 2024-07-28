@@ -35,8 +35,11 @@ export class SubmissionController {
 
   @Post('/rejudge/:submissionId')
   @UseGuards(AuthGuard(), AbilityGuard)
-  async rejudgeSubmission() {
+  async rejudgeSubmission(
+    @Param('submissionId') submissionId: string
+  ): Promise<Submission> {
     //...
+    return;
   }
 
   @Post('/callback')
