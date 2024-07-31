@@ -442,6 +442,7 @@ export type CreateSubmissionDto = {
   code: string;
   language: object;
 };
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type UpdateSubmissionDto = {};
 export type SubmissionResponseDto = {
   id: string;
