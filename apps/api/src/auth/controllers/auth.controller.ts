@@ -40,7 +40,7 @@ export class AuthController {
   @Post('/initiate-sign-in')
   @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @ApiOkResponse({ type: SuccessMessageDto })
-  async signIn(@Body() body: SignInDto): Promise<SuccessMessageDto> {
+  async initiateSignIn(@Body() body: SignInDto): Promise<SuccessMessageDto> {
     return this.authService.signIn(body);
   }
 
