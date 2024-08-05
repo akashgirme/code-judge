@@ -44,9 +44,7 @@ export class ProblemController {
   @Get('/')
   @ApiOkResponse({ type: ProblemsResponseDto })
   @ApiQuery({ type: () => ProblemsQueryDto })
-  getProblemsForPublicUsers(
-    @Query() query: ProblemsQueryValidatorDto
-  ): Promise<ProblemsResponseDto> {
+  getProblems(@Query() query: ProblemsQueryValidatorDto): Promise<ProblemsResponseDto> {
     return this.problemService.getProblemForPublic(query);
   }
 
@@ -55,7 +53,7 @@ export class ProblemController {
   @ApiQuery({ type: () => ProblemsQueryDto })
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Problem })
-  getProblemsForAdmins(
+  getProblemsForAdmin(
     @CurrentUser() user: User,
     @Query() query: ProblemsQueryValidatorDto
   ): Promise<ProblemsResponseDto> {
