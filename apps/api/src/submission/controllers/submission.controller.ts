@@ -51,7 +51,7 @@ export class SubmissionController {
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: [Submission] })
-  getSubmissionsByProblemAndUser(
+  getSubmissions(
     @CurrentUser() user: User,
     @Param('problemId') problemId: string
   ): Promise<Submission[]> {
@@ -62,7 +62,7 @@ export class SubmissionController {
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: SubmissionResponseDto })
-  findSubmissionById(
+  getSubmissionById(
     @Param('submissionId') submissionId: string
   ): Promise<SubmissionResponseDto> {
     return this.submissionService.findSubmissionById(submissionId);
