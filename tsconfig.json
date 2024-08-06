@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@code-judge/ui": ["libs/ui/src/index.ts"],
+      "@code-judge/ui/*": ["libs/ui/src/*"]
+    }
+  }
+}
