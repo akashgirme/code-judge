@@ -1,6 +1,6 @@
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { SignInWithOtpModel } from './sign-in-with-otp-logic';
-import { Button, CardContent, Input } from '@code-judge/ui';
+import { Button, Card, CardContent, CardHeader, Input } from '@code-judge/ui';
 import { PageHeader } from '../../../components';
 import { ResendOTPButton } from '../components';
 import {
@@ -12,12 +12,14 @@ interface SignInWithOtpViewProps {
   form: UseFormReturn<SignInWithOtpModel>;
   onSubmit: (data: SignInWithOtpModel) => void;
   handleRequestOtp: () => void;
+  email: string;
 }
 
 export const SignInWithOtpView: React.FC<SignInWithOtpViewProps> = ({
   form,
   onSubmit,
   handleRequestOtp,
+  email,
 }) => {
   const [_signIn, { isLoading }] = useSignInWithOtpMutation({
     fixedCacheKey: 'sign-in-with-otp',
@@ -34,24 +36,34 @@ export const SignInWithOtpView: React.FC<SignInWithOtpViewProps> = ({
   } = form;
 
   return (
-    <div>
-      <FormProvider {...form}>
-        <PageHeader
-          title="Verify"
-          description="We've sent an 6-digit OTP to you email, please enter."
-          hideLogo={true}
-          prevRoute="/auth/initiate-sign-in"
-        />
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid py-6 ">
-              <Input placeholder="OTP" {...register('otp')} />
-              <div className="flex flex-col py-6 gap-4 ">
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="w-full max-w-md">
+        <FormProvider {...form}>
+          <CardHeader>
+            <PageHeader
+              title="Verify"
+              description={'Enter the code generated from the link sent to'}
+              email={`${email}`}
+              hideLogo={true}
+              prevRoute="/auth/initiate-sign-in"
+            />
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="grid gap-4">
+                <Input
+                  id="otp"
+                  type="text"
+                  placeholder="Enter verification code"
+                  {...register('otp')}
+                  className="w-full"
+                />
                 <Button
                   isActive={isValid}
                   variant="default"
                   type="submit"
                   isLoading={isLoading}
+                  className="w-full"
                 >
                   Continue
                 </Button>
@@ -59,10 +71,10 @@ export const SignInWithOtpView: React.FC<SignInWithOtpViewProps> = ({
                   {...{ isResendLoading, handleRequestOtp, OtpTimer: 30 }}
                 />
               </div>
-            </div>
-          </form>
-        </CardContent>
-      </FormProvider>
+            </form>
+          </CardContent>
+        </FormProvider>
+      </Card>
     </div>
   );
 };

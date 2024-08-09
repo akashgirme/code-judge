@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { OnboardView } from './onboard-view';
 
 const OnboardSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+  firstName: z.string().min(1, 'First name is required').trim(),
+  lastName: z.string().min(1, 'Last name is required').trim(),
 });
 
 export type OnboardModel = z.infer<typeof OnboardSchema>;

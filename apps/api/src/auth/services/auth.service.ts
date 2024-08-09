@@ -46,6 +46,7 @@ export class AuthService {
       user = await this.usersService.create({
         email,
         provider: AuthProvider.EMAIL,
+        hasOnborded: false,
       });
     }
 

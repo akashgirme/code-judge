@@ -37,11 +37,13 @@ export class UserService {
   }
 
   async onboard(user: User, { firstName, lastName }: OnboardUserDto) {
-    user.firstName = firstName;
-    user.lastName = lastName;
-    user.hasOnboarded = true;
+    const currentUser = await this.findAccountById(user.id);
 
-    const updatedUser = await this.repo.save(user);
+    currentUser.firstName = firstName;
+    currentUser.lastName = lastName;
+    currentUser.hasOnboarded = true;
+
+    const updatedUser = await this.repo.save(currentUser);
 
     this.mailService.sendMail({
       to: updatedUser.email,

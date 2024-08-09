@@ -1,5 +1,5 @@
 'use client';
-import { SignInWithTokenContainer } from '../../../features/auth/sign-in-with-token';
+import { SignInWithTokenContainer } from '../../../features/auth';
 
 const SignInWithTokenPage = () => {
   return <SignInWithTokenContainer />;

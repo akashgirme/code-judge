@@ -7,6 +7,7 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/store';
+import { boolean } from 'zod';
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -19,7 +20,9 @@ export const useAuth = () => {
   const handleLogin = (signedInUser: SignedInUserResponseDto) => {
     dispatch(setCredentials(signedInUser));
 
-    const shouldGoToOnBoard = !signedInUser.user.hasOnboarded;
+    const shouldGoToOnBoard = Boolean(!signedInUser.user.hasOnboarded);
+
+    console.log('received user \n', signedInUser);
 
     navigate(shouldGoToOnBoard ? '/auth/onboard' : '/');
   };

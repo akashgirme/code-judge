@@ -8,7 +8,12 @@ import { PassportModule } from '@nestjs/passport';
 import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), AbilityModule, PassportModule, MailModule],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    AbilityModule,
+    MailModule,
+  ],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

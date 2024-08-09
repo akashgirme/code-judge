@@ -13,17 +13,18 @@ export const ResendOTPButton = ({
   handleRequestOtp,
   isResendLoading,
 }: ResendOTPButtonProps) => {
-  const { timer, isTimerActive, startTimer } = useTimer(OtpTimer || 10);
+  const { timer, isTimerActive, startTimer } = useTimer(OtpTimer || 30);
   return (
     <Button
       type="button"
-      variant="secondary"
+      variant="link"
       onClick={() => {
         handleRequestOtp();
         startTimer();
       }}
       disabled={isTimerActive}
-      // isLoading={isResendLoading}
+      isLoading={isResendLoading}
+      className="w-full"
     >
       {isTimerActive ? (
         `You can request again in ${timer} seconds`
@@ -31,7 +32,7 @@ export const ResendOTPButton = ({
         // <>
         //   <RefreshDouble className="size-5" /> Didn&apos;t receive an OTP ?
         // </>
-        <h1>Didn't recieve otp</h1>
+        <h1>Not seeing the email in your inbox? Try Sending Again</h1>
       )}
     </Button>
   );

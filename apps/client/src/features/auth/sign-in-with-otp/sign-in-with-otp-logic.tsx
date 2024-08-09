@@ -13,12 +13,14 @@ interface SignInWithOtpLogicProps {
   defaultValues: SignInWithOtpModel;
   onSubmit: (data: SignInWithOtpModel) => Promise<void>;
   handleRequestOtp: () => void;
+  email: string;
 }
 
 export const SignInWithOtpLogic: React.FC<SignInWithOtpLogicProps> = ({
   defaultValues,
   onSubmit,
   handleRequestOtp,
+  email,
 }) => {
   const form = useForm<SignInWithOtpModel>({
     mode: 'onSubmit',
@@ -34,6 +36,7 @@ export const SignInWithOtpLogic: React.FC<SignInWithOtpLogicProps> = ({
       form={form}
       onSubmit={handleSubmit}
       handleRequestOtp={handleRequestOtp}
+      email={email}
     />
   );
 };

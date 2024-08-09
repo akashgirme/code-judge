@@ -1,5 +1,5 @@
 'use client';
-import { SignInWithOtpContainer } from '../../../features/auth/sign-in-with-otp';
+import { SignInWithOtpContainer } from '../../../features/auth';
 
 const SignInWithOtp = () => {
   return <SignInWithOtpContainer />;

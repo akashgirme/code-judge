@@ -15,7 +15,7 @@ export const SignInWithTokenContainer = () => {
     if (token) {
       handleSignInWithToken();
     }
-  });
+  }, [token]);
 
   const handleSignInWithToken = async () => {
     if (!token) return;

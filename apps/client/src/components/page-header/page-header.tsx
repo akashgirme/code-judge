@@ -10,6 +10,7 @@ interface PageHeaderProps {
   hideLogo?: boolean;
   SkipButton?: ReactNode;
   prevRoute?: string;
+  email?: string;
 }
 export const PageHeader = ({
   title = HeaderData.title,
@@ -18,6 +19,7 @@ export const PageHeader = ({
   hideLogo = false,
   SkipButton,
   prevRoute,
+  email,
 }: PageHeaderProps) => {
   return (
     <div>
@@ -44,11 +46,14 @@ export const PageHeader = ({
             <CardDescription className="w-max">
               <Typography
                 fontFamily={'roboto'}
-                fontSize={'body-s'}
+                fontSize={'body-m'}
                 fontWeight={'regular'}
                 className="text-center text-body-secondary"
               >
-                {description}
+                <>
+                  {description}
+                  <br /> {email}
+                </>
               </Typography>
             </CardDescription>
           </div>

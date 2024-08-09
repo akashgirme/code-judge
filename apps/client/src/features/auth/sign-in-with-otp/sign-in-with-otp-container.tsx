@@ -56,6 +56,7 @@ export const SignInWithOtpContainer = () => {
       defaultValues={defaultValues}
       onSubmit={handleSubmit}
       handleRequestOtp={handleRequestOtp}
+      email={email}
     />
   );
 };

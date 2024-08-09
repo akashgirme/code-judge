@@ -1,4 +1,4 @@
-import { Button, CardContent, Input } from '@code-judge/ui';
+import { Button, Card, CardContent, CardHeader, Input } from '@code-judge/ui';
 import { OR, SocialSignInButtons } from '../components';
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import React from 'react';
@@ -26,38 +26,44 @@ export const InitiateSignInView: React.FC<InitiateSignInViewProps> = ({
   } = form;
 
   return (
-    <div>
-      <FormProvider {...form}>
-        <PageHeader
-          title="Login"
-          description={'Enter your email to login.'}
-          hideBackButton
-          hideLogo
-          prevRoute="/auth/sign-in"
-        />
-        <CardContent className="grid gap-4">
-          <SocialSignInButtons />
-          <OR />
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid gap-2">
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@email.com"
-                {...register('email')}
-              />
-            </div>
-            <Button
-              isActive={isValid}
-              variant="default"
-              type="submit"
-              isLoading={isLoading}
-            >
-              Continue with email
-            </Button>
-          </form>
-        </CardContent>
-      </FormProvider>
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="w-full max-w-sm">
+        <FormProvider {...form}>
+          <CardHeader>
+            <PageHeader
+              title="Login"
+              description={'Login to start solving problems'}
+              hideBackButton
+              hideLogo
+              prevRoute="/auth/sign-in"
+            />
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <SocialSignInButtons />
+            <OR />
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="grid gap-4">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@email.com"
+                  {...register('email')}
+                  className="w-full"
+                />
+                <Button
+                  isActive={isValid}
+                  variant="default"
+                  type="submit"
+                  isLoading={isLoading}
+                  className="w-full"
+                >
+                  Continue with email
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </FormProvider>
+      </Card>
     </div>
   );
 };
