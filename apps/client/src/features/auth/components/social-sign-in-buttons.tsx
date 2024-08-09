@@ -1,12 +1,10 @@
 import { Button, Icon } from '@code-judge/ui';
 import { GoogleIcon } from '../../../assets/icons';
-import { useNavigate } from 'react-router-dom';
 
 export const SocialSignInButtons = () => {
-  const navigate = useNavigate();
-
   const onGoogleSignInClick = () => {
-    navigate(`${process.env.API_SERVER_URL}/api/auth/google`);
+    // Redirect user to Google authentication page
+    window.location.href = `${import.meta.env.VITE_API_SERVER_URL}/api/auth/google`;
   };
 
   return (

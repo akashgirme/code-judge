@@ -1,9 +1,9 @@
 'use client';
 
-import { SignInContainer } from '../../../features/auth';
+import { InitiateSignInContainer } from '../../../features/auth';
 
 const SignIn = () => {
-  return <SignInContainer />;
+  return <InitiateSignInContainer />;
 };
 
 export default SignIn;

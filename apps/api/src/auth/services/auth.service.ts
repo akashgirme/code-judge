@@ -7,12 +7,12 @@ import {
 import { MailService } from '../../mail/mail.service';
 
 import {
-  SignInDto,
   ResendVerificationEmailDto,
   OAuthSignUpDto,
   AuthProviderDto,
   VerifyTokenDto,
   SignInWithOtpDto,
+  InitiateSignInDto,
 } from '../dto';
 import { ConfigService } from '@nestjs/config';
 import { UserOtpService } from './user-otp.service';
@@ -38,7 +38,7 @@ export class AuthService {
     private cacheservice: AuthCacheService
   ) {}
 
-  async signIn({ email }: SignInDto) {
+  async signIn({ email }: InitiateSignInDto) {
     let user = await this.usersService.findAccountByEmail(email);
 
     if (!user) {
@@ -55,6 +55,8 @@ export class AuthService {
     const validationUrl = `${this.configService.get(
       'AUTH_UI_URL'
     )}/sign-in-with-token?token=${validationToken}`;
+
+    console.log('validation URL', validationUrl);
 
     await this.mailService.sendMail({
       to: email,

@@ -5,9 +5,9 @@ import {
   SuccessMessageDto,
   VerifyTokenDto,
   RefreshedSessionDto,
-  SignInDto,
   SignInWithOtpDto,
   SignedInUserResponseDto,
+  InitiateSignInDto,
 } from '../dto';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { Response, Request } from 'express';
@@ -40,7 +40,7 @@ export class AuthController {
   @Post('/initiate-sign-in')
   @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @ApiOkResponse({ type: SuccessMessageDto })
-  async initiateSignIn(@Body() body: SignInDto): Promise<SuccessMessageDto> {
+  async initiateSignIn(@Body() body: InitiateSignInDto): Promise<SuccessMessageDto> {
     return this.authService.signIn(body);
   }
 
@@ -66,7 +66,6 @@ export class AuthController {
 
   @Get('/refresh')
   @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
-  @ApiOkResponse({ type: SignedInUserResponseDto })
   @ApiOkResponse({ type: RefreshedSessionDto })
   async refreshSession(@Req() req: Request, @Res() res: Response) {
     return this.authService.refreshSession(req.cookies['refreshToken'], res);

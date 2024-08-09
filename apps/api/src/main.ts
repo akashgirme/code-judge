@@ -13,6 +13,12 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.use(cookieParser());
+  app.enableCors({
+    origin: process.env.UI_BASE_URL,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   await generateClient(app);
 
   const port = process.env.PORT || 3000;

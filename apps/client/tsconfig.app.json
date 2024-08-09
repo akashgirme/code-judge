@@ -19,5 +19,14 @@
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "**/*.ts",
+    "**/*.tsx",
+    "../../libs/api-client/src/**/*.ts",
+    "../../libs/api-client/src/**/*.tsx"
+  ]
 }

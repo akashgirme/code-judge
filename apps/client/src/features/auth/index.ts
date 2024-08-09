@@ -1,1 +1,1 @@
-export { SignInContainer } from './sign-in';
+export { InitiateSignInContainer } from './initiate-sign-in';

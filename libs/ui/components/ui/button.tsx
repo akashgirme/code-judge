@@ -3,6 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib';
+import { Refresh } from 'iconoir-react';
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
@@ -31,21 +32,53 @@ const buttonVariants = cva(
   }
 );
 
+const btnActiveState = {
+  primary: 'bg-primary-active',
+  secondary: 'bg-secondary-active text-background',
+};
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  isLoading?: boolean;
+  isActive?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      isLoading = false,
+      disabled = false,
+      children,
+      type = 'button',
+      isActive = false,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          isActive && variant && variant in btnActiveState
+            ? btnActiveState[variant as keyof typeof btnActiveState]
+            : null,
+          className
+        )}
         ref={ref}
+        type={type}
+        disabled={disabled || isLoading}
         {...props}
-      />
+      >
+        {isLoading ? <Refresh className="animate-spin" /> : null}
+        {children}
+      </Comp>
     );
   }
 );

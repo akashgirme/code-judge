@@ -1,18 +1,21 @@
 import { Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import Home from './home/page';
 import SignIn from './auth/sign-in/page';
-
-const queryClient = new QueryClient();
+import SignInWithOtp from './auth/sign-in-with-otp/page';
+import SignInWithTokenPage from './auth/sign-in-with-token/page';
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
       <Routes>
-        <Route path="/" element={<SignIn />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/auth/initiate-sign-in" element={<SignIn />} />
+        <Route path="/auth/sign-in-with-otp" element={<SignInWithOtp />} />
+        <Route path="/auth/sign-in-with-token" element={<SignInWithTokenPage />} />
       </Routes>
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+    </Provider>
   );
 }
 
