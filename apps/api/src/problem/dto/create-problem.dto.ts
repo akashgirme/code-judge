@@ -11,7 +11,10 @@ export class CreateProblemDto {
   })
   title: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: ProblemDifficulty,
+    enumName: 'ProblemDifficulty',
+  })
   @IsEnum(ProblemDifficulty)
   difficulty: ProblemDifficulty;
 
@@ -25,7 +28,10 @@ export class CreateProblemDto {
   @IsNotEmpty()
   solution: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: SupportedLanguages,
+    enumName: 'SupportedLanguages',
+  })
   @IsEnum(SupportedLanguages)
   solutionLanguage: SupportedLanguages;
 
@@ -39,9 +45,9 @@ export class CreateProblemDto {
   @IsNotEmpty()
   testCasesOutput: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
-  internalNotes: string;
+  internalNotes?: string;
 
   @ApiProperty()
   @IsArray()

@@ -7,6 +7,8 @@ import SignInWithOtp from './auth/sign-in-with-otp/page';
 import SignInWithTokenPage from './auth/sign-in-with-token/page';
 import { AppBar } from '../components';
 import Onboard from './auth/onboard/page';
+import PublicProblems from './problem/public-problems/page';
+import CreateProblem from './problem/create-problem/page';
 
 export function App() {
   return (
@@ -18,6 +20,8 @@ export function App() {
         <Route path="/auth/sign-in-with-otp" element={<SignInWithOtp />} />
         <Route path="/auth/sign-in-with-token" element={<SignInWithTokenPage />} />
         <Route path="/auth/onboard" element={<Onboard />} />
+        <Route path="/problems" element={<PublicProblems />} />
+        <Route path="/problems/create" element={<CreateProblem />} />
       </Routes>
     </Provider>
   );

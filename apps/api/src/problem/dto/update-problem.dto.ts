@@ -4,7 +4,11 @@ import { ProblemStatus } from '../enums';
 import { CreateProblemDto } from './create-problem.dto';
 
 export class UpdateProblemDto extends PartialType(CreateProblemDto) {
-  @ApiProperty()
+  @ApiProperty({
+    enum: ProblemStatus,
+    enumName: 'ProblemStatus',
+    required: false,
+  })
   @IsEnum(ProblemStatus)
   status: ProblemStatus;
 }

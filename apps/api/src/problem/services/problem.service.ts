@@ -164,6 +164,8 @@ export class ProblemService {
         'problem.title',
         'problem.difficulty',
         'problem.slug',
+        'problem.createdAt',
+        'problem.updatedAt',
         'author.id',
         'author.firstName',
         'author.lastName',

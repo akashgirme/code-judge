@@ -1,4 +1,5 @@
 import './styles/globals.css';
+export { cn } from './lib/utils';
 export * from './components/ui/avatar';
 export * from './components/ui/button';
 export * from './components/ui/card';
@@ -8,3 +9,11 @@ export * from './components/ui/icon';
 export * from './components/ui/typography';
 export * from './components/ui/input';
 export * from './components/ui/label';
+export * from './components/ui/badge';
+export * from './components/ui/textarea';
+export * from './components/form-fields/text-area-feild';
+export * from './components/form-fields/helper-text';
+export * from './components/ui/select';
+export * from './components/ui/dialog';
+export * from './components/multi-selector';
+export * from './components/command';

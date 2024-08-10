@@ -1,4 +1,4 @@
-import { Card, cn } from '@skill-street-ui/core-design';
+import { Card, cn } from '@code-judge/ui';
 
 interface AuthCardProps {
   children: React.ReactNode;

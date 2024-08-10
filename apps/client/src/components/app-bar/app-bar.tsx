@@ -20,7 +20,7 @@ export function AppBar() {
         <Link to="#" className="hover:underline">
           Contests
         </Link>
-        <Link to="/problems" className="hover:underline">
+        <Link to="/problems/create" className="hover:underline">
           Problems
         </Link>
         <Link to="#" className="hover:underline">

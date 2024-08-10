@@ -380,15 +380,17 @@ export type Problem = {
   topics: Topic[];
   status: object;
 };
+export type ProblemDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
+export type SupportedLanguages = 'c' | 'cpp' | 'java' | 'js' | 'go';
 export type CreateProblemDto = {
   title: string;
-  difficulty: object;
+  difficulty: ProblemDifficulty;
   description: string;
   solution: string;
-  solutionLanguage: object;
+  solutionLanguage: SupportedLanguages;
   testCasesInput: string;
   testCasesOutput: string;
-  internalNotes: string;
+  internalNotes?: string;
   topicIds: string[];
 };
 export type ProblemsResponseDto = {
@@ -396,7 +398,6 @@ export type ProblemsResponseDto = {
   paginationMeta: PaginationResultDto;
 };
 export type SortOrder = 'ASC' | 'DESC';
-export type ProblemDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 export type PostStatus = 'unpublished' | 'approved' | 'rejected' | 'deleted';
 export type ProblemResponseDto = {
   id: string;
@@ -408,17 +409,18 @@ export type ProblemResponseDto = {
   status: object;
   description: string;
 };
+export type ProblemStatus = 'unpublished' | 'approved' | 'rejected' | 'deleted';
 export type UpdateProblemDto = {
   title?: string;
-  difficulty?: object;
+  difficulty?: ProblemDifficulty;
   description?: string;
   solution?: string;
-  solutionLanguage?: object;
+  solutionLanguage?: SupportedLanguages;
   testCasesInput?: string;
   testCasesOutput?: string;
   internalNotes?: string;
   topicIds?: string[];
-  status: object;
+  status?: ProblemStatus;
 };
 export type CreateTopicDto = {
   topicName: string;
@@ -436,11 +438,9 @@ export type Submission = {
 export type CreateSubmissionDto = {
   problemId: string;
   code: string;
-  language: object;
+  language: SupportedLanguages;
 };
-export type UpdateSubmissionDto = {
-  //
-};
+export type UpdateSubmissionDto = {};
 export type SubmissionResponseDto = {
   id: string;
   slug: string;
