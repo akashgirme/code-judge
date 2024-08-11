@@ -6,10 +6,12 @@ import { AuthModule } from '../auth/auth.module';
 import { AbilityModule } from '../ability/ability.module';
 import { ProblemService, TestCaseService, TopicService } from './services';
 import { ProblemController, TopicController } from './controllers';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Problem, Topic]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     AuthModule,
     AbilityModule,
     StorageModule,

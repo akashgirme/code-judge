@@ -8,10 +8,12 @@ import { SubmissionService } from './services/submission.service';
 import { StorageModule } from '../object-store/storage.module';
 import { HttpModule } from '@nestjs/axios';
 import { VerifyCallbackMiddleware } from './middlewares';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Submission]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     AbilityModule,
     ProblemModule,
     StorageModule,

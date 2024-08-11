@@ -11,4 +11,12 @@ export class TestCaseService {
       this.storageService.putObject(`problems/${slug}/testcases/output.txt`, output),
     ]);
   }
+
+  getInputTestCases(slug: string) {
+    return this.storageService.getObject(`problems/${slug}/testcases/input.txt`);
+  }
+
+  getExpectedOutput(slug: string) {
+    return this.storageService.getObject(`problems/${slug}/testcases/output.txt`);
+  }
 }

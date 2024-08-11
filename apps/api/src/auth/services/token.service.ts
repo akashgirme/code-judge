@@ -16,7 +16,7 @@ export class TokenService {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: SEVEN_DAYS_IN_MILISECONDS,
-      secure: process.env.NODE_ENV !== 'development',
+      secure: this.configService.get('NODE_ENV') !== 'development',
       domain: this.configService.get('COOKIES_DOMAIN'),
     });
   };

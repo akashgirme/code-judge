@@ -7,12 +7,12 @@ import {
 import { MailService } from '../../mail/mail.service';
 
 import {
-  SignInDto,
   ResendVerificationEmailDto,
   OAuthSignUpDto,
   AuthProviderDto,
   VerifyTokenDto,
   SignInWithOtpDto,
+  InitiateSignInDto,
 } from '../dto';
 import { ConfigService } from '@nestjs/config';
 import { UserOtpService } from './user-otp.service';
@@ -38,7 +38,7 @@ export class AuthService {
     private cacheservice: AuthCacheService
   ) {}
 
-  async signIn({ email }: SignInDto) {
+  async signIn({ email }: InitiateSignInDto) {
     let user = await this.usersService.findAccountByEmail(email);
 
     if (!user) {
@@ -46,6 +46,7 @@ export class AuthService {
       user = await this.usersService.create({
         email,
         provider: AuthProvider.EMAIL,
+        hasOnborded: false,
       });
     }
 
@@ -55,6 +56,8 @@ export class AuthService {
     const validationUrl = `${this.configService.get(
       'AUTH_UI_URL'
     )}/sign-in-with-token?token=${validationToken}`;
+
+    console.log('validation URL', validationUrl);
 
     await this.mailService.sendMail({
       to: email,
@@ -104,34 +107,6 @@ export class AuthService {
     )}/sign-in-with-token?token=${validationToken}`;
 
     return { redirectUrl };
-  }
-
-  async resendVerificationEmail({ email }: ResendVerificationEmailDto) {
-    const user = await this.usersService.findAccountByEmail(email);
-
-    if (!user) {
-      throw new NotFoundException(
-        `No user found with email ${email}, Please login again.`
-      );
-    }
-
-    const { otp } = await this.otpService.createOtp(user);
-    const { validationToken } = await this.tokenService.generateValidationToken(user);
-
-    const validationUrl = `${this.configService.get(
-      'AUTH_UI_URL'
-    )}/sign-in-with-token?token=${validationToken}`;
-
-    await this.mailService.sendMail({
-      to: email,
-      subject: `Secure link to log in to example.com | ${Date.now().toString()} `,
-      htmlBody: verifyEmailWithOtpMjml,
-      data: { otp, validationUrl },
-    });
-
-    return {
-      message: `We have resent the email with login link. Please check your email ${email}`,
-    };
   }
 
   async signInWithToken({ verificationToken }: VerifyTokenDto, res: Response) {

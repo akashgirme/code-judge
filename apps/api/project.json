@@ -28,13 +28,11 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "api:build",
-        "watch": true
+        "buildTarget": "api:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "api:build:development",
-          "watch": true
+          "buildTarget": "api:build:development"
         },
         "production": {
           "buildTarget": "api:build:production"

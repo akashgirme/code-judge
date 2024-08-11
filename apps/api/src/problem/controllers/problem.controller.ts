@@ -13,6 +13,7 @@ import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import {
   CreateProblemDto,
+  ProblemResponseAdminDto,
   ProblemResponseDto,
   ProblemsQueryDto,
   ProblemsQueryValidatorDto,
@@ -45,7 +46,7 @@ export class ProblemController {
   @ApiOkResponse({ type: ProblemsResponseDto })
   @ApiQuery({ type: () => ProblemsQueryDto })
   getProblems(@Query() query: ProblemsQueryValidatorDto): Promise<ProblemsResponseDto> {
-    return this.problemService.getProblemForPublic(query);
+    return this.problemService.getProblemsForPublic(query);
   }
 
   @Get('/admin')
@@ -57,13 +58,21 @@ export class ProblemController {
     @CurrentUser() user: User,
     @Query() query: ProblemsQueryValidatorDto
   ): Promise<ProblemsResponseDto> {
-    return this.problemService.getProblemForAdmin(user, query);
+    return this.problemService.getProblemsForAdmin(user, query);
   }
 
   @Get('/:problemId')
   @ApiOkResponse({ type: ProblemResponseDto })
-  getProblemById(@Param('problemId') problemId: string): Promise<ProblemResponseDto> {
-    return this.problemService.getProblemById(problemId);
+  getProblem(@Param('problemId') problemId: string): Promise<ProblemResponseDto> {
+    return this.problemService.getProblem(problemId);
+  }
+
+  @Get('/admin/:problemId')
+  @ApiOkResponse({ type: ProblemResponseAdminDto })
+  getProblemForAdmin(
+    @Param('problemId') problemId: string
+  ): Promise<ProblemResponseAdminDto> {
+    return this.problemService.getProblemForAdmin(problemId);
   }
 
   @Put('/:problemId')

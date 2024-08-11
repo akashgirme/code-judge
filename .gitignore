@@ -52,3 +52,7 @@ Thumbs.db
 #Migrations
 db/*
 db
+
+
+things-to-consider-before-deployment.txt
+./things-to-consider-before-deployment.txt

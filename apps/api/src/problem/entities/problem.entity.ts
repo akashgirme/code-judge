@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProblemDifficulty, ProblemStatus } from '../enums';
+import { ProblemDifficulty, ProblemStatus, SupportedLanguages } from '../enums';
 import { User } from '../../user/entities';
 import { Topic } from './topic.entity';
 import { Submission } from '../../submission/entities';
@@ -27,7 +27,10 @@ export class Problem {
   @Column()
   title: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: ProblemDifficulty,
+    enumName: 'ProblemDifficulty',
+  })
   @Column({
     type: 'enum',
     enum: ProblemDifficulty,
@@ -38,7 +41,9 @@ export class Problem {
   @Column('varchar')
   slug: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: () => User,
+  })
   @ManyToOne(() => User, (user) => user.problems)
   author: User;
 
@@ -47,17 +52,32 @@ export class Problem {
   @JoinTable()
   topics: Topic[];
 
+  @ApiProperty()
   @Column('text', { nullable: true })
-  @Exclude({ toPlainOnly: true })
+  // @Exclude({ toPlainOnly: true })
   internalNotes: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: ProblemStatus,
+    enumName: 'ProblemStatus',
+    default: ProblemStatus.UNPUBLISHED,
+  })
   @Column({
     type: 'enum',
     enum: ProblemStatus,
     default: ProblemStatus.UNPUBLISHED,
   })
   status: ProblemStatus;
+
+  @ApiProperty({
+    enum: SupportedLanguages,
+    enumName: 'SupportedLanguages',
+  })
+  @Column({
+    type: 'enum',
+    enum: SupportedLanguages,
+  })
+  solutionLanguage: SupportedLanguages;
 
   @OneToMany(() => Submission, (submission) => submission.problem)
   submissions: Submission[];

@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@code-judge/api-client": ["libs/api-client/src/index.ts"],
-      "@code-judge/ui": ["libs/ui/src/index.ts"]
+      "@code-judge/ui": ["libs/ui/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

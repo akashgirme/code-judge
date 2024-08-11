@@ -11,6 +11,9 @@ export class UserOtpService {
 
   async createOtp(user: User) {
     const otp = generateOtp();
+
+    console.log('otp: ', otp);
+
     const hashedOtp = await hashOtp(otp);
 
     const otpDetails: OtpDetails = {
