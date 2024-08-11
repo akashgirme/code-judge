@@ -12,9 +12,11 @@ import {
   ProblemInternalNotesField,
   ProblemSolutionField,
   ProblemSolutionLangaugeField,
+  ProblemStatusField,
   ProblemTitleField,
   ProblemTopicsField,
 } from '../components/form-fields';
+import { Action, Can, Subject } from '../../auth/ability';
 
 interface CreateProblemViewProps {
   form: UseFormReturn<CreateProblemModel>;
@@ -76,6 +78,13 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
               <div>
                 <ProblemInternalNotesField />
               </div>
+              <Can I={Action.UpdateOwn} a={Subject.Problem}>
+                {problemId && (
+                  <div className=" w-1/4 ">
+                    <ProblemStatusField />
+                  </div>
+                )}
+              </Can>
               <Button
                 isActive={isValid}
                 variant="default"

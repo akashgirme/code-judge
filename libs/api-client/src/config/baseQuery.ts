@@ -6,7 +6,6 @@ import { paramsSerializer } from './param-serializer';
 type RootAuthState = { auth: AuthState };
 
 const baseQuery = fetchBaseQuery({
-  // baseUrl: process.env['API_SERVER_URL'],
   baseUrl: import.meta.env.VITE_API_SERVER_URL,
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {

@@ -1,21 +1,26 @@
 import { IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { SupportedLanguages } from '../../problem/enums';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class SendCodeToExecutionServerDto {
+export class ExecutionRequestDto {
+  @ApiProperty()
   @IsString()
   @IsUUID()
   @IsNotEmpty()
-  submissionId: string;
+  id: string;
 
+  @ApiProperty()
   @IsString()
   @IsUUID()
   @IsNotEmpty()
   problemId: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  sourceCodeSlug: string;
+  sourceCode: string;
 
+  @ApiProperty({ enum: SupportedLanguages, enumName: 'Languages' })
   @IsEnum(SupportedLanguages)
   @IsNotEmpty()
   language: SupportedLanguages;

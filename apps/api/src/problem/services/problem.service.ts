@@ -4,6 +4,7 @@ import { Problem } from '../entities';
 import { Repository } from 'typeorm';
 import {
   CreateProblemDto,
+  ProblemResponseAdminDto,
   ProblemsQueryDto,
   ProblemsResponseDto,
   UpdateProblemDto,
@@ -65,6 +66,7 @@ export class ProblemService {
       topics,
       author: user,
       internalNotes,
+      solutionLanguage,
     });
     return this.problemRepo.save(problem);
   }
@@ -128,6 +130,7 @@ export class ProblemService {
       title,
       difficulty,
       topics,
+      solutionLanguage,
       internalNotes,
     });
 
@@ -142,11 +145,40 @@ export class ProblemService {
     return this.problemRepo.save(problem);
   }
 
-  getProblemForPublic(body: ProblemsQueryDto) {
+  async getProblem(problemId: string) {
+    const problem = await this.getProblemById(problemId);
+    const { slug } = problem;
+
+    const description = await this.storageService.getObject(
+      `problems/${slug}/description.md`
+    );
+
+    return { ...problem, description };
+  }
+
+  async getProblemForAdmin(problemId: string): Promise<ProblemResponseAdminDto> {
+    const problem = await this.getProblemById(problemId);
+
+    const { slug, solutionLanguage } = problem;
+    const [solution, description, testCasesInput, testCasesOutput] = await Promise.all([
+      this.storageService.getObject(
+        `problems/${slug}/solutions/solution.${solutionLanguage}`
+      ),
+
+      this.storageService.getObject(`problems/${slug}/description.md`),
+
+      this.testCaseService.getInputTestCases(slug),
+      this.testCaseService.getExpectedOutput(slug),
+    ]);
+
+    return { ...problem, description, solution, testCasesInput, testCasesOutput };
+  }
+
+  getProblemsForPublic(body: ProblemsQueryDto) {
     return this.getAllProblems(body);
   }
 
-  getProblemForAdmin(user: User, body: ProblemsQueryDto) {
+  getProblemsForAdmin(user: User, body: ProblemsQueryDto) {
     return this.getAllProblems(body, user);
   }
 
@@ -229,16 +261,13 @@ export class ProblemService {
     return { problems, paginationMeta };
   }
 
-  async getProblemById(problemId: string) {
+  async getProblemById(problemId: string): Promise<Problem> {
     const problem = await this.problemRepo
       .createQueryBuilder('problem')
       .leftJoinAndSelect('problem.author', 'author')
       .leftJoinAndSelect('problem.topics', 'topic')
       .select([
-        'problem.id',
-        'problem.title',
-        'problem.difficulty',
-        'problem.slug',
+        'problem',
         'author.id',
         'author.firstName',
         'author.lastName',
@@ -255,11 +284,7 @@ export class ProblemService {
       );
     }
 
-    const description = await this.storageService.getObject(
-      `problems/${problem.slug}/description.md`
-    );
-
-    return { ...problem, description };
+    return problem;
   }
 
   private convertTitletoSlug(title: string) {

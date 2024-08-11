@@ -76,12 +76,8 @@ export const CreateProblemLogic: React.FC<CreatePostLogicProps> = ({
   }, [watch, clearStoredValue, setStoredValue]);
 
   const handleSubmit: SubmitHandler<CreateProblemModel> = async (data) => {
-    // if (!data[imageUploadModalKey].publicId) {
-    //   toast.error('A cover image is compulsory!');
-    // } else {
     await onSubmit(data);
     clearStoredValue();
-    // }
   };
 
   return <CreateProblemView form={form} onSubmit={handleSubmit} />;

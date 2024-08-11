@@ -9,6 +9,7 @@ import { AppBar } from '../components';
 import Onboard from './auth/onboard/page';
 import PublicProblems from './problem/public-problems/page';
 import CreateProblem from './problem/create-problem/page';
+import UpdateProblem from './problem/edit-problem/page';
 
 export function App() {
   return (
@@ -22,6 +23,7 @@ export function App() {
         <Route path="/auth/onboard" element={<Onboard />} />
         <Route path="/problems" element={<PublicProblems />} />
         <Route path="/problems/create" element={<CreateProblem />} />
+        <Route path="/problems/update/:problemId" element={<UpdateProblem />} />
       </Routes>
     </Provider>
   );

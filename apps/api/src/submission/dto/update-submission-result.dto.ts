@@ -2,7 +2,7 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class UpdateSubmissionDto {
   @IsString()
-  submissionId: string;
+  id: string;
 
   @IsNumber()
   testCasesPassed: number;

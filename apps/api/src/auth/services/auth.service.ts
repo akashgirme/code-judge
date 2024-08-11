@@ -109,34 +109,6 @@ export class AuthService {
     return { redirectUrl };
   }
 
-  async resendVerificationEmail({ email }: ResendVerificationEmailDto) {
-    const user = await this.usersService.findAccountByEmail(email);
-
-    if (!user) {
-      throw new NotFoundException(
-        `No user found with email ${email}, Please login again.`
-      );
-    }
-
-    const { otp } = await this.otpService.createOtp(user);
-    const { validationToken } = await this.tokenService.generateValidationToken(user);
-
-    const validationUrl = `${this.configService.get(
-      'AUTH_UI_URL'
-    )}/sign-in-with-token?token=${validationToken}`;
-
-    await this.mailService.sendMail({
-      to: email,
-      subject: `Secure link to log in to example.com | ${Date.now().toString()} `,
-      htmlBody: verifyEmailWithOtpMjml,
-      data: { otp, validationUrl },
-    });
-
-    return {
-      message: `We have resent the email with login link. Please check your email ${email}`,
-    };
-  }
-
   async signInWithToken({ verificationToken }: VerifyTokenDto, res: Response) {
     const { id } = await this.tokenService.verifyToken(
       verificationToken,

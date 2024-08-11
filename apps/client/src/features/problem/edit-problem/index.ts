@@ -1,1 +1,1 @@
-export { EditPostContainer } from './edit-post-container';
+export { EditProblemContainer } from './edit-problem-container';

@@ -38,7 +38,9 @@ const Home = () => {
           </span>
           <Can I={Action.Update} a={Subject.Problem}>
             <Button>
-              <Link to="/problems/update">Continue</Link>
+              <Link to="/problems/update/37436d66-87df-41b2-8989-c54a41b6af83">
+                Continue
+              </Link>
             </Button>
           </Can>
         </li>
