@@ -28,13 +28,11 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "code-execution-engine:build",
-        "watch": true
+        "buildTarget": "code-execution-engine:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "code-execution-engine:build:development",
-          "watch": true
+          "buildTarget": "code-execution-engine:build:development"
         },
         "production": {
           "buildTarget": "code-execution-engine:build:production"

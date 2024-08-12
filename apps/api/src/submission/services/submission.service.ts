@@ -1,29 +1,22 @@
 import {
+  forwardRef,
+  Inject,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
-  ServiceUnavailableException,
 } from '@nestjs/common';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from '../entities';
 import { Repository } from 'typeorm';
-import {
-  AllSubmissionsDto,
-  CreateSubmissionDto,
-  ExecutionRequestDto,
-  UpdateSubmissionDto,
-} from '../dto';
-import { ProblemService } from '../../problem/services';
-import { firstValueFrom } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
+import { AllSubmissionsDto, CreateSubmissionDto } from '../dto';
 import { SubmissionStatus } from '../enums';
 import { getPaginationMeta } from '../../common/utility';
 import { SubmissionsQueryDto } from '../dto/submissions-query.dto';
 import { SortOrder } from '../../common/types';
+import { ExecutionService } from '../../execution/services';
+import { UpdateSubmission } from '../types';
 
 @Injectable()
 export class SubmissionService {
@@ -31,9 +24,8 @@ export class SubmissionService {
   constructor(
     @InjectRepository(Submission) private submissionRepo: Repository<Submission>,
     private readonly storageService: StorageService,
-    private readonly problemService: ProblemService,
-    private readonly configService: ConfigService,
-    private readonly HttpService: HttpService
+    @Inject(forwardRef(() => ExecutionService))
+    private readonly executionService: ExecutionService
   ) {}
 
   async createSubmission(user: User, { problemId, code, language }: CreateSubmissionDto) {
@@ -42,7 +34,7 @@ export class SubmissionService {
     }/${problemId}/${Date.now()}.${language}`;
     await this.storageService.putObject(submissionSlug, code);
 
-    const submission = this.submissionRepo.create({
+    const submissionObj = this.submissionRepo.create({
       slug: submissionSlug,
       language,
       user,
@@ -50,15 +42,32 @@ export class SubmissionService {
       problem: { id: problemId },
     });
 
-    return this.submissionRepo.save(submission);
+    const submission = await this.submissionRepo.save(submissionObj);
+
+    this.logger.log('Submission created');
+
+    /**
+     * Send submission for execution.
+     */
+    const requestId = await this.executionService.execute({
+      problemId,
+      submissionId: submission.id,
+    });
+
+    this.logger.log('Code excution request send with requestId: ', requestId);
+
+    return submission;
   }
 
-  async updateSubmissionResult({
-    id,
+  async updateSubmission({
+    submissionId,
     totalTestCases,
     testCasesPassed,
-  }: UpdateSubmissionDto) {
-    const submission = await this.getSubmissionById(id);
+    stderr,
+  }: UpdateSubmission) {
+    const submission = await this.getSubmissionById(submissionId);
+
+    this.logger.log('Standard Error occured: ', stderr);
 
     const status =
       totalTestCases === testCasesPassed
@@ -136,54 +145,5 @@ export class SubmissionService {
     const code = await this.storageService.getObject(submission.slug);
 
     return { ...submission, code };
-  }
-
-  async sendExecutionRequest({
-    id,
-    problemId,
-    sourceCode,
-    language,
-  }: ExecutionRequestDto): Promise<void> {
-    const { slug } = await this.problemService.getProblemById(problemId);
-
-    const inputTestCases = await this.storageService.getObject(
-      `problems/${slug}/testcases/input.txt`
-    );
-    const expectedOutput = await this.storageService.getObject(
-      `problems/${slug}/testcases/output.txt`
-    );
-
-    const executionServerUrl = `${this.configService.get<string>(
-      'CODE_EXECUTION_SERVER_URL'
-    )}/api/submissions`;
-
-    try {
-      await firstValueFrom(
-        this.HttpService.post(executionServerUrl, {
-          id,
-          sourceCode,
-          inputTestCases,
-          expectedOutput,
-          language,
-        })
-      );
-
-      this.logger.log('Execution Request Send ', id);
-    } catch (error) {
-      if (error.response) {
-        // Axios error with response
-        this.logger.error('Execution server responded with error', error.response.data);
-        throw new InternalServerErrorException(
-          'Execution server error',
-          `${error.response.data.message}`
-        );
-      } else {
-        // Axios error without response
-        this.logger.error("Execution server didn't response");
-        throw new ServiceUnavailableException(
-          'Failed to communicate with execution server'
-        );
-      }
-    }
   }
 }

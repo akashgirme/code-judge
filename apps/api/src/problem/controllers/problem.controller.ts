@@ -12,6 +12,7 @@ import { ProblemService } from '../services';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import {
+  ChangeProblemStatusDto,
   CreateProblemDto,
   ProblemResponseAdminDto,
   ProblemResponseDto,
@@ -85,5 +86,13 @@ export class ProblemController {
     @Body() body: UpdateProblemDto
   ): Promise<Problem> {
     return this.problemService.updateProblem(user, problemId, body);
+  }
+
+  @Put('/change-status')
+  @ApiOkResponse({ type: Problem })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.Publish, subject: Problem })
+  changeProblemStatus(@Body() body: ChangeProblemStatusDto): Promise<Problem> {
+    return this.problemService.changeProblemStatus(body);
   }
 }

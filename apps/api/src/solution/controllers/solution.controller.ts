@@ -19,7 +19,7 @@ export class SolutionController {
   @ApiOkResponse({ type: String })
   @ApiQuery({ type: () => SolutionQueryDto })
   getSolution(@Query() query: SolutionQueryValidatorDto): Promise<string> {
-    return this.solutionService.getSolution(query);
+    return this.solutionService.getSolutionByProblemId(query);
   }
 
   @Post('/')
@@ -29,6 +29,6 @@ export class SolutionController {
     @CurrentUser() user: User,
     @Body() body: AddSolutionDto
   ): Promise<SuccessMessageDto> {
-    return this.solutionService.addSolution(user, body);
+    return this.solutionService.addSolutionToProblem(user, body);
   }
 }

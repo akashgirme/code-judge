@@ -1,7 +1,7 @@
+import { Languages } from '@code-judge/common';
 import { Problem } from '../entities';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
-import { SupportedLanguages } from '../enums';
 
 export class ProblemResponseAdminDto extends Problem {
   @ApiProperty()
@@ -9,13 +9,13 @@ export class ProblemResponseAdminDto extends Problem {
   description: string;
 
   @ApiProperty()
-  solution: string;
+  primarySolution: string;
 
   @ApiProperty({
-    enum: SupportedLanguages,
+    enum: Languages,
     enumName: 'SupportedLanguages',
   })
-  solutionLanguage: SupportedLanguages;
+  primarySolutionLanguage: Languages;
 
   @ApiProperty()
   testCasesInput: string;

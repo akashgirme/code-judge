@@ -1,5 +1,7 @@
 import {
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -8,33 +10,52 @@ import { ProblemService } from '../../problem/services';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
-import { AddSolutionDto } from '../dto';
+import { AddSolutionDto, SolutionQueryDto } from '../dto';
 import { Problem } from '../../problem/entities';
+import { Languages } from '@code-judge/common';
 
 @Injectable()
 export class SolutionService {
   private readonly logger = new Logger(SolutionService.name);
   constructor(
+    @Inject(forwardRef(() => ProblemService))
     private readonly problemService: ProblemService,
     private readonly storageService: StorageService,
     private readonly abilityFactory: AbilityFactory
   ) {}
 
-  async getSolution({ problemId, language }) {
+  async getSolutionByProblemId({
+    problemId,
+    language,
+  }: SolutionQueryDto): Promise<string> {
     const { slug } = await this.problemService.getProblemById(problemId);
 
+    return this.getSolutionAddedAsProblemSolution(slug, language);
+  }
+
+  async getSolutionAddedAsProblemSolution(problemSlug: string, language: Languages) {
     const solution = await this.storageService.getObject(
-      `problems/${slug}/solutions/solution.${language}`
+      `problems/${problemSlug}/solutions/solution.${language}`
     );
 
     if (!solution) {
-      throw new NotFoundException('Solution not found');
+      throw new NotFoundException('Problem solution not found');
     }
 
     return solution;
   }
 
-  async addSolution(user: User, { problemId, code, language }: AddSolutionDto) {
+  async getSolutionAddedBySubmissionRecord(submissionSlug: string) {
+    const solution = await this.storageService.getObject(submissionSlug);
+
+    if (!solution) {
+      throw new NotFoundException('Submission solution not found');
+    }
+
+    return solution;
+  }
+
+  async addSolutionToProblem(user: User, { problemId, code, language }: AddSolutionDto) {
     const ability = this.abilityFactory.defineAbilityForUser(user);
     const problem = await this.problemService.getProblemById(problemId);
 
@@ -42,18 +63,20 @@ export class SolutionService {
     if (!ability.can(Action.Update, Problem) && problem.author.id !== user.id) {
       throw new ForbiddenException(
         'Permission Error',
-        `You do not have permission to add solutions to problem with id: ${problemId}`
+        `You do not have permission to add solutions to problem: ${problemId}`
       );
     }
 
-    // Logic to extecute the code and return the result
-    // If all testcases pass then n' then add solution
-
-    await this.storageService.putObject(
-      `problems/${problem.slug}/solutions/solution.${language}`,
-      code
-    );
+    //TODO: Verify the solution before adding it
+    await this.saveSolution(problem.slug, code, language);
 
     return { message: 'Solution added successfully' };
+  }
+
+  saveSolution(problemSlug: string, solution: string, language: Languages) {
+    return this.storageService.putObject(
+      `problems/${problemSlug}/solutions/solution.${language}`,
+      solution
+    );
   }
 }
