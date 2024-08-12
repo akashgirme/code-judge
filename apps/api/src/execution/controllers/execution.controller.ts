@@ -1,7 +1,6 @@
 import { ExecutionCallback } from '@code-judge/common';
 import { Body, Controller, Logger, Post } from '@nestjs/common';
 import { ExecutionService } from '../services';
-import { stderr } from 'process';
 
 @Controller('execute')
 export class ExecutionController {
@@ -9,7 +8,7 @@ export class ExecutionController {
 
   constructor(private readonly executionService: ExecutionService) {}
   @Post('/callback')
-  async handleExecutionCallback(@Body() body: ExecutionCallback): Promise<void> {
+  async handleExecutionServerCallback(@Body() body: ExecutionCallback): Promise<void> {
     //
     this.logger.log(`
       Execution response callback received \n
@@ -17,7 +16,7 @@ export class ExecutionController {
       Execution Type: ${body.executionType} \n
       TotalTestCases: ${body.totalTestCases} \n
       TestCasesPassed: ${body.testCasesPassed} \n
-      Standard error (if any): ${stderr}
+      Standard error (if any): ${body.stderr}
     `);
     //
 

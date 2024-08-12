@@ -15,9 +15,9 @@ import {
   ExecutionRequestPayload,
   ExecutionType,
 } from '@code-judge/common';
-import { ExecuteFuncReturn, ExecuteRequestArgs } from '../types';
 import { SolutionService } from '../../solution/services';
 import { SubmissionService } from '../../submission/services/submission.service';
+import axios from 'axios';
 
 @Injectable()
 export class ExecutionService {
@@ -35,77 +35,72 @@ export class ExecutionService {
     private readonly httpService: HttpService
   ) {}
 
-  /***
-   * If problemId and submissionId is provided then execution is done for submission
-   * If only problemId is provided the execution is for problem verification.
-   * @param {string} problemId // problemId as uuid
-   * @param {string} submissionId //submissionId as uuid
-   * @returns { Promise<ExecuteFuncReturn>}
-   */
-  async execute({
-    problemId,
-    submissionId,
-  }: ExecuteRequestArgs): Promise<ExecuteFuncReturn> {
-    const [problemResult, submissionResult] = await Promise.all([
-      this.problemService.getProblemById(problemId),
-      this.submissionService.getSubmissionById(submissionId),
-    ]);
-
-    const { slug: problemSlug, primarySolutionLanguage } = problemResult;
-    const { slug: submissionSlug, language } = submissionResult;
-
-    let sourceCode = await this.solutionService.getSolutionAddedBySubmissionRecord(
-      submissionSlug
+  async verifyProblem(problemId: string) {
+    const { slug, primarySolutionLanguage } = await this.problemService.getProblemById(
+      problemId
     );
-    let executionLanguage = language;
-    let requestId = submissionId;
-    let executionType = ExecutionType.SUBMISSIONEXECUTION;
+    const sourceCode = await this.solutionService.getSolutionAddedAsProblemSolution(
+      slug,
+      primarySolutionLanguage
+    );
 
-    if (!submissionId) {
-      sourceCode = await this.solutionService.getSolutionAddedAsProblemSolution(
-        problemSlug,
-        primarySolutionLanguage
-      );
-      executionLanguage = primarySolutionLanguage;
-      requestId = problemId;
-      executionType = ExecutionType.PROBLEMEXECUTION;
-    }
-
-    const [inputTestCases, expectedOutput] = await Promise.all([
-      this.testCaseService.getTestCasesInput(problemSlug),
-      this.testCaseService.getExpectedOutput(problemSlug),
+    const [testCasesInput, expectedOutput] = await Promise.all([
+      this.testCaseService.getTestCasesInput(slug),
+      this.testCaseService.getExpectedOutput(slug),
     ]);
 
-    const { message, requestId: id } = await this.requestExecution({
-      requestId,
+    const requestPayloadObj: ExecutionRequestPayload = {
+      requestId: problemId,
       sourceCode,
-      language: executionLanguage,
-      testCasesInput: inputTestCases,
+      language: primarySolutionLanguage,
+      testCasesInput,
       expectedOutput,
-      executionType,
-    });
+      executionType: ExecutionType.PROBLEMEXECUTION,
+    };
 
-    return {
-      message,
-      requestId: id,
-    } as ExecuteFuncReturn;
+    await this.sendRequestToExecutionServer(requestPayloadObj);
+  }
+
+  async executeSubmission(problemId: string, submissionId: string) {
+    const { slug, language } = await this.submissionService.getSubmissionById(
+      submissionId
+    );
+    const [problem, sourceCode] = await Promise.all([
+      this.problemService.getProblemById(problemId),
+      this.solutionService.getSolutionAddedBySubmissionRecord(slug),
+    ]);
+
+    const [testCasesInput, expectedOutput] = await Promise.all([
+      this.testCaseService.getTestCasesInput(problem.slug),
+      this.testCaseService.getExpectedOutput(problem.slug),
+    ]);
+
+    const requestPayloadObj: ExecutionRequestPayload = {
+      requestId: submissionId,
+      sourceCode,
+      language,
+      testCasesInput,
+      expectedOutput,
+      executionType: ExecutionType.SUBMISSIONEXECUTION,
+    };
+
+    await this.sendRequestToExecutionServer(requestPayloadObj);
   }
 
   /**
-   * This method send request to execution-server with payload and return a requestId
-   * @returns {Promise<ExecuteFuncReturn>}
+   * This method send request to execution-server with payload.
+   * @returns {Promise<void>}
    */
-  async requestExecution({
+  async sendRequestToExecutionServer({
     requestId,
     sourceCode,
     language,
     testCasesInput,
     expectedOutput,
     executionType,
-  }: ExecutionRequestPayload): Promise<ExecuteFuncReturn> {
-    const executionServerUrl = this.configService.get<string>(
-      'CODE_EXECUTION_REQUEST_URL'
-    );
+  }: ExecutionRequestPayload): Promise<void> {
+    const executionServerUrl =
+      this.configService.get<string>('CODE_EXECUTION_REQUEST_URL') ?? '';
 
     try {
       await firstValueFrom(
@@ -119,12 +114,12 @@ export class ExecutionService {
         })
       );
     } catch (error) {
-      if (error.response) {
+      if (axios.isAxiosError(error)) {
         // Axios error with response
-        this.logger.error('Execution server responded with error', error.response.data);
+        this.logger.error('Execution server responded with error', error.response?.data);
         throw new InternalServerErrorException(
           'Execution server error',
-          `${error.response.data.message}`
+          `${error.response?.data?.message}`
         );
       } else {
         // Axios error without response
@@ -135,12 +130,7 @@ export class ExecutionService {
       }
     }
 
-    this.logger.log('Execution Request Send ', requestId);
-
-    return {
-      message: 'Execution Request Send successfully ',
-      requestId,
-    } as ExecuteFuncReturn;
+    this.logger.log('Execution request send successfully: ', requestId);
   }
 
   async handleExecutionResponse({

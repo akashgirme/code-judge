@@ -14,12 +14,15 @@
 
 Run `npx nx serve api` to start the API development server. Happy coding!
 Run `npx nx serve client` to start the CLIENT development server. Happy coding!
+Run `npx nx serve code-execution-engine` to start the CODE-EXECUTION-ENGINE development server. Happy coding!
 
 ## Build for production
 
 Run `npx nx build api` to build the application. The build artifacts are stored in the output directory (e.g. `dist/` or `build/`), ready to be deployed.
 
 Run `npx nx build client` to build the application. The build artifacts are stored in the output directory (e.g. `dist/` or `build/`), ready to be deployed.
+
+Run `npx nx build code-execution-engine` to build the application. The build artifacts are stored in the output directory (e.g. `dist/` or `build/`), ready to be deployed.
 
 ## Running tasks
 

@@ -25,11 +25,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload): Promise<User> {
     const { id } = payload;
 
-    let user = await this.cacheService.fetchUserFromCache(id);
+    let user: User | null = await this.cacheService.fetchUserFromCache(id);
     if (!user) {
       this.logger.log('User Cache Miss');
       user = await this.usersService.findAccountById(id);
-      await this.cacheService.setUserCache(user);
+      if (user !== null) {
+        await this.cacheService.setUserCache(user);
+      }
     }
 
     if (!user) {

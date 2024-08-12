@@ -15,13 +15,13 @@ export class UserService {
     private mailService: MailService
   ) {}
 
-  findAccountByEmail(email: string) {
+  findAccountByEmail(email: string): Promise<User | null> {
     return this.repo.findOne({
       where: { email },
     });
   }
 
-  findAccountById(id: string) {
+  findAccountById(id: string): Promise<User | null> {
     return this.repo.findOne({ where: { id } });
   }
 
@@ -38,6 +38,10 @@ export class UserService {
 
   async onboard(user: User, { firstName, lastName }: OnboardUserDto) {
     const currentUser = await this.findAccountById(user.id);
+
+    if (!currentUser) {
+      throw new NotFoundException(`User not found with id: ${user.id}`);
+    }
 
     currentUser.firstName = firstName;
     currentUser.lastName = lastName;

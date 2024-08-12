@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-cbc';
-const SECRET_KEY = process.env.ENCRYPT_DECRYPT_SECRET_KEY;
+const SECRET_KEY = process.env.ENCRYPT_DECRYPT_SECRET_KEY ?? 'Secret-key';
 const INITIALIZATION_VECTOR = crypto.randomBytes(16);
 
 export function encrypt(token: string): string {
@@ -17,7 +17,7 @@ export function encrypt(token: string): string {
 
 export function decrypt(encryptedToken: string): string {
   const textParts = encryptedToken.split(':');
-  const initializationVector = Buffer.from(textParts.shift(), 'hex');
+  const initializationVector = Buffer.from(textParts.shift() || '', 'hex');
   const encryptedText = Buffer.from(textParts.join(':'), 'hex');
   const decipher = crypto.createDecipheriv(
     ALGORITHM,

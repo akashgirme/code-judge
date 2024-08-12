@@ -73,7 +73,7 @@ export class ProblemService {
     const problem = await this.problemRepo.save(problemObj);
 
     // Send request to verify problem solution and testcases
-    await this.executionService.execute({ problemId: problem.id });
+    await this.executionService.verifyProblem(problem.id);
 
     return problem;
   }
@@ -142,7 +142,11 @@ export class ProblemService {
       status: ProblemStatus.UNPUBLISHED,
     });
 
-    return this.problemRepo.save(problem);
+    const updatedProblem = await this.problemRepo.save(problem);
+
+    await this.executionService.verifyProblem(problem.id);
+
+    return updatedProblem;
   }
 
   async getProblem(problemId: string) {

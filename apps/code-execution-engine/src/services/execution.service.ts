@@ -22,7 +22,7 @@ export class ExecutionService {
       Execution-language: ${language}\n`
     );
 
-    const callbackUrl = process.env.PROBLEM_SERVER_CALLBACK_URL;
+    const callbackUrl = process.env.PROBLEM_SERVER_CALLBACK_URL ?? '';
 
     //TODO: This is mock function but here is actual execution via docker goes.
     setTimeout(async () => {
@@ -36,7 +36,7 @@ export class ExecutionService {
         totalTestCases,
         testCasesPassed,
         stderr,
-      } as ExecutionRequestPayload);
+      });
     }, 2000);
   }
 }

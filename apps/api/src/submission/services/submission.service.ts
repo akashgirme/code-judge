@@ -44,17 +44,14 @@ export class SubmissionService {
 
     const submission = await this.submissionRepo.save(submissionObj);
 
-    this.logger.log('Submission created');
+    this.logger.log('Submission created with id: ', submission.id);
 
     /**
      * Send submission for execution.
      */
-    const requestId = await this.executionService.execute({
-      problemId,
-      submissionId: submission.id,
-    });
+    await this.executionService.executeSubmission(problemId, submission.id);
 
-    this.logger.log('Code excution request send with requestId: ', requestId);
+    this.logger.log('Code excution request send for submission: ', submission.id);
 
     return submission;
   }
