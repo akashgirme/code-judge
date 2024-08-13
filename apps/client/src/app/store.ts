@@ -1,20 +1,46 @@
-import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import {
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+  persistReducer,
+  PersistConfig,
+  persistStore,
+} from 'redux-persist';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { authReducer, apiQuery as api, UserRole } from '@code-judge/api-client';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { createBlacklistFilter } from 'redux-persist-transform-filter';
 import { ability, defineAbilityForUser } from '../features/auth/ability/ability-factory';
+import storage from 'redux-persist/lib/storage';
 
 const rootReducer = combineReducers({
+  [api.reducerPath]: api.reducer,
   auth: authReducer,
 });
 
-const reducers = {
-  [api.reducerPath]: api.reducer,
-  auth: authReducer,
+//TODO: Uncomment this when refresh-token is able to store
+//because if there is no refresh token then session won't refresh and if we lost authToken then have to login again to get it.
+// const accessTokenBlackListFilter = createBlacklistFilter('auth', ['accessToken']);
+
+const persistConfig: PersistConfig<RootState> = {
+  key: 'root',
+  storage,
+  whitelist: ['auth'],
+  // transforms: [accessTokenBlackListFilter],
 };
 
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+// const reducers = {
+//   [api.reducerPath]: api.reducer,
+//   auth: authReducer,
+// };
+
 export const store = configureStore({
-  reducer: reducers,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -30,6 +56,8 @@ export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+export const persistor = persistStore(store);
 
 let lastUserRole: UserRole;
 
