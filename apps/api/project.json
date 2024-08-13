@@ -65,7 +65,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/typeorm-migration",
-        "main": "apps/api/src/app/typeorm.config.ts",
+        "main": "apps/api/src/configs/typeorm.config.ts",
         "tsConfig": "apps/api/tsconfig.app.json"
       }
     },
