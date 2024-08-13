@@ -1,46 +1,55 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { AbilityGuard } from '../../ability/ability.guard';
-import { CreateTopicDto } from '../dto';
-import { Topic } from '../entities';
-import { TopicService } from '../services';
+import { CreateTagDto } from '../dto';
+import { Tag } from '../entities';
+import { TagService } from '../services';
 import { Action } from '../../ability/ability.factory';
 
 @UseGuards(AuthGuard(), AbilityGuard)
-@Controller('topics')
-export class TopicController {
-  constructor(private topicService: TopicService) {}
+@Controller('tags')
+export class TagController {
+  constructor(private tagService: TagService) {}
 
   @Post('/')
-  @CheckAbilities({ action: Action.Create, subject: Topic })
-  @ApiOkResponse({ type: Topic })
-  createTopic(@Body() body: CreateTopicDto): Promise<Topic> {
-    return this.topicService.createTopic(body);
+  @CheckAbilities({ action: Action.Create, subject: Tag })
+  @ApiOkResponse({ type: Tag })
+  createTag(@Body() body: CreateTagDto): Promise<Tag> {
+    return this.tagService.createTag(body);
   }
 
   @Get('/')
-  @CheckAbilities({ action: Action.Read, subject: Topic })
-  @ApiOkResponse({ type: [Topic] })
-  getAllTopics(): Promise<Topic[]> {
-    return this.topicService.getAllTopics();
+  @CheckAbilities({ action: Action.Read, subject: Tag })
+  @ApiOkResponse({ type: [Tag] })
+  getAllTags(): Promise<Tag[]> {
+    return this.tagService.getAllTags();
   }
 
-  @Get('/:topicId')
-  @CheckAbilities({ action: Action.Read, subject: Topic })
-  @ApiOkResponse({ type: Topic })
-  getTopic(@Param('topicId') tagId: string): Promise<Topic> {
-    return this.topicService.findTopic(tagId);
+  @Get('/:tagId')
+  @CheckAbilities({ action: Action.Read, subject: Tag })
+  @ApiOkResponse({ type: Tag })
+  getTag(@Param('tagId', ParseIntPipe) tagId: number): Promise<Tag> {
+    return this.tagService.findTag(tagId);
   }
 
-  @Put('/:topicId')
-  @CheckAbilities({ action: Action.Update, subject: Topic })
-  @ApiOkResponse({ type: Topic })
-  updateTopic(
-    @Param('topicId') tagId: string,
-    @Body() body: CreateTopicDto
-  ): Promise<Topic> {
-    return this.topicService.updateTopic(tagId, body);
+  @Put('/:tagId')
+  @CheckAbilities({ action: Action.Update, subject: Tag })
+  @ApiOkResponse({ type: Tag })
+  updateTag(
+    @Param('tagId', ParseIntPipe) tagId: number,
+    @Body() body: CreateTagDto
+  ): Promise<Tag> {
+    return this.tagService.updateTag(tagId, body);
   }
 }

@@ -5,24 +5,50 @@ import { StorageService } from '../../object-store/storage.service';
 export class TestCaseService {
   constructor(private readonly storageService: StorageService) {}
 
-  async saveTestCases(slug: string, testCasesInput: string, expectedOutput: string) {
+  async saveTestCases(problemSlug: string, input: string, output: string) {
     await Promise.all([
+      this.storageService.putObject(`problems/${problemSlug}/testcases/input.txt`, input),
       this.storageService.putObject(
-        `problems/${slug}/testcases/input.txt`,
-        testCasesInput
-      ),
-      this.storageService.putObject(
-        `problems/${slug}/testcases/output.txt`,
-        expectedOutput
+        `problems/${problemSlug}/testcases/output.txt`,
+        output
       ),
     ]);
   }
 
-  getTestCasesInput(problemSlug: string) {
-    return this.storageService.getObject(`problems/${problemSlug}/testcases/input.txt`);
+  async saveAdditionalTestCases(problemSlug: string, input: string, output: string) {
+    await Promise.all([
+      this.storageService.putObject(
+        `problems/${problemSlug}/testcases/additional/input.txt`,
+        input
+      ),
+      this.storageService.putObject(
+        `problems/${problemSlug}/testcases/additional/output.txt`,
+        output
+      ),
+    ]);
   }
 
-  getExpectedOutput(problemSlug: string) {
-    return this.storageService.getObject(`problems/${problemSlug}/testcases/output.txt`);
+  async getTestCases(problemSlug: string): Promise<{ input: string; output: string }> {
+    const input = await this.storageService.getObject(
+      `problems/${problemSlug}/testcases/input.txt`
+    );
+
+    const output = await this.storageService.getObject(
+      `problems/${problemSlug}/testcases/output.txt`
+    );
+
+    return { input, output };
+  }
+
+  async getAdditionalTestCases(problemSlug: string) {
+    const input = await this.storageService.getObject(
+      `problems/${problemSlug}/testcases/additional/input.txt`
+    );
+
+    const output = await this.storageService.getObject(
+      `problems/${problemSlug}/testcases/additional/output.txt`
+    );
+
+    return { input, output };
   }
 }

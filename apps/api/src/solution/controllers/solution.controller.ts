@@ -1,11 +1,23 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { AddSolutionDto, SolutionQueryDto, SolutionQueryValidatorDto } from '../dto';
-import { SuccessMessageDto } from '../../auth/dto';
+import {
+  AllSolutionsDto,
+  CreateSolutionDto,
+  SolutionDto,
+  SolutionQueryDto,
+  SolutionQueryValidatorDto,
+} from '../dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
-import { CheckAbilities } from '../../ability/ability.decorator';
-import { Action } from '../../ability/ability.factory';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import { SolutionService } from '../services';
@@ -15,20 +27,27 @@ import { SolutionService } from '../services';
 export class SolutionController {
   constructor(private readonly solutionService: SolutionService) {}
 
+  @Post('/')
+  @ApiOkResponse({ type: () => SolutionDto })
+  createSolution(
+    @CurrentUser() user: User,
+    @Body() body: CreateSolutionDto
+  ): Promise<SolutionDto> {
+    return this.solutionService.createSolution(user, body);
+  }
+
   @Get('/')
   @ApiOkResponse({ type: String })
   @ApiQuery({ type: () => SolutionQueryDto })
-  getSolution(@Query() query: SolutionQueryValidatorDto): Promise<string> {
-    return this.solutionService.getSolutionByProblemId(query);
+  getAllSolutions(@Query() query: SolutionQueryValidatorDto): Promise<AllSolutionsDto> {
+    return this.solutionService.getAllSolutions(query);
   }
 
-  @Post('/')
-  @CheckAbilities({ action: Action.Create, subject: null })
-  @ApiOkResponse({ type: SuccessMessageDto })
-  addSolution(
-    @CurrentUser() user: User,
-    @Body() body: AddSolutionDto
-  ): Promise<SuccessMessageDto> {
-    return this.solutionService.addSolutionToProblem(user, body);
+  @Get('/:solutionId')
+  @ApiOkResponse({ type: () => SolutionDto })
+  getSolutionById(
+    @Param('solutionId', ParseIntPipe) solutionId: number
+  ): Promise<SolutionDto> {
+    return this.solutionService.getSolutionById(solutionId);
   }
 }

@@ -3,98 +3,65 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Problem } from '../entities';
 import { Repository } from 'typeorm';
 import {
+  AllProblemsDto,
+  AuthorProblemDto,
   ChangeProblemStatusDto,
   CreateProblemDto,
-  ProblemResponseAdminDto,
+  AdminProblemDto,
+  ProblemDto,
   ProblemsQueryDto,
-  ProblemsResponseDto,
   UpdateProblemDto,
 } from '../dto';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
-import { TopicService } from './topic.service';
+import { TagService } from './topic.service';
 import { TestCaseService } from './testcase.service';
 import { getPaginationMeta } from '../../common/utility';
 import { ProblemStatus } from '../enums';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
 import { SortOrder } from '../../common/types';
-import { SolutionService } from '../../solution/services';
-import { ExecutionService } from '../../execution/services';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ProblemService {
   constructor(
     @InjectRepository(Problem) private problemRepo: Repository<Problem>,
     private readonly storageService: StorageService,
-    private readonly topicService: TopicService,
+    private readonly tagService: TagService,
     private readonly testCaseService: TestCaseService,
-    private readonly solutionService: SolutionService,
-    private abilityFactory: AbilityFactory,
-    private readonly executionService: ExecutionService
+    private abilityFactory: AbilityFactory
   ) {}
 
   async createProblem(
     user: User,
-    {
-      title,
-      difficulty,
-      description,
-      primarySolution,
-      primarySolutionLanguage,
-      testCasesInput,
-      testCasesOutput,
-      internalNotes,
-      topicIds,
-    }: CreateProblemDto
+    { title, difficulty, description, tagIds }: CreateProblemDto
   ) {
-    const { topics } = await this.topicService.findTopics(topicIds);
+    const { tags } = await this.tagService.findTags(tagIds);
 
-    const slug = `${this.convertTitletoSlug(title)}-${
-      Math.floor(Math.random() * 10) + 1
-    }`;
+    const slug = `${this.convertTitletoSlug(title)}-${Date.now()}`;
 
-    await Promise.all([
-      this.storageService.putObject(`problems/${slug}/description.md`, description),
-      this.solutionService.saveSolution(slug, primarySolution, primarySolutionLanguage),
-      this.testCaseService.saveTestCases(slug, testCasesInput, testCasesOutput),
-    ]);
+    await this.storageService.putObject(`problems/${slug}/description.md`, description);
 
-    const problemObj = this.problemRepo.create({
+    const problem = this.problemRepo.create({
       title,
       difficulty,
       slug,
-      topics,
+      tags,
       author: user,
-      internalNotes,
-      primarySolutionLanguage,
-      isVerified: false,
+      hasTestCases: false,
+      status: ProblemStatus.UNPUBLISHED,
     });
 
-    const problem = await this.problemRepo.save(problemObj);
-
-    // Send request to verify problem solution and testcases
-    await this.executionService.verifyProblem(problem.id);
-
-    return problem;
+    return await this.problemRepo.save(problem);
   }
 
   async updateProblem(
     user: User,
-    problemId: string,
-    {
-      title,
-      difficulty,
-      description,
-      primarySolution,
-      primarySolutionLanguage,
-      testCasesInput,
-      testCasesOutput,
-      internalNotes,
-      topicIds,
-    }: UpdateProblemDto
+    problemId: number,
+    { title, difficulty, description, tagIds }: UpdateProblemDto
   ) {
     const ability = this.abilityFactory.defineAbilityForUser(user);
-    const { topics } = await this.topicService.findTopics(topicIds);
+    const { tags } = await this.tagService.findTags(tagIds);
 
     const problem = await this.getProblemById(problemId);
 
@@ -114,42 +81,17 @@ export class ProblemService {
       );
     }
 
-    // Store/update the solution provided by user in object store (S3 Bucket).
-    if (primarySolution && primarySolutionLanguage) {
-      await this.solutionService.saveSolution(
-        problem.slug,
-        primarySolution,
-        primarySolutionLanguage
-      );
-    }
-
-    // Store/update the testcases in object store (S3 Bucket).
-    if (testCasesInput && testCasesOutput) {
-      await this.testCaseService.saveTestCases(
-        testCasesInput,
-        testCasesOutput,
-        problem.slug
-      );
-    }
-
     Object.assign(problem, {
       title,
       difficulty,
-      topics,
-      primarySolutionLanguage,
-      internalNotes,
-      isVerified: false,
+      tags,
       status: ProblemStatus.UNPUBLISHED,
     });
 
-    const updatedProblem = await this.problemRepo.save(problem);
-
-    await this.executionService.verifyProblem(problem.id);
-
-    return updatedProblem;
+    return this.problemRepo.save(problem);
   }
 
-  async getProblem(problemId: string) {
+  async getProblem(problemId: number): Promise<ProblemDto> {
     const problem = await this.getProblemById(problemId);
     const { slug } = problem;
 
@@ -160,53 +102,73 @@ export class ProblemService {
     return { ...problem, description };
   }
 
-  async getProblemForAdmin(problemId: string): Promise<ProblemResponseAdminDto> {
-    const problem = await this.getProblemById(problemId);
+  async getProblemForAuthor(user: User, problemId: number): Promise<AuthorProblemDto> {
+    const problem = await this.problemRepo
+      .createQueryBuilder('problem')
+      .leftJoinAndSelect('problem.author', 'author')
+      .select(['problem'])
+      .where('problem.id =: problemId', { problemId })
+      .andWhere('author.id =: userId', { userId: user.id })
+      .getOne();
 
-    const { slug, primarySolutionLanguage } = problem;
-    const [primarySolution, description, testCasesInput, testCasesOutput] =
-      await Promise.all([
-        this.solutionService.getSolutionAddedAsProblemSolution(
-          slug,
-          primarySolutionLanguage
-        ),
-        this.storageService.getObject(`problems/${slug}/description.md`),
-        this.testCaseService.getTestCasesInput(slug),
-        this.testCaseService.getExpectedOutput(slug),
-      ]);
+    const [description, { input, output }] = await Promise.all([
+      this.storageService.getObject(`problems/${problem.slug}/description.md`),
+      this.testCaseService.getTestCases(problem.slug),
+    ]);
 
-    return { ...problem, description, primarySolution, testCasesInput, testCasesOutput };
+    return plainToClass(AuthorProblemDto, {
+      ...problem,
+      description,
+      testCasesInput: input,
+      testCasesOutput: output,
+    });
   }
 
-  getProblemsForPublic(body: ProblemsQueryDto) {
+  async getProblemForAdmin(problemId: number): Promise<AdminProblemDto> {
+    const problem = await this.getProblemById(problemId);
+
+    const { slug } = problem;
+    const [description, testcases, additionalTestcases] = await Promise.all([
+      this.storageService.getObject(`problems/${slug}/description.md`),
+      this.testCaseService.getTestCases(slug),
+      this.testCaseService.getAdditionalTestCases(slug),
+    ]);
+
+    return plainToClass(AdminProblemDto, {
+      ...problem,
+      description,
+      authorTestCasesInput: testcases.input,
+      authorTestCasesOutput: testcases.output,
+      additionalTestCasesInput: additionalTestcases.input,
+      additionalTestCasesOutput: additionalTestcases.output,
+    });
+  }
+
+  getProblemsForPublic(body: ProblemsQueryDto): Promise<AllProblemsDto> {
     return this.getAllProblems(body);
   }
 
-  getProblemsForAdmin(user: User, body: ProblemsQueryDto) {
+  getProblemsForAdmin(user: User, body: ProblemsQueryDto): Promise<AllProblemsDto> {
     return this.getAllProblems(body, user);
   }
 
-  async getAllProblems(
-    body: ProblemsQueryDto,
-    user?: User
-  ): Promise<ProblemsResponseDto> {
+  async getAllProblems(body: ProblemsQueryDto, user?: User): Promise<AllProblemsDto> {
     const { pageIndex = 0, pageSize = 10 } = body;
     const query = this.problemRepo
       .createQueryBuilder('problem')
       .leftJoinAndSelect('problem.author', 'author')
-      .leftJoinAndSelect('problem.topics', 'topic')
+      .leftJoinAndSelect('problem.tags', 'tag')
       .select([
         'problem.id',
         'problem.title',
         'problem.difficulty',
-        'problem.slug',
         'problem.createdAt',
         'problem.updatedAt',
         'author.id',
         'author.firstName',
         'author.lastName',
-        'topic.id',
-        'topic.name',
+        'tag.id',
+        'tag.name',
       ])
       .take(pageSize)
       .skip(pageSize * pageIndex);
@@ -236,9 +198,9 @@ export class ProblemService {
       });
     }
 
-    if (body.topicIds && body.topicIds.length > 0) {
-      query.andWhere('filterTopics.id IN (:...topicIds)', {
-        topicIds: body.topicIds,
+    if (body.tagIds && body.tagIds.length > 0) {
+      query.andWhere('filterTags.id IN (:...tagIds)', {
+        tagIds: body.tagIds,
       });
     }
 
@@ -265,18 +227,18 @@ export class ProblemService {
     return { problems, paginationMeta };
   }
 
-  async getProblemById(problemId: string): Promise<Problem> {
+  async getProblemById(problemId: number): Promise<Problem> {
     const problem = await this.problemRepo
       .createQueryBuilder('problem')
       .leftJoinAndSelect('problem.author', 'author')
-      .leftJoinAndSelect('problem.topics', 'topic')
+      .leftJoinAndSelect('problem.tags', 'tag')
       .select([
         'problem',
         'author.id',
         'author.firstName',
         'author.lastName',
-        'topic.id',
-        'topic.name',
+        'tag.id',
+        'tag.name',
       ])
       .where('problem.id = :problemId', { problemId })
       .getOne();
@@ -291,17 +253,11 @@ export class ProblemService {
     return problem;
   }
 
-  async setVerified(problemId: string): Promise<void> {
-    const problem = await this.getProblemById(problemId);
-    problem.isVerified = true;
-
-    await this.problemRepo.save(problem);
-  }
-
-  async changeProblemStatus({ problemId, status }: ChangeProblemStatusDto) {
+  async changeProblemStatus({ problemId, remark, status }: ChangeProblemStatusDto) {
     const problem = await this.getProblemById(problemId);
 
     problem.status = status;
+    problem.remark = remark;
 
     return this.problemRepo.save(problem);
   }

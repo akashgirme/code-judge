@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -12,13 +13,14 @@ import { ProblemService } from '../services';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import {
+  AdminProblemDto,
+  AllProblemsDto,
+  AuthorProblemDto,
   ChangeProblemStatusDto,
   CreateProblemDto,
-  ProblemResponseAdminDto,
-  ProblemResponseDto,
+  ProblemDto,
   ProblemsQueryDto,
   ProblemsQueryValidatorDto,
-  ProblemsResponseDto,
   UpdateProblemDto,
 } from '../dto';
 import { Problem } from '../entities';
@@ -44,45 +46,57 @@ export class ProblemController {
   }
 
   @Get('/')
-  @ApiOkResponse({ type: ProblemsResponseDto })
+  @ApiOkResponse({ type: AllProblemsDto })
   @ApiQuery({ type: () => ProblemsQueryDto })
-  getProblems(@Query() query: ProblemsQueryValidatorDto): Promise<ProblemsResponseDto> {
+  getProblems(@Query() query: ProblemsQueryValidatorDto): Promise<AllProblemsDto> {
     return this.problemService.getProblemsForPublic(query);
   }
 
   @Get('/admin')
-  @ApiOkResponse({ type: ProblemsResponseDto })
+  @ApiOkResponse({ type: AllProblemsDto })
   @ApiQuery({ type: () => ProblemsQueryDto })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.ReadOwn, subject: Problem })
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
   getProblemsForAdmin(
     @CurrentUser() user: User,
     @Query() query: ProblemsQueryValidatorDto
-  ): Promise<ProblemsResponseDto> {
+  ): Promise<AllProblemsDto> {
     return this.problemService.getProblemsForAdmin(user, query);
   }
 
   @Get('/:problemId')
-  @ApiOkResponse({ type: ProblemResponseDto })
-  getProblem(@Param('problemId') problemId: string): Promise<ProblemResponseDto> {
+  @ApiOkResponse({ type: ProblemDto })
+  getProblem(@Param('problemId', ParseIntPipe) problemId: number): Promise<ProblemDto> {
     return this.problemService.getProblem(problemId);
   }
 
+  @Get('/author/:problemId')
+  @ApiOkResponse({ type: AuthorProblemDto })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.ReadOwn, subject: Problem })
+  getProblemForAuthor(
+    @Param('problemId', ParseIntPipe) problemId: number
+  ): Promise<AuthorProblemDto> {
+    return this.getProblemForAuthor(problemId);
+  }
+
   @Get('/admin/:problemId')
-  @ApiOkResponse({ type: ProblemResponseAdminDto })
+  @ApiOkResponse({ type: AdminProblemDto })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
   getProblemForAdmin(
-    @Param('problemId') problemId: string
-  ): Promise<ProblemResponseAdminDto> {
+    @Param('problemId', ParseIntPipe) problemId: number
+  ): Promise<AdminProblemDto> {
     return this.problemService.getProblemForAdmin(problemId);
   }
 
   @Put('/:problemId')
   @ApiOkResponse({ type: Problem })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Update, subject: Problem })
+  @CheckAbilities({ action: Action.UpdateOwn, subject: Problem })
   updateProblem(
     @CurrentUser() user: User,
-    @Param('problemId') problemId: string,
+    @Param('problemId', ParseIntPipe) problemId: number,
     @Body() body: UpdateProblemDto
   ): Promise<Problem> {
     return this.problemService.updateProblem(user, problemId, body);
@@ -91,7 +105,7 @@ export class ProblemController {
   @Put('/change-status')
   @ApiOkResponse({ type: Problem })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Publish, subject: Problem })
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
   changeProblemStatus(@Body() body: ChangeProblemStatusDto): Promise<Problem> {
     return this.problemService.changeProblemStatus(body);
   }

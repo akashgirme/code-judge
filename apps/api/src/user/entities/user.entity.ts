@@ -12,6 +12,7 @@ import { AuthProvider } from '../../auth/enums';
 import { Problem } from '../../problem/entities';
 import { Exclude } from 'class-transformer';
 import { Submission } from '../../submission/entities';
+import { Solution } from '../../solution/entities';
 
 @Entity()
 export class User {
@@ -56,6 +57,9 @@ export class User {
 
   @OneToMany(() => Submission, (submission) => submission.user)
   submissions: Submission[];
+
+  @OneToMany(() => Solution, (solution) => solution.user)
+  solutions: Solution[];
 
   @CreateDateColumn()
   @Exclude({ toPlainOnly: true })

@@ -1,12 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { ProblemStatus } from '../enums';
 
 export class ChangeProblemStatusDto {
   @ApiProperty()
+  @IsNumber()
+  problemId: number;
+
+  @ApiProperty()
   @IsString()
-  @IsUUID()
-  problemId: string;
+  remark: string;
 
   @ApiProperty({
     enum: ProblemStatus,

@@ -5,9 +5,12 @@ import { StorageModule } from '../object-store/storage.module';
 import { SolutionController } from './controllers';
 import { SolutionService } from './services';
 import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Solution } from './entities';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Solution]),
     forwardRef(() => AbilityModule),
     forwardRef(() => ProblemModule),
     forwardRef(() => StorageModule),
@@ -15,6 +18,5 @@ import { PassportModule } from '@nestjs/passport';
   ],
   controllers: [SolutionController],
   providers: [SolutionService],
-  exports: [SolutionService],
 })
 export class SolutionModule {}

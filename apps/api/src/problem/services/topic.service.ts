@@ -1,79 +1,75 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Topic } from '../entities';
-import { CreateTopicDto } from '../dto';
 import { In, Repository } from 'typeorm';
+import { Tag } from '../entities';
+import { CreateTagDto } from '../dto';
 
 @Injectable()
-export class TopicService {
-  constructor(@InjectRepository(Topic) private readonly topicRepo: Repository<Topic>) {}
+export class TagService {
+  constructor(
+    @InjectRepository(Tag)
+    private tagRepo: Repository<Tag>
+  ) {}
 
-  async createTopic({ topicName }: CreateTopicDto) {
-    await this.isTopicUnique(topicName);
+  async createTag({ tagName }: CreateTagDto) {
+    await this.isTagUnique(tagName);
 
-    const newtopic = this.topicRepo.create({
-      name: topicName,
+    const newTag = this.tagRepo.create({
+      name: tagName,
     });
 
-    const topic = await this.topicRepo.save(newtopic);
-    return topic;
+    const tag = await this.tagRepo.save(newTag);
+    return tag;
   }
 
-  async isTopicUnique(topicName: string): Promise<void> {
-    const topic = await this.topicRepo.findOneBy({ name: topicName });
+  async isTagUnique(tagName: string): Promise<void> {
+    const tag = await this.tagRepo.findOne({ where: { name: tagName } });
 
-    if (topic) {
+    if (tag) {
       throw new BadRequestException(
-        'Duplicate Topic Error',
-        `A topic with name '${topicName}' already exists.`
+        `A tag already exists for the given tagName = ${tagName}`
       );
     }
   }
 
-  async updateTopic(topicId: string, { topicName }: CreateTopicDto) {
-    const topic = await this.findTopic(topicId);
+  async updateTag(tagId: number, { tagName }: CreateTagDto) {
+    const tag = await this.findTag(tagId);
 
-    if (topic.name !== topicName) {
-      await this.isTopicUnique(topicName);
+    if (tag.name !== tagName) {
+      await this.isTagUnique(tagName);
     }
 
-    topic.name = topicName;
+    tag.name = tagName;
 
-    const updatedtopic = await this.topicRepo.save(topic);
-    return updatedtopic;
+    const updatedTag = await this.tagRepo.save(tag);
+    return updatedTag;
   }
 
-  async findTopic(topicId: string) {
-    const topic = await this.topicRepo.findOne({ where: { id: topicId } });
+  async findTag(tagId: number) {
+    const tag = await this.tagRepo.findOne({ where: { id: tagId } });
 
-    if (!topic) {
-      throw new NotFoundException(
-        'Topic Not Found',
-        ` Topic not exist with topic id '${topicId}'`
-      );
+    if (!tag) {
+      throw new NotFoundException(`No tag found for tag id = ${tagId}`);
     }
-    return topic;
+    return tag;
   }
 
-  async findTopics(topicIds: string[]) {
-    const topics = await this.topicRepo.findBy({ id: In(topicIds) });
+  async findTags(tagIds: number[]) {
+    const tags = await this.tagRepo.findBy({ id: In(tagIds) });
 
-    if (topics.length !== topicIds.length) {
-      const missingtopicIds = topicIds.filter(
-        (topicId) => !topics.some((topic) => topic.id === topicId)
+    if (tags.length !== tagIds.length) {
+      const missingTagIds = tagIds.filter(
+        (tagId) => !tags.some((tag) => tag.id === tagId)
       );
 
-      throw new NotFoundException(
-        'Topics Not Found',
-        `Topics with ids '${missingtopicIds.join(', ')}' not found.`
-      );
+      throw new BadRequestException(`Tags '${missingTagIds.join(', ')}' not found.`);
     }
 
-    return { topics };
+    return { tags };
   }
 
-  async getAllTopics() {
-    const alltopics = this.topicRepo.find();
-    return alltopics;
+  async getAllTags() {
+    const allTags = this.tagRepo.find();
+    return allTags;
   }
 }
