@@ -1,4 +1,4 @@
-export enum SupportedLanguages {
+export enum Languages {
   C = 'c',
   CPP = 'cpp',
   JAVA = 'java',

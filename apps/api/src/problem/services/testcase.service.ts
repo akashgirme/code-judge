@@ -5,18 +5,24 @@ import { StorageService } from '../../object-store/storage.service';
 export class TestCaseService {
   constructor(private readonly storageService: StorageService) {}
 
-  async saveTestCases(input: string, output: string, slug: string) {
+  async saveTestCases(slug: string, testCasesInput: string, expectedOutput: string) {
     await Promise.all([
-      this.storageService.putObject(`problems/${slug}/testcases/input.txt`, input),
-      this.storageService.putObject(`problems/${slug}/testcases/output.txt`, output),
+      this.storageService.putObject(
+        `problems/${slug}/testcases/input.txt`,
+        testCasesInput
+      ),
+      this.storageService.putObject(
+        `problems/${slug}/testcases/output.txt`,
+        expectedOutput
+      ),
     ]);
   }
 
-  getInputTestCases(slug: string) {
-    return this.storageService.getObject(`problems/${slug}/testcases/input.txt`);
+  getTestCasesInput(problemSlug: string) {
+    return this.storageService.getObject(`problems/${problemSlug}/testcases/input.txt`);
   }
 
-  getExpectedOutput(slug: string) {
-    return this.storageService.getObject(`problems/${slug}/testcases/output.txt`);
+  getExpectedOutput(problemSlug: string) {
+    return this.storageService.getObject(`problems/${problemSlug}/testcases/output.txt`);
   }
 }

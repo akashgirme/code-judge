@@ -15,6 +15,7 @@ import { StorageModule } from '../object-store/storage.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { SolutionModule } from '../solution/solution.module';
 import { APP_GUARD } from '@nestjs/core';
+import { ExecutionModule } from '../execution/execution.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { APP_GUARD } from '@nestjs/core';
     StorageModule,
     SubmissionModule,
     SolutionModule,
+    ExecutionModule,
   ],
   controllers: [AppController],
   providers: [

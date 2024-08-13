@@ -1,0 +1,14 @@
+{
+  "name": "@code-judge/common",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
+  "private": true,
+  "exports": {
+    "exports": {
+      "./enum": "./src/enum/index.ts",
+      "./types": "./src/types/index.ts"
+    }
+  }
+}

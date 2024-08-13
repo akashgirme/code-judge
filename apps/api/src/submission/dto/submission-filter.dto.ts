@@ -1,12 +1,12 @@
+import { Languages } from '@code-judge/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
-import { SupportedLanguages } from '../../problem/enums';
 
 export class SubmissionFilterDto {
   @ApiProperty({
-    enum: SupportedLanguages,
-    enumName: 'Language',
+    enum: Languages,
+    enumName: 'SupportedLanguages',
   })
-  @IsEnum(SupportedLanguages)
-  language?: SupportedLanguages;
+  @IsEnum(Languages)
+  language?: Languages;
 }

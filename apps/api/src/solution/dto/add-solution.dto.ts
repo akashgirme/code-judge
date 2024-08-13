@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { SupportedLanguages } from '../../problem/enums';
+import { Languages } from '@code-judge/common';
 
 export class AddSolutionDto {
   @ApiProperty()
@@ -14,6 +14,6 @@ export class AddSolutionDto {
   code: string;
 
   @ApiProperty()
-  @IsEnum(SupportedLanguages)
-  language: SupportedLanguages;
+  @IsEnum(Languages)
+  language: Languages;
 }

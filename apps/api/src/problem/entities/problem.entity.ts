@@ -11,11 +11,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProblemDifficulty, ProblemStatus, SupportedLanguages } from '../enums';
+import { ProblemDifficulty, ProblemStatus } from '../enums';
 import { User } from '../../user/entities';
 import { Topic } from './topic.entity';
 import { Submission } from '../../submission/entities';
 import { Exclude } from 'class-transformer';
+import { Languages } from '@code-judge/common';
 
 @Entity()
 export class Problem {
@@ -70,26 +71,35 @@ export class Problem {
   status: ProblemStatus;
 
   @ApiProperty({
-    enum: SupportedLanguages,
+    enum: Languages,
     enumName: 'SupportedLanguages',
   })
   @Column({
     type: 'enum',
-    enum: SupportedLanguages,
+    enum: Languages,
   })
-  solutionLanguage: SupportedLanguages;
+  primarySolutionLanguage: Languages;
+
+  @ApiProperty()
+  @Column({
+    default: false,
+  })
+  isVerified: boolean;
 
   @OneToMany(() => Submission, (submission) => submission.problem)
   submissions: Submission[];
 
+  @ApiProperty()
   @CreateDateColumn()
   @Exclude({ toPlainOnly: true })
   createdAt: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   @Exclude({ toPlainOnly: true })
   updatedAt: Date;
 
+  @ApiProperty()
   @DeleteDateColumn()
   @Exclude({ toPlainOnly: true })
   deletedAt: Date;

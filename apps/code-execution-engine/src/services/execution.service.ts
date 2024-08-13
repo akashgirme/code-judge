@@ -1,40 +1,38 @@
 import { injectable } from 'tsyringe';
-import { IExecutionPayload } from '../interfaces';
-import { S3Service } from './s3.service';
 import axios from 'axios';
+import { ExecutionRequestPayload } from '@code-judge/common';
 
 @injectable()
 export class ExecutionService {
-  constructor(private readonly s3Service: S3Service) {}
-
   async executeCode({
-    submissionId,
-    sourceCodeSlug,
-    inputTestCasesSlug,
-    expectedOutputSlug,
+    requestId,
+    executionType,
+    sourceCode,
+    testCasesInput,
+    expectedOutput,
     language,
-  }: IExecutionPayload) {
-    const sourceCode = await this.s3Service.getObject(sourceCodeSlug);
-    const inputTestCases = await this.s3Service.getObject(inputTestCasesSlug);
-    const expectedOutput = await this.s3Service.getObject(expectedOutputSlug);
-
-    console.log(`Execution Payload\n'
+  }: ExecutionRequestPayload) {
+    console.log(
+      `Execution Payload Received \n'
+      RequestId: ${requestId} \n,
+      ExecutionType: ${executionType} \n
       SourceCode: ${sourceCode}\n, 
-      InputTestCases: ${inputTestCases}\n, 
+      InputTestCases: ${testCasesInput}\n, 
       ExpectedOutput:${expectedOutput}\n,
-      Execution-language: ${language}\n`);
+      Execution-language: ${language}\n`
+    );
 
-    const callbackUrl = `${process.env.PROBLEM_API_SERVER_URL}/api/submissions/callback`;
+    const callbackUrl = process.env.PROBLEM_SERVER_CALLBACK_URL ?? '';
 
     //TODO: This is mock function but here is actual execution via docker goes.
     setTimeout(async () => {
-      const totalTestCases = 5;
+      const totalTestCases = 10;
       const testCasesPassed = 10;
-      const stderr = 'Error: Invalid syntax';
-
+      const stderr = '';
       // Send result back to the problem server
       await axios.post(callbackUrl, {
-        submissionId,
+        requestId,
+        executionType,
         totalTestCases,
         testCasesPassed,
         stderr,

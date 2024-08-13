@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Problem } from '../entities';
 import { Repository } from 'typeorm';
 import {
+  ChangeProblemStatusDto,
   CreateProblemDto,
   ProblemResponseAdminDto,
   ProblemsQueryDto,
@@ -17,6 +18,8 @@ import { getPaginationMeta } from '../../common/utility';
 import { ProblemStatus } from '../enums';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
 import { SortOrder } from '../../common/types';
+import { SolutionService } from '../../solution/services';
+import { ExecutionService } from '../../execution/services';
 
 @Injectable()
 export class ProblemService {
@@ -25,7 +28,9 @@ export class ProblemService {
     private readonly storageService: StorageService,
     private readonly topicService: TopicService,
     private readonly testCaseService: TestCaseService,
-    private abilityFactory: AbilityFactory
+    private readonly solutionService: SolutionService,
+    private abilityFactory: AbilityFactory,
+    private readonly executionService: ExecutionService
   ) {}
 
   async createProblem(
@@ -34,16 +39,14 @@ export class ProblemService {
       title,
       difficulty,
       description,
-      solution,
-      solutionLanguage,
+      primarySolution,
+      primarySolutionLanguage,
       testCasesInput,
       testCasesOutput,
       internalNotes,
       topicIds,
     }: CreateProblemDto
   ) {
-    //TODO: Before creating the problem validate the problem wth inputTestCases and expectedOutput
-    // If validated then n' then save problem or change its state from invalid-> valid etc.
     const { topics } = await this.topicService.findTopics(topicIds);
 
     const slug = `${this.convertTitletoSlug(title)}-${
@@ -52,23 +55,27 @@ export class ProblemService {
 
     await Promise.all([
       this.storageService.putObject(`problems/${slug}/description.md`, description),
-      this.storageService.putObject(
-        `problems/${slug}/solutions/solution.${solutionLanguage}`,
-        solution
-      ),
-      this.testCaseService.saveTestCases(testCasesInput, testCasesOutput, slug),
+      this.solutionService.saveSolution(slug, primarySolution, primarySolutionLanguage),
+      this.testCaseService.saveTestCases(slug, testCasesInput, testCasesOutput),
     ]);
 
-    const problem = this.problemRepo.create({
+    const problemObj = this.problemRepo.create({
       title,
       difficulty,
       slug,
       topics,
       author: user,
       internalNotes,
-      solutionLanguage,
+      primarySolutionLanguage,
+      isVerified: false,
     });
-    return this.problemRepo.save(problem);
+
+    const problem = await this.problemRepo.save(problemObj);
+
+    // Send request to verify problem solution and testcases
+    await this.executionService.verifyProblem(problem.id);
+
+    return problem;
   }
 
   async updateProblem(
@@ -78,16 +85,14 @@ export class ProblemService {
       title,
       difficulty,
       description,
-      solution,
-      solutionLanguage,
+      primarySolution,
+      primarySolutionLanguage,
       testCasesInput,
       testCasesOutput,
       internalNotes,
       topicIds,
-      status,
     }: UpdateProblemDto
   ) {
-    //TODO: Validate problem before updating it.
     const ability = this.abilityFactory.defineAbilityForUser(user);
     const { topics } = await this.topicService.findTopics(topicIds);
 
@@ -97,7 +102,7 @@ export class ProblemService {
     if (!ability.can(Action.Update, Problem) && problem.author.id !== user.id) {
       throw new ForbiddenException(
         'Permission Error',
-        `You do not have permission edit problem '${problemId}'`
+        `You do not have permission edit this problem '${problemId}'`
       );
     }
 
@@ -110,10 +115,11 @@ export class ProblemService {
     }
 
     // Store/update the solution provided by user in object store (S3 Bucket).
-    if (solution && solutionLanguage) {
-      await this.storageService.putObject(
-        `problems/${problem.slug}/solutions/solution.${solutionLanguage}`,
-        solution
+    if (primarySolution && primarySolutionLanguage) {
+      await this.solutionService.saveSolution(
+        problem.slug,
+        primarySolution,
+        primarySolutionLanguage
       );
     }
 
@@ -130,19 +136,17 @@ export class ProblemService {
       title,
       difficulty,
       topics,
-      solutionLanguage,
+      primarySolutionLanguage,
       internalNotes,
+      isVerified: false,
+      status: ProblemStatus.UNPUBLISHED,
     });
 
-    if (ability.can(Action.Publish, Problem)) {
-      if (status) {
-        problem.status = status;
-      }
-    } else {
-      problem.status = ProblemStatus.UNPUBLISHED;
-    }
+    const updatedProblem = await this.problemRepo.save(problem);
 
-    return this.problemRepo.save(problem);
+    await this.executionService.verifyProblem(problem.id);
+
+    return updatedProblem;
   }
 
   async getProblem(problemId: string) {
@@ -159,19 +163,19 @@ export class ProblemService {
   async getProblemForAdmin(problemId: string): Promise<ProblemResponseAdminDto> {
     const problem = await this.getProblemById(problemId);
 
-    const { slug, solutionLanguage } = problem;
-    const [solution, description, testCasesInput, testCasesOutput] = await Promise.all([
-      this.storageService.getObject(
-        `problems/${slug}/solutions/solution.${solutionLanguage}`
-      ),
+    const { slug, primarySolutionLanguage } = problem;
+    const [primarySolution, description, testCasesInput, testCasesOutput] =
+      await Promise.all([
+        this.solutionService.getSolutionAddedAsProblemSolution(
+          slug,
+          primarySolutionLanguage
+        ),
+        this.storageService.getObject(`problems/${slug}/description.md`),
+        this.testCaseService.getTestCasesInput(slug),
+        this.testCaseService.getExpectedOutput(slug),
+      ]);
 
-      this.storageService.getObject(`problems/${slug}/description.md`),
-
-      this.testCaseService.getInputTestCases(slug),
-      this.testCaseService.getExpectedOutput(slug),
-    ]);
-
-    return { ...problem, description, solution, testCasesInput, testCasesOutput };
+    return { ...problem, description, primarySolution, testCasesInput, testCasesOutput };
   }
 
   getProblemsForPublic(body: ProblemsQueryDto) {
@@ -285,6 +289,21 @@ export class ProblemService {
     }
 
     return problem;
+  }
+
+  async setVerified(problemId: string): Promise<void> {
+    const problem = await this.getProblemById(problemId);
+    problem.isVerified = true;
+
+    await this.problemRepo.save(problem);
+  }
+
+  async changeProblemStatus({ problemId, status }: ChangeProblemStatusDto) {
+    const problem = await this.getProblemById(problemId);
+
+    problem.status = status;
+
+    return this.problemRepo.save(problem);
   }
 
   private convertTitletoSlug(title: string) {

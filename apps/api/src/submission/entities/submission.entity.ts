@@ -6,10 +6,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { SupportedLanguages } from '../../problem/enums';
 import { Problem } from '../../problem/entities';
 import { User } from '../../user/entities';
 import { SubmissionStatus } from '../enums';
+import { Languages } from '@code-judge/common';
 
 @Entity()
 export class Submission {
@@ -22,8 +22,8 @@ export class Submission {
   slug: string;
 
   @ApiProperty()
-  @Column('enum', { enum: SupportedLanguages })
-  language: SupportedLanguages;
+  @Column('enum', { enum: Languages })
+  language: Languages;
 
   @Column({
     type: 'enum',

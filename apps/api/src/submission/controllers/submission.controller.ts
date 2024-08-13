@@ -12,12 +12,7 @@ import { SubmissionService } from '../services/submission.service';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
-import {
-  AllSubmissionsDto,
-  CreateSubmissionDto,
-  SubmissionResponseDto,
-  UpdateSubmissionDto,
-} from '../dto';
+import { AllSubmissionsDto, CreateSubmissionDto, SubmissionResponseDto } from '../dto';
 import { Submission } from '../entities';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
@@ -41,31 +36,7 @@ export class SubmissionController {
     @CurrentUser() user: User,
     @Body() body: CreateSubmissionDto
   ): Promise<Submission> {
-    const submission = await this.submissionService.createSubmission(user, body);
-
-    this.logger.log('Submission created');
-
-    await this.submissionService.sendExecutionRequest({
-      id: submission.id,
-      problemId: body.problemId,
-      sourceCode: body.code,
-      language: body.language,
-    });
-
-    return submission;
-  }
-
-  @Post('/callback')
-  async handleExecutionResponseCallback(@Body() body: UpdateSubmissionDto) {
-    this.logger.log(
-      'Execution response callback received\n Solution: ',
-      body.id,
-      '\n TotalTestCases: ',
-      body.totalTestCases,
-      ' TestCasesPassed: ',
-      body.testCasesPassed
-    );
-    await this.submissionService.updateSubmissionResult(body);
+    return this.submissionService.createSubmission(user, body);
   }
 
   @Get('/problem/:problemId')

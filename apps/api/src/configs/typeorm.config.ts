@@ -10,6 +10,7 @@ const commonTypeOrmConfig: DataSourceOptions = {
   type: 'postgres',
   entities: [User, Problem, Topic, Submission],
   synchronize: false,
+  logNotifications: true,
   ssl: true,
 };
 
@@ -28,6 +29,7 @@ export const getTypeOrmConfig = async (
   };
 };
 
+//TODO: Issue with migration generation > unable to locate @code-judge/common lib
 const datasource = new DataSource({
   ...commonTypeOrmConfig,
   // url: process.env.DB_URL,

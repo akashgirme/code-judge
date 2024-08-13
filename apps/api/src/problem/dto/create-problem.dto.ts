@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, IsEnum, IsArray, Matches } from 'class-validator';
-import { ProblemDifficulty, SupportedLanguages } from '../enums';
+import { ProblemDifficulty } from '../enums';
 import { ApiProperty } from '@nestjs/swagger';
+import { Languages } from '@code-judge/common';
 
 export class CreateProblemDto {
   @ApiProperty()
@@ -26,14 +27,14 @@ export class CreateProblemDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  solution: string;
+  primarySolution: string;
 
   @ApiProperty({
-    enum: SupportedLanguages,
+    enum: Languages,
     enumName: 'SupportedLanguages',
   })
-  @IsEnum(SupportedLanguages)
-  solutionLanguage: SupportedLanguages;
+  @IsEnum(Languages)
+  primarySolutionLanguage: Languages;
 
   @ApiProperty()
   @IsString()

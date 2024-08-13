@@ -16,9 +16,9 @@ export class StorageService {
 
   constructor(private configService: ConfigService) {
     this.s3Client = new S3Client();
-    this.PROBLEM_STORE_S3_BUCKET = this.configService.get<string>(
-      'PROBLEM_STORE_S3_BUCKET_NAME'
-    );
+    this.PROBLEM_STORE_S3_BUCKET =
+      this.configService.get<string>('PROBLEM_STORE_S3_BUCKET_NAME') ??
+      'problems-content';
   }
 
   async putObject(key: string, body: string) {

@@ -1,7 +1,7 @@
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
-import { SupportedLanguages } from '../../problem/enums';
 import { IsEmpty, IsEnum, IsString } from 'class-validator';
 import { IntersectionType as ValidatorIntersectionType } from '@nestjs/mapped-types';
+import { Languages } from '@code-judge/common';
 
 class SolutionQuery {
   @ApiProperty()
@@ -10,8 +10,8 @@ class SolutionQuery {
   problemId: string;
 
   @ApiProperty()
-  @IsEnum(SupportedLanguages)
-  language: SupportedLanguages;
+  @IsEnum(Languages)
+  language: Languages;
 }
 
 export class SolutionQueryValidatorDto extends ValidatorIntersectionType(SolutionQuery) {}

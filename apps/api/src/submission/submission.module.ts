@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Submission } from './entities';
 import { AbilityModule } from '../ability/ability.module';
@@ -6,24 +6,22 @@ import { ProblemModule } from '../problem/problem.module';
 import { SubmissionController } from './controllers/submission.controller';
 import { SubmissionService } from './services/submission.service';
 import { StorageModule } from '../object-store/storage.module';
-import { HttpModule } from '@nestjs/axios';
-import { VerifyCallbackMiddleware } from './middlewares';
 import { PassportModule } from '@nestjs/passport';
+import { ExecutionModule } from '../execution/execution.module';
+import { SolutionModule } from '../solution/solution.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Submission]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     AbilityModule,
-    ProblemModule,
     StorageModule,
-    HttpModule,
+    forwardRef(() => ProblemModule),
+    forwardRef(() => ExecutionModule),
+    forwardRef(() => SolutionModule),
   ],
   controllers: [SubmissionController],
   providers: [SubmissionService],
+  exports: [SubmissionService],
 })
-export class SubmissionModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(VerifyCallbackMiddleware).forRoutes('/callback');
-  }
-}
+export class SubmissionModule {}

@@ -1,2 +1,2 @@
 export { Queues } from './queue.enum';
-export { ExecutionQueueJobTypes } from './queue.enum';
+export { CodeExecutionQueueJobTypes } from './queue.enum';
