@@ -1,5 +1,5 @@
 export interface OtpDetails {
-  userId: string;
+  userId: number;
   otp: string;
   otpAttempts: number;
 }

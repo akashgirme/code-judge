@@ -16,9 +16,9 @@ import { Solution } from '../../solution/entities';
 
 @Entity()
 export class User {
-  @ApiProperty()
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @ApiProperty({ type: 'integer' })
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @ApiProperty()
   @Column({ nullable: true })

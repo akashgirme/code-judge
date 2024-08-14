@@ -7,7 +7,6 @@ import {
 import { MailService } from '../../mail/mail.service';
 
 import {
-  ResendVerificationEmailDto,
   OAuthSignUpDto,
   AuthProviderDto,
   VerifyTokenDto,

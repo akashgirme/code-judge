@@ -1,4 +1,13 @@
-import { Body, Controller, Get, UseGuards, Put, Query, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  UseGuards,
+  Put,
+  Query,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AllUsersDto, ChangeUserRoleDto, EditProfileDto, OnboardUserDto } from '../dto';
 import { ApiOkResponse } from '@nestjs/swagger';
@@ -49,7 +58,10 @@ export class UserController {
   @ApiOkResponse({ type: User })
   @UseGuards(AuthGuard())
   @CheckAbilities({ action: Action.Manage, subject: User })
-  changeUserRole(@Param('userId') userId: string, @Body() body: ChangeUserRoleDto) {
+  changeUserRole(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() body: ChangeUserRoleDto
+  ) {
     return this.usersService.changeUserRole(userId, body);
   }
 }

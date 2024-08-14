@@ -21,7 +21,7 @@ export class UserService {
     });
   }
 
-  findAccountById(id: string): Promise<User | null> {
+  findAccountById(id: number): Promise<User | null> {
     return this.repo.findOne({ where: { id } });
   }
 
@@ -70,7 +70,7 @@ export class UserService {
     return { user: updatedUser };
   }
 
-  async changeUserRole(userId: string, { role }: ChangeUserRoleDto) {
+  async changeUserRole(userId: number, { role }: ChangeUserRoleDto) {
     const user = await this.findAccountById(userId);
     if (!user) throw new NotFoundException('User Not Found');
 
