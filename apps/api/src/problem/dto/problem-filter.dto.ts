@@ -1,21 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsUUID,
   IsArray,
   ArrayUnique,
   IsEnum,
   IsString,
   IsNumber,
+  IsNotEmpty,
 } from 'class-validator';
 import { ProblemDifficulty, ProblemStatus } from '../enums';
 
 export class ProblemFilterDto {
   @ApiProperty({ required: false })
   @IsString()
+  @IsNotEmpty()
   title?: string;
 
   @ApiProperty({ required: false })
-  @IsUUID()
+  @IsNumber()
   authorId?: string;
 
   @ApiProperty({

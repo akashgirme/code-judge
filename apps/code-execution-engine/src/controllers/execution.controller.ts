@@ -1,43 +1,26 @@
 import { injectable } from 'tsyringe';
 import { Request, Response } from 'express';
-import { QueueService } from '../services';
-import { CodeExecutionQueueJobTypes, Queues } from '../enums';
-import { ExecutionRequestPayload } from '@code-judge/common';
+import { ExecutionService } from '../services';
 import { ExecutionRequestSchema } from '@code-judge/common';
 
 @injectable()
 export class ExecutionController {
-  constructor(private queueService: QueueService) {}
+  constructor(private executionService: ExecutionService) {}
 
   async executeCode(req: Request, res: Response) {
-    const result = ExecutionRequestSchema.safeParse(req.body);
-    if (!result.success) {
-      res.status(400).json({ errors: result.error.errors });
-      return;
+    try {
+      const result = ExecutionRequestSchema.safeParse(req.body);
+      if (!result.success) {
+        res.status(400).json({ errors: result.error.errors });
+        return;
+      }
+
+      const response = await this.executionService.executeCode(req.body);
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).json(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    await this.addJobToExecutionQueue(req.body);
-
-    res.json({ message: 'Submission received!' });
-  }
-
-  async addJobToExecutionQueue({
-    requestId,
-    executionType,
-    sourceCode,
-    testCasesInput,
-    expectedOutput,
-    language,
-  }: ExecutionRequestPayload) {
-    const queue = this.queueService.getQueue(Queues.CODE_EXECUTION);
-
-    await queue.add(CodeExecutionQueueJobTypes.EXECUTE_CODE, {
-      requestId,
-      executionType,
-      sourceCode,
-      testCasesInput,
-      expectedOutput,
-      language,
-    } as ExecutionRequestPayload);
   }
 }

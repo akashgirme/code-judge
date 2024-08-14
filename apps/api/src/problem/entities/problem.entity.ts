@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -37,8 +37,9 @@ export class Problem {
   })
   difficulty: ProblemDifficulty;
 
-  @ApiProperty()
+  @ApiHideProperty()
   @Column('varchar')
+  @Exclude({ toPlainOnly: true })
   slug: string;
 
   @Column({
@@ -56,7 +57,7 @@ export class Problem {
 
   @ApiProperty()
   @Column('text', { nullable: true })
-  @Exclude({ toPlainOnly: true })
+  // @Exclude({ toPlainOnly: true })
   remark: string;
 
   @ApiProperty({ type: [Tag] })

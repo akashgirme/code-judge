@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class CreateSolutionDto {
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   @IsNumber()
   problemId: number;
 
@@ -12,6 +12,7 @@ export class CreateSolutionDto {
   description: string;
 
   @ApiProperty({
+    type: 'enum',
     enum: Languages,
     enumName: 'Languages',
   })

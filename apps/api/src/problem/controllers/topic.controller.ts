@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { AbilityGuard } from '../../ability/ability.guard';
 import { CreateTagDto } from '../dto';
@@ -18,6 +18,7 @@ import { TagService } from '../services';
 import { Action } from '../../ability/ability.factory';
 
 @UseGuards(AuthGuard(), AbilityGuard)
+@ApiTags('tags')
 @Controller('tags')
 export class TagController {
   constructor(private tagService: TagService) {}

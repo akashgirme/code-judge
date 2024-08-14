@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AllUsersDto, ChangeUserRoleDto, EditProfileDto, OnboardUserDto } from '../dto';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from '../services';
 import { User } from '../entities';
 import { CurrentUser } from '../../auth/decorators';
@@ -19,6 +19,7 @@ import { CheckAbilities } from '../../ability/ability.decorator';
 import { Action } from '../../ability/ability.factory';
 import { PaginationDto } from '../../common/dto';
 
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private usersService: UserService) {}

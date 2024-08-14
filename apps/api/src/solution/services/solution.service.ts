@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ProblemService } from '../../problem/services';
-import { AbilityFactory } from '../../ability/ability.factory';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import {
@@ -15,7 +14,6 @@ import {
   SolutionDto,
   SolutionQueryDto,
 } from '../dto';
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Solution } from '../entities';
 import { Repository } from 'typeorm';
@@ -30,8 +28,7 @@ export class SolutionService {
     private solutionRepo: Repository<Solution>,
     @Inject(forwardRef(() => ProblemService))
     private readonly problemService: ProblemService,
-    private readonly storageService: StorageService,
-    private readonly abilityFactory: AbilityFactory
+    private readonly storageService: StorageService
   ) {}
 
   async createSolution(
@@ -43,6 +40,7 @@ export class SolutionService {
     await this.storageService.putObject(path, description);
     const solutionObj = this.solutionRepo.create({
       path,
+      language,
       problem: { id: problemId },
       user,
     });
@@ -63,9 +61,16 @@ export class SolutionService {
       .createQueryBuilder('solution')
       .leftJoinAndSelect('solution.user', 'user')
       .leftJoinAndSelect('solution.problem', 'problem')
-      .select(['solution, user.id, user.firstName, user.lastName'])
-      .where('solution.language =: language', { language })
-      .andWhere('problem.id =: problemId', { problemId })
+      .select([
+        'solution',
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'problem.id',
+        'problem.title',
+      ])
+      .where('solution.language = :language', { language })
+      .andWhere('problem.id = :problemId', { problemId })
       .skip(pageIndex * pageSize)
       .take(pageSize)
       .orderBy('solution.createdAt', order)

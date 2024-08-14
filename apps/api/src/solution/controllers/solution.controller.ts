@@ -8,7 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   AllSolutionsDto,
   CreateSolutionDto,
@@ -23,6 +23,7 @@ import { User } from '../../user/entities';
 import { SolutionService } from '../services';
 
 @UseGuards(AuthGuard(), AbilityGuard)
+@ApiTags('solutions')
 @Controller('solutions')
 export class SolutionController {
   constructor(private readonly solutionService: SolutionService) {}

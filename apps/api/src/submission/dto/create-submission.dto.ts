@@ -3,9 +3,8 @@ import { IsString, IsNotEmpty, IsEnum, IsNumber } from 'class-validator';
 import { Languages } from '@code-judge/common';
 
 export class CreateSubmissionDto {
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   @IsNumber()
-  @IsNotEmpty()
   problemId: number;
 
   @ApiProperty()
@@ -14,6 +13,7 @@ export class CreateSubmissionDto {
   code: string;
 
   @ApiProperty({
+    type: 'enum',
     enum: Languages,
     enumName: 'SupportedLanguages',
   })

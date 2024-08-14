@@ -3,7 +3,7 @@ import { UserRole } from '../enums/user-role';
 import { IsEnum } from 'class-validator';
 
 export class ChangeUserRoleDto {
-  @ApiProperty({ enum: UserRole, enumName: 'UserRole' })
+  @ApiProperty({ type: 'enum', enum: UserRole, enumName: 'UserRole' })
   @IsEnum(UserRole)
   role: UserRole;
 }

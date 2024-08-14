@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +10,7 @@ import { Problem } from '../../problem/entities';
 import { User } from '../../user/entities';
 import { SubmissionState } from '../enums';
 import { Languages, StatusMessage } from '@code-judge/common';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Submission {
@@ -17,8 +18,9 @@ export class Submission {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ApiProperty()
+  @ApiHideProperty()
   @Column('varchar')
+  @Exclude({ toPlainOnly: true })
   path: string;
 
   @ApiProperty({

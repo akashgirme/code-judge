@@ -9,13 +9,14 @@ import {
   SignedInUserResponseDto,
   InitiateSignInDto,
 } from '../dto';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 import { AuthProvider } from '../enums';
 import { Throttle } from '@nestjs/throttler';
 
 const RATE_LIMIT_TIME_IN_MILISECONDS = 30 * 1000;
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

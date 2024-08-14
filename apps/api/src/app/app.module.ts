@@ -36,6 +36,7 @@ import { BullModule } from '@nestjs/bullmq';
         limit: 10,
       },
     ]),
+    //TODO: Use REDIS_URL here for connection
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

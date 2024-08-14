@@ -1,7 +1,6 @@
 import { Problem } from '../entities';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsString } from 'class-validator';
 
 export class AdminProblemDto extends Problem {
   @ApiProperty()
@@ -9,7 +8,6 @@ export class AdminProblemDto extends Problem {
   remark: string;
 
   @ApiProperty()
-  @IsString()
   description: string;
 
   @ApiProperty()

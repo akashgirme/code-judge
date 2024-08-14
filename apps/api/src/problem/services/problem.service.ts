@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Problem } from '../entities';
 import { Repository } from 'typeorm';
@@ -11,6 +16,8 @@ import {
   ProblemDto,
   ProblemsQueryDto,
   UpdateProblemDto,
+  AddTestCasesDto,
+  SuccessMessageDto,
 } from '../dto';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
@@ -24,6 +31,7 @@ import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ProblemService {
+  private logger = new Logger(ProblemService.name);
   constructor(
     @InjectRepository(Problem) private problemRepo: Repository<Problem>,
     private readonly storageService: StorageService,
@@ -61,6 +69,7 @@ export class ProblemService {
     { title, difficulty, description, tagIds }: UpdateProblemDto
   ) {
     const ability = this.abilityFactory.defineAbilityForUser(user);
+
     const { tags } = await this.tagService.findTags(tagIds);
 
     const problem = await this.getProblemById(problemId);
@@ -73,7 +82,6 @@ export class ProblemService {
       );
     }
 
-    // Store/update the problem description in object store (S3 Bucket).
     if (description) {
       await this.storageService.putObject(
         `problems/${problem.slug}/description.md`,
@@ -99,16 +107,16 @@ export class ProblemService {
       `problems/${slug}/description.md`
     );
 
-    return { ...problem, description };
+    return plainToClass(ProblemDto, { ...problem, description });
   }
 
   async getProblemForAuthor(user: User, problemId: number): Promise<AuthorProblemDto> {
     const problem = await this.problemRepo
       .createQueryBuilder('problem')
       .leftJoinAndSelect('problem.author', 'author')
-      .select(['problem'])
-      .where('problem.id =: problemId', { problemId })
-      .andWhere('author.id =: userId', { userId: user.id })
+      .select(['problem', 'problem.remark'])
+      .where('problem.id = :problemId', { problemId })
+      .andWhere('author.id = :userId', { userId: user.id })
       .getOne();
 
     const [description, { input, output }] = await Promise.all([
@@ -128,19 +136,37 @@ export class ProblemService {
     const problem = await this.getProblemById(problemId);
 
     const { slug } = problem;
-    const [description, testcases, additionalTestcases] = await Promise.all([
-      this.storageService.getObject(`problems/${slug}/description.md`),
-      this.testCaseService.getTestCases(slug),
-      this.testCaseService.getAdditionalTestCases(slug),
-    ]);
+    let description, testcases, additionalTestcases;
+    try {
+      const promises = [
+        this.storageService.getObject(`problems/${slug}/description.md`),
+        this.testCaseService.getTestCases(slug),
+        this.testCaseService.getAdditionalTestCases(slug),
+      ];
+
+      const results = await Promise.all(
+        promises.map(async (promise) => {
+          try {
+            return await promise;
+          } catch (error) {
+            console.error(error);
+            return null; // Return null if the promise fails
+          }
+        })
+      );
+
+      [description, testcases, additionalTestcases] = results;
+    } catch (error) {
+      this.logger.error('An error occurred:', error);
+    }
 
     return plainToClass(AdminProblemDto, {
       ...problem,
       description,
-      authorTestCasesInput: testcases.input,
-      authorTestCasesOutput: testcases.output,
-      additionalTestCasesInput: additionalTestcases.input,
-      additionalTestCasesOutput: additionalTestcases.output,
+      authorTestCasesInput: testcases?.input ?? '',
+      authorTestCasesOutput: testcases?.output ?? '',
+      additionalTestCasesInput: additionalTestcases?.input ?? '',
+      additionalTestCasesOutput: additionalTestcases?.output ?? '',
     });
   }
 
@@ -164,6 +190,7 @@ export class ProblemService {
         'problem.difficulty',
         'problem.createdAt',
         'problem.updatedAt',
+        'problem.deletedAt',
         'author.id',
         'author.firstName',
         'author.lastName',
@@ -253,13 +280,43 @@ export class ProblemService {
     return problem;
   }
 
-  async changeProblemStatus({ problemId, remark, status }: ChangeProblemStatusDto) {
+  async changeProblemStatus(
+    problemId: number,
+    { remark, status }: ChangeProblemStatusDto
+  ) {
     const problem = await this.getProblemById(problemId);
 
     problem.status = status;
     problem.remark = remark;
 
     return this.problemRepo.save(problem);
+  }
+
+  async addTestCasesToProblem(
+    user: User,
+    { problemId, input, output }: AddTestCasesDto
+  ): Promise<SuccessMessageDto> {
+    const problem = await this.getProblemById(problemId);
+    if (problem.author.id !== user.id) {
+      throw new ForbiddenException(
+        `You are not allowed to add testcases to problem with id: ${problemId}`
+      );
+    }
+
+    await this.testCaseService.saveTestCases(problem.slug, input, output);
+    problem.hasTestCases = true;
+    await this.problemRepo.save(problem);
+    return { message: 'TestCases added successfully' };
+  }
+
+  async addAdditionalTestCasesToProblem({
+    problemId,
+    input,
+    output,
+  }: AddTestCasesDto): Promise<SuccessMessageDto> {
+    const problem = await this.getProblemById(problemId);
+    await this.testCaseService.saveAdditionalTestCases(problem.slug, input, output);
+    return { message: 'TestCases added successfully' };
   }
 
   private convertTitletoSlug(title: string) {

@@ -13,6 +13,7 @@ import { ProblemService } from '../services';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import {
+  AddTestCasesDto,
   AdminProblemDto,
   AllProblemsDto,
   AuthorProblemDto,
@@ -21,15 +22,17 @@ import {
   ProblemDto,
   ProblemsQueryDto,
   ProblemsQueryValidatorDto,
+  SuccessMessageDto,
   UpdateProblemDto,
 } from '../dto';
 import { Problem } from '../entities';
-import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { Action } from '../../ability/ability.factory';
 
+@ApiTags('problems')
 @Controller('problems')
 export class ProblemController {
   constructor(private readonly problemService: ProblemService) {}
@@ -75,9 +78,10 @@ export class ProblemController {
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Problem })
   getProblemForAuthor(
+    @CurrentUser() user: User,
     @Param('problemId', ParseIntPipe) problemId: number
   ): Promise<AuthorProblemDto> {
-    return this.getProblemForAuthor(problemId);
+    return this.problemService.getProblemForAuthor(user, problemId);
   }
 
   @Get('/admin/:problemId')
@@ -102,11 +106,30 @@ export class ProblemController {
     return this.problemService.updateProblem(user, problemId, body);
   }
 
-  @Put('/change-status')
+  @Put('/:problemId/change-status')
   @ApiOkResponse({ type: Problem })
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.Manage, subject: Problem })
-  changeProblemStatus(@Body() body: ChangeProblemStatusDto): Promise<Problem> {
-    return this.problemService.changeProblemStatus(body);
+  changeProblemStatus(
+    @Param('problemId', ParseIntPipe) problemId: number,
+    @Body() body: ChangeProblemStatusDto
+  ): Promise<Problem> {
+    return this.problemService.changeProblemStatus(problemId, body);
+  }
+
+  @Post('/add-testcases')
+  @ApiOkResponse({ type: SuccessMessageDto })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.UpdateOwn, subject: Problem })
+  addTestCasesToProblem(@CurrentUser() user: User, @Body() body: AddTestCasesDto) {
+    return this.problemService.addTestCasesToProblem(user, body);
+  }
+
+  @Post('/admin/add-testcases')
+  @ApiOkResponse({ type: SuccessMessageDto })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
+  addTestCasesToProblemByAdminOnly(@Body() body: AddTestCasesDto) {
+    return this.problemService.addAdditionalTestCasesToProblem(body);
   }
 }

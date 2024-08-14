@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Problem } from '../../problem/entities';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Languages } from '@code-judge/common';
 import { User } from '../../user/entities';
 import { Exclude } from 'class-transformer';
@@ -19,7 +19,7 @@ export class Solution {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ApiProperty()
+  @ApiHideProperty()
   @Column('varchar')
   @Exclude({ toPlainOnly: true })
   path: string;

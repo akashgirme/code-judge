@@ -4,16 +4,12 @@ import { User } from '../../user/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from '../entities';
 import { Repository } from 'typeorm';
-import { AllSubmissionsDto, CreateSubmissionDto } from '../dto';
-import { SubmissionState } from '../enums';
-import { getPaginationMeta } from '../../common/utility';
-import { SubmissionsQueryDto } from '../dto/submissions-query.dto';
-import { SortOrder } from '../../common/types';
 import { UpdateSubmission } from '../types';
 import { ProblemService } from '../../problem/services';
-import { StatusMessage } from '@code-judge/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { CreateSubmissionDto, SubmissionDto } from '../dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class SubmissionService {
@@ -73,42 +69,9 @@ export class SubmissionService {
 
     const updatedSubmission = await this.submissionRepo.save(submission);
 
-    this.logger.log('Submission Updated');
+    this.logger.log('Submission state updated', `state: ${state}`);
 
     return updatedSubmission;
-  }
-
-  async getSubmissionsByProblem(
-    problemId: number,
-    body: SubmissionsQueryDto
-  ): Promise<AllSubmissionsDto> {
-    const { pageIndex = 0, pageSize = 10 } = body;
-
-    const query = this.submissionRepo
-      .createQueryBuilder('submission')
-      .where('submission.problem = :problemId', { problemId })
-      .orderBy('submission.createdAt', 'DESC')
-      .skip(pageIndex * pageSize)
-      .take(pageSize);
-
-    if (body.language) {
-      query.andWhere('submission.language =:language', { language: body.language });
-    }
-
-    if (body.order) {
-      query.orderBy('submission.updatedAt', body.order);
-    } else {
-      query.orderBy('submission.updatedAt', SortOrder.DESC);
-    }
-
-    const [submissions, totalItems] = await query.getManyAndCount();
-
-    const paginationMeta = getPaginationMeta(
-      { pageIndex, pageSize },
-      { totalItems, itemsOnPage: submissions.length }
-    );
-
-    return { submissions, paginationMeta };
   }
 
   async getSubmissionsByProblemAndUser(
@@ -117,12 +80,21 @@ export class SubmissionService {
   ): Promise<Submission[]> {
     const submissions = await this.submissionRepo
       .createQueryBuilder('submission')
-      .where('submission.user = :userId', { userId: user.id })
-      .andWhere('submission.problem = :problemId', { problemId })
+      .leftJoinAndSelect('submission.user', 'user')
+      .leftJoinAndSelect('submission.problem', 'problem')
+      .select(['submission'])
+      .where('user.id = :userId', { userId: user.id })
+      .andWhere('problem.id = :problemId', { problemId })
       .orderBy('submission.createdAt', 'DESC')
       .getMany();
 
     return submissions;
+  }
+
+  async getSubmission(submissionId: number): Promise<SubmissionDto> {
+    const submission = await this.getSubmissionById(submissionId);
+    const code = await this.storageService.getObject(submission.path);
+    return plainToClass(SubmissionDto, { ...submission, code });
   }
 
   async getSubmissionById(id: number) {
@@ -135,8 +107,6 @@ export class SubmissionService {
       );
     }
 
-    const code = await this.storageService.getObject(submission.path);
-
-    return { ...submission, code };
+    return submission;
   }
 }
