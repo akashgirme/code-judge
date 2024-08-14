@@ -1,7 +1,14 @@
-import { IsString, IsNotEmpty, IsEnum, IsArray, Matches } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEnum,
+  IsArray,
+  Matches,
+  IsNumber,
+  ArrayUnique,
+} from 'class-validator';
 import { ProblemDifficulty } from '../enums';
 import { ApiProperty } from '@nestjs/swagger';
-import { Languages } from '@code-judge/common';
 
 export class CreateProblemDto {
   @ApiProperty()
@@ -24,34 +31,9 @@ export class CreateProblemDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  primarySolution: string;
-
-  @ApiProperty({
-    enum: Languages,
-    enumName: 'SupportedLanguages',
-  })
-  @IsEnum(Languages)
-  primarySolutionLanguage: Languages;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  testCasesInput: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  testCasesOutput: string;
-
-  @ApiProperty({ required: false })
-  @IsString()
-  internalNotes?: string;
-
-  @ApiProperty()
+  @ApiProperty({ required: false, type: [Number] })
   @IsArray()
-  @IsString({ each: true })
-  topicIds: string[];
+  @ArrayUnique({ message: 'Tags array must contain unique TagIds' })
+  @IsNumber(undefined, { each: true })
+  tagIds?: number[];
 }

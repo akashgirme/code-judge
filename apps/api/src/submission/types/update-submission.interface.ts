@@ -1,6 +1,11 @@
+import { StatusMessage } from '@code-judge/common';
+import { SubmissionState } from '../enums';
+
 export interface UpdateSubmission {
-  submissionId: string;
-  totalTestCases: number;
-  testCasesPassed: number;
-  stderr?: string;
+  submissionId: number;
+  totalTestCases?: number;
+  testCasesPassed?: number;
+  statusMessage?: StatusMessage;
+  state: SubmissionState;
+  finished?: boolean;
 }

@@ -1,22 +1,15 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from '../entities';
 import { Repository } from 'typeorm';
-import { AllSubmissionsDto, CreateSubmissionDto } from '../dto';
-import { SubmissionStatus } from '../enums';
-import { getPaginationMeta } from '../../common/utility';
-import { SubmissionsQueryDto } from '../dto/submissions-query.dto';
-import { SortOrder } from '../../common/types';
-import { ExecutionService } from '../../execution/services';
 import { UpdateSubmission } from '../types';
+import { ProblemService } from '../../problem/services';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { CreateSubmissionDto, SubmissionDto } from '../dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class SubmissionService {
@@ -24,22 +17,22 @@ export class SubmissionService {
   constructor(
     @InjectRepository(Submission) private submissionRepo: Repository<Submission>,
     private readonly storageService: StorageService,
-    @Inject(forwardRef(() => ExecutionService))
-    private readonly executionService: ExecutionService
+    private readonly problemService: ProblemService,
+    @InjectQueue('CODE_EXECUTION') private executionQueue: Queue
   ) {}
 
   async createSubmission(user: User, { problemId, code, language }: CreateSubmissionDto) {
-    const submissionSlug = `submissions/${
+    const problem = await this.problemService.getProblemById(problemId);
+    const path = `submissions/${problem.slug}/${language}/${
       user.id
-    }/${problemId}/${Date.now()}.${language}`;
-    await this.storageService.putObject(submissionSlug, code);
+    }/solution-${Date.now()}.txt`;
+    await this.storageService.putObject(path, code);
 
     const submissionObj = this.submissionRepo.create({
-      slug: submissionSlug,
+      path,
       language,
       user,
-      status: SubmissionStatus.PENDING,
-      problem: { id: problemId },
+      problem,
     });
 
     const submission = await this.submissionRepo.save(submissionObj);
@@ -47,9 +40,11 @@ export class SubmissionService {
     this.logger.log('Submission created with id: ', submission.id);
 
     /**
-     * Send submission for execution.
+     * Add submission in Queue for execution.
      */
-    await this.executionService.executeSubmission(problemId, submission.id);
+    await this.executionQueue.add('execute', {
+      payload: { problemId, submissionId: submission.id },
+    });
 
     this.logger.log('Code excution request send for submission: ', submission.id);
 
@@ -60,76 +55,49 @@ export class SubmissionService {
     submissionId,
     totalTestCases,
     testCasesPassed,
-    stderr,
+    statusMessage,
+    state,
+    finished,
   }: UpdateSubmission) {
     const submission = await this.getSubmissionById(submissionId);
 
-    this.logger.log('Standard Error occured: ', stderr);
-
-    const status =
-      totalTestCases === testCasesPassed
-        ? SubmissionStatus.ACCEPTED
-        : SubmissionStatus.FAILED;
-
-    submission.status = status;
+    submission.state = state;
+    submission.statusMessage = statusMessage;
     submission.totalTestCases = totalTestCases;
     submission.testCasesPassed = testCasesPassed;
+    submission.finished = finished;
 
     const updatedSubmission = await this.submissionRepo.save(submission);
 
-    this.logger.log('Submission Updated');
+    this.logger.log('Submission state updated', `state: ${state}`);
 
     return updatedSubmission;
   }
 
-  async getSubmissionsByProblem(
-    problemId: string,
-    body: SubmissionsQueryDto
-  ): Promise<AllSubmissionsDto> {
-    const { pageIndex = 0, pageSize = 10 } = body;
-
-    const query = this.submissionRepo
-      .createQueryBuilder('submission')
-      .where('submission.problem = :problemId', { problemId })
-      .orderBy('submission.createdAt', 'DESC')
-      .skip(pageIndex * pageSize)
-      .take(pageSize);
-
-    if (body.language) {
-      query.andWhere('submission.language =:language', { language: body.language });
-    }
-
-    if (body.order) {
-      query.orderBy('submission.updatedAt', body.order);
-    } else {
-      query.orderBy('submission.updatedAt', SortOrder.DESC);
-    }
-
-    const [submissions, totalItems] = await query.getManyAndCount();
-
-    const paginationMeta = getPaginationMeta(
-      { pageIndex, pageSize },
-      { totalItems, itemsOnPage: submissions.length }
-    );
-
-    return { submissions, paginationMeta };
-  }
-
   async getSubmissionsByProblemAndUser(
     user: User,
-    problemId: string
+    problemId: number
   ): Promise<Submission[]> {
     const submissions = await this.submissionRepo
       .createQueryBuilder('submission')
-      .where('submission.user = :userId', { userId: user.id })
-      .andWhere('submission.problem = :problemId', { problemId })
+      .leftJoinAndSelect('submission.user', 'user')
+      .leftJoinAndSelect('submission.problem', 'problem')
+      .select(['submission'])
+      .where('user.id = :userId', { userId: user.id })
+      .andWhere('problem.id = :problemId', { problemId })
       .orderBy('submission.createdAt', 'DESC')
       .getMany();
 
     return submissions;
   }
 
-  async getSubmissionById(id: string) {
+  async getSubmission(submissionId: number): Promise<SubmissionDto> {
+    const submission = await this.getSubmissionById(submissionId);
+    const code = await this.storageService.getObject(submission.path);
+    return plainToClass(SubmissionDto, { ...submission, code });
+  }
+
+  async getSubmissionById(id: number) {
     const submission = await this.submissionRepo.findOneBy({ id });
 
     if (!submission) {
@@ -139,8 +107,6 @@ export class SubmissionService {
       );
     }
 
-    const code = await this.storageService.getObject(submission.slug);
-
-    return { ...submission, code };
+    return submission;
   }
 }

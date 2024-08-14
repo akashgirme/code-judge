@@ -1,42 +1,40 @@
 import { injectable } from 'tsyringe';
-import axios from 'axios';
-import { ExecutionRequestPayload } from '@code-judge/common';
+import {
+  ExecutionCallback,
+  ExecutionRequestPayload,
+  StatusMessage,
+} from '@code-judge/common';
+import { finished } from 'stream';
 
 @injectable()
 export class ExecutionService {
   async executeCode({
-    requestId,
-    executionType,
+    submissionId,
     sourceCode,
     testCasesInput,
     expectedOutput,
     language,
-  }: ExecutionRequestPayload) {
+  }: ExecutionRequestPayload): Promise<ExecutionCallback> {
     console.log(
       `Execution Payload Received \n'
-      RequestId: ${requestId} \n,
-      ExecutionType: ${executionType} \n
+      RequestId: ${submissionId} \n,
       SourceCode: ${sourceCode}\n, 
       InputTestCases: ${testCasesInput}\n, 
       ExpectedOutput:${expectedOutput}\n,
-      Execution-language: ${language}\n`
+      language: ${language}\n`
     );
 
-    const callbackUrl = process.env.PROBLEM_SERVER_CALLBACK_URL ?? '';
-
-    //TODO: This is mock function but here is actual execution via docker goes.
-    setTimeout(async () => {
-      const totalTestCases = 10;
-      const testCasesPassed = 10;
-      const stderr = '';
-      // Send result back to the problem server
-      await axios.post(callbackUrl, {
-        requestId,
-        executionType,
-        totalTestCases,
-        testCasesPassed,
-        stderr,
-      });
-    }, 2000);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const responseObj = {
+          submissionId,
+          totalTestCases: 10,
+          testCasesPassed: 10,
+          statusMessage: StatusMessage.ACCEPTED,
+          finished: true,
+        };
+        resolve(responseObj);
+      }, 2000);
+    });
   }
 }

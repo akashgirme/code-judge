@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
-export class CreateTopicDto {
+export class CreateTagDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -10,5 +10,5 @@ export class CreateTopicDto {
     message: 'Only alphabetical characters and white spaces are allowed.',
   })
   @Transform(({ value }) => (value as string).trim().toLowerCase())
-  topicName: string;
+  tagName: string;
 }

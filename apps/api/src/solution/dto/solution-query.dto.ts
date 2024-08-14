@@ -1,19 +1,27 @@
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
-import { IsEmpty, IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsNumber } from 'class-validator';
 import { IntersectionType as ValidatorIntersectionType } from '@nestjs/mapped-types';
 import { Languages } from '@code-judge/common';
+import { PaginationDto, SortingDto } from '../../common/dto';
 
 class SolutionQuery {
-  @ApiProperty()
-  @IsString()
-  @IsEmpty()
-  problemId: string;
+  @ApiProperty({ type: Number })
+  @IsNumber()
+  problemId: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'enum', enum: Languages, enumName: 'SupportedLanguages' })
   @IsEnum(Languages)
   language: Languages;
 }
 
-export class SolutionQueryValidatorDto extends ValidatorIntersectionType(SolutionQuery) {}
+export class SolutionQueryValidatorDto extends ValidatorIntersectionType(
+  PaginationDto,
+  SortingDto,
+  SolutionQuery
+) {}
 
-export class SolutionQueryDto extends IntersectionType(SolutionQuery) {}
+export class SolutionQueryDto extends IntersectionType(
+  PaginationDto,
+  SortingDto,
+  SolutionQuery
+) {}

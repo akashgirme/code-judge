@@ -24,15 +24,15 @@ export class AuthCacheService {
     }
   }
 
-  fetchUserFromCache(userId: string): Promise<User> {
+  fetchUserFromCache(userId: number): Promise<User> {
     return this.cacheManager.get(`user:${userId}`);
   }
 
-  deleteUserFromCache(userId: string): Promise<void> {
+  deleteUserFromCache(userId: number): Promise<void> {
     return this.cacheManager.del(`user:${userId}`);
   }
 
-  async storeRefreshTokenInCache(refreshToken: string, userId: string): Promise<void> {
+  async storeRefreshTokenInCache(refreshToken: string, userId: number): Promise<void> {
     try {
       await this.cacheManager.set(`refresh-token:${userId}`, refreshToken, {
         ttl: REFRESH_TOKEN_CACHING_TTL_IN_SECONDS,
@@ -44,15 +44,15 @@ export class AuthCacheService {
     }
   }
 
-  async retrieveRefreshTokenFromCache(userId: string): Promise<string> {
+  async retrieveRefreshTokenFromCache(userId: number): Promise<string> {
     return this.cacheManager.get(`refresh-token:${userId}`);
   }
 
-  removeRefreshTokenFromCache(userId: string): Promise<void> {
+  removeRefreshTokenFromCache(userId: number): Promise<void> {
     return this.cacheManager.del(`refresh-token:${userId}`);
   }
 
-  async storeOtpDetailsInCache(otpDetails: OtpDetails, userId: string): Promise<void> {
+  async storeOtpDetailsInCache(otpDetails: OtpDetails, userId: number): Promise<void> {
     try {
       await this.cacheManager.set(`user-otp:${userId}`, otpDetails, {
         ttl: OTP_CACHING_TTL_IN_SECONDS,
@@ -63,7 +63,7 @@ export class AuthCacheService {
     }
   }
 
-  fetchOtpDetailsFromCache(userId: string): Promise<OtpDetails> {
+  fetchOtpDetailsFromCache(userId: number): Promise<OtpDetails> {
     return this.cacheManager.get(`user-otp:${userId}`);
   }
 }

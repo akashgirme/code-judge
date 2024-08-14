@@ -1,2 +1,2 @@
 export { Problem } from './problem.entity';
-export { Topic } from './topic.entity';
+export { Tag } from './tag.entity';

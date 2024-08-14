@@ -1,10 +1,13 @@
 export { CreateProblemDto } from './create-problem.dto';
-export { CreateTopicDto } from './create-topic.dto';
-export { ProblemsResponseDto } from './problems-response.dto';
-export { ProblemResponseDto } from './problem-response.dto';
+export { CreateTagDto } from './create-tag.dto';
+export { ProblemDto } from './problem.dto';
+export { AllProblemsDto } from './all-problems.dto';
 export { ProblemsQueryDto } from './problems-query.dto';
 export { ProblemsQueryValidatorDto } from './problems-query.dto';
 export { UpdateProblemDto } from './update-problem.dto';
 export { ProblemFilterDto } from './problem-filter.dto';
-export { ProblemResponseAdminDto } from './problem-response-admin.dto';
+export { AdminProblemDto } from './problem-admin.dto';
 export { ChangeProblemStatusDto } from './change-problem-status.dto';
+export { AuthorProblemDto } from './author-problem.dto';
+export { AddTestCasesDto } from './add-testcases.dto';
+export { SuccessMessageDto } from './success-message.dto';

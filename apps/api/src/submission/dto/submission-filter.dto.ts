@@ -4,6 +4,7 @@ import { IsEnum } from 'class-validator';
 
 export class SubmissionFilterDto {
   @ApiProperty({
+    type: 'enum',
     enum: Languages,
     enumName: 'SupportedLanguages',
   })

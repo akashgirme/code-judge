@@ -1,14 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsArray, ArrayUnique, IsEnum, IsString } from 'class-validator';
+import {
+  IsArray,
+  ArrayUnique,
+  IsEnum,
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+} from 'class-validator';
 import { ProblemDifficulty, ProblemStatus } from '../enums';
 
 export class ProblemFilterDto {
   @ApiProperty({ required: false })
   @IsString()
+  @IsNotEmpty()
   title?: string;
 
   @ApiProperty({ required: false })
-  @IsUUID()
+  @IsNumber()
   authorId?: string;
 
   @ApiProperty({
@@ -29,9 +37,9 @@ export class ProblemFilterDto {
   @IsEnum(ProblemStatus)
   status?: ProblemStatus;
 
-  @ApiProperty({ required: false, type: [String] })
+  @ApiProperty({ required: false, type: [Number] })
   @IsArray()
-  @ArrayUnique({ message: 'Topics array must contain unique TopicIds' })
-  @IsUUID(undefined, { each: true })
-  topicIds?: string[];
+  @ArrayUnique({ message: 'Tags array must contain unique TagIds' })
+  @IsNumber(undefined, { each: true })
+  tagIds?: number[];
 }

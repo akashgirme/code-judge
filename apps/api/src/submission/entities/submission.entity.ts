@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -8,37 +8,49 @@ import {
 } from 'typeorm';
 import { Problem } from '../../problem/entities';
 import { User } from '../../user/entities';
-import { SubmissionStatus } from '../enums';
-import { Languages } from '@code-judge/common';
+import { SubmissionState } from '../enums';
+import { Languages, StatusMessage } from '@code-judge/common';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Submission {
-  @ApiProperty()
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @ApiProperty({ type: 'integer' })
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
-  @ApiProperty()
+  @ApiHideProperty()
   @Column('varchar')
-  slug: string;
+  @Exclude({ toPlainOnly: true })
+  path: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: 'enum',
+    enum: Languages,
+  })
   @Column('enum', { enum: Languages })
   language: Languages;
 
-  @Column({
-    type: 'enum',
-    enum: SubmissionStatus,
-    default: SubmissionStatus.PENDING,
+  @Column('enum', {
+    enum: SubmissionState,
+    default: SubmissionState.PENDING,
   })
-  status: SubmissionStatus;
+  state: SubmissionState;
+
+  @ApiProperty()
+  @Column('enum', { enum: StatusMessage, default: StatusMessage.NULL })
+  statusMessage: StatusMessage;
+
+  @ApiProperty()
+  @Column('int', { nullable: true })
+  totalTestCases: number;
 
   @ApiProperty()
   @Column('int', { nullable: true })
   testCasesPassed: number;
 
   @ApiProperty()
-  @Column('int', { nullable: true })
-  totalTestCases: number;
+  @Column('boolean', { default: false })
+  finished: boolean;
 
   @ApiProperty()
   @ManyToOne(() => Problem, (problem) => problem.submissions, { eager: true })

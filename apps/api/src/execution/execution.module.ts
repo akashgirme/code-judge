@@ -1,25 +1,19 @@
-import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ExecutionController } from './controllers';
+import { forwardRef, Module } from '@nestjs/common';
 import { ExecutionService } from './services';
 import { ProblemModule } from '../problem/problem.module';
-import { SolutionModule } from '../solution/solution.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { HttpModule } from '@nestjs/axios';
-import { VerifyCallbackMiddleware } from './middlewares';
+import { StorageModule } from '../object-store/storage.module';
 
 @Module({
   imports: [
     forwardRef(() => ProblemModule),
-    forwardRef(() => SolutionModule),
     forwardRef(() => SubmissionModule),
+    StorageModule,
     HttpModule,
   ],
-  controllers: [ExecutionController],
+  controllers: [],
   providers: [ExecutionService],
-  exports: [ExecutionService],
+  exports: [],
 })
-export class ExecutionModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(VerifyCallbackMiddleware).forRoutes('/callback');
-  }
-}
+export class ExecutionModule {}

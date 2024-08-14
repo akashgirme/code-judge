@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Problem } from '../entities';
 import { PaginationResultDto } from '../../common/dto';
 
-export class ProblemsResponseDto {
+export class AllProblemsDto {
   @ApiProperty({ type: [Problem] })
   problems: Problem[];
 

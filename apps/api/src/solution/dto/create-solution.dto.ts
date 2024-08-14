@@ -1,21 +1,20 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEnum, IsNumber } from 'class-validator';
 import { Languages } from '@code-judge/common';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 
-export class CreateSubmissionDto {
+export class CreateSolutionDto {
   @ApiProperty({ type: Number })
   @IsNumber()
   problemId: number;
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  code: string;
+  description: string;
 
   @ApiProperty({
     type: 'enum',
     enum: Languages,
-    enumName: 'SupportedLanguages',
+    enumName: 'Languages',
   })
   @IsEnum(Languages)
   language: Languages;

@@ -1,1 +1,1 @@
-export { SubmissionStatus } from './submission-status.enum';
+export { SubmissionState } from './submission-state.enum';

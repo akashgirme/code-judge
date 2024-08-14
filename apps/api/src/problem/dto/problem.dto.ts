@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Submission } from '../entities';
+import { Problem } from '../entities';
 import { Exclude } from 'class-transformer';
 
-export class SubmissionDto extends Submission {
+export class ProblemDto extends Problem {
   @Exclude()
-  path: string;
+  remark: string;
 
   @ApiProperty()
-  code: string;
+  description: string;
 }

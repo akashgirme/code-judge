@@ -12,16 +12,16 @@ import { Problem } from './problem.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity()
-export class Topic {
-  @ApiProperty()
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class Tag {
+  @ApiProperty({ type: 'integer' })
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @ApiProperty()
   @Column('varchar')
   name: string;
 
-  @ManyToMany(() => Problem, (problem) => problem.topics)
+  @ManyToMany(() => Problem, (problem) => problem.tags)
   problems: Problem[];
 
   @CreateDateColumn()

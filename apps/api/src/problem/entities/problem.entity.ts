@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -13,16 +13,16 @@ import {
 } from 'typeorm';
 import { ProblemDifficulty, ProblemStatus } from '../enums';
 import { User } from '../../user/entities';
-import { Topic } from './topic.entity';
 import { Submission } from '../../submission/entities';
 import { Exclude } from 'class-transformer';
-import { Languages } from '@code-judge/common';
+import { Tag } from './tag.entity';
+import { Solution } from '../../solution/entities';
 
 @Entity()
 export class Problem {
-  @ApiProperty()
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @ApiProperty({ type: 'integer' })
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @ApiProperty()
   @Column()
@@ -32,37 +32,16 @@ export class Problem {
     enum: ProblemDifficulty,
     enumName: 'ProblemDifficulty',
   })
-  @Column({
-    type: 'enum',
+  @Column('enum', {
     enum: ProblemDifficulty,
   })
   difficulty: ProblemDifficulty;
 
-  @ApiProperty()
+  @ApiHideProperty()
   @Column('varchar')
+  @Exclude({ toPlainOnly: true })
   slug: string;
 
-  @ApiProperty({
-    type: () => User,
-  })
-  @ManyToOne(() => User, (user) => user.problems)
-  author: User;
-
-  @ApiProperty({ type: [Topic] })
-  @ManyToMany(() => Topic, (topic) => topic.problems)
-  @JoinTable()
-  topics: Topic[];
-
-  @ApiProperty()
-  @Column('text', { nullable: true })
-  // @Exclude({ toPlainOnly: true })
-  internalNotes: string;
-
-  @ApiProperty({
-    enum: ProblemStatus,
-    enumName: 'ProblemStatus',
-    default: ProblemStatus.UNPUBLISHED,
-  })
   @Column({
     type: 'enum',
     enum: ProblemStatus,
@@ -70,24 +49,33 @@ export class Problem {
   })
   status: ProblemStatus;
 
-  @ApiProperty({
-    enum: Languages,
-    enumName: 'SupportedLanguages',
-  })
-  @Column({
-    type: 'enum',
-    enum: Languages,
-  })
-  primarySolutionLanguage: Languages;
-
   @ApiProperty()
   @Column({
     default: false,
   })
-  isVerified: boolean;
+  hasTestCases: boolean;
+
+  @ApiProperty()
+  @Column('text', { nullable: true })
+  // @Exclude({ toPlainOnly: true })
+  remark: string;
+
+  @ApiProperty({ type: [Tag] })
+  @ManyToMany(() => Tag, (tag) => tag.problems)
+  @JoinTable()
+  tags: Tag[];
+
+  @ApiProperty({
+    type: () => User,
+  })
+  @ManyToOne(() => User, (user) => user.problems)
+  author: User;
 
   @OneToMany(() => Submission, (submission) => submission.problem)
   submissions: Submission[];
+
+  @OneToMany(() => Solution, (solution) => solution.problem)
+  solutions: Solution[];
 
   @ApiProperty()
   @CreateDateColumn()
