@@ -32,8 +32,7 @@ export class Problem {
     enum: ProblemDifficulty,
     enumName: 'ProblemDifficulty',
   })
-  @Column({
-    type: 'enum',
+  @Column('enum', {
     enum: ProblemDifficulty,
   })
   difficulty: ProblemDifficulty;

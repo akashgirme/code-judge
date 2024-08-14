@@ -39,7 +39,7 @@ export class SolutionService {
     { problemId, description, language }: CreateSolutionDto
   ): Promise<SolutionDto> {
     const { slug } = await this.problemService.getProblemById(problemId);
-    const path = `solutions/${slug}/${language}/${user.id}/solution-${Date.now()}`;
+    const path = `solutions/${slug}/${language}/${user.id}/solution-${Date.now()}.md`;
     await this.storageService.putObject(path, description);
     const solutionObj = this.solutionRepo.create({
       path,

@@ -5,9 +5,8 @@ import { StorageModule } from '../object-store/storage.module';
 import { AuthModule } from '../auth/auth.module';
 import { AbilityModule } from '../ability/ability.module';
 import { ProblemService, TagService, TestCaseService } from './services';
-import { ProblemController } from './controllers';
+import { ProblemController, TagController } from './controllers';
 import { PassportModule } from '@nestjs/passport';
-import { TagController } from './controllers/topic.controller';
 
 @Module({
   imports: [

@@ -4,6 +4,7 @@ import {
   Get,
   Logger,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -44,7 +45,7 @@ export class SubmissionController {
   @ApiOkResponse({ type: () => AllSubmissionsDto })
   @ApiQuery({ type: () => SubmissionsQueryDto })
   getSubmissionsByProblem(
-    @Param('problemId') problemId: string,
+    @Param('problemId', ParseIntPipe) problemId: number,
     @Query() query: SubmissionsQueryValidatorDto
   ): Promise<AllSubmissionsDto> {
     return this.submissionService.getSubmissionsByProblem(problemId, query);
@@ -56,7 +57,7 @@ export class SubmissionController {
   @ApiOkResponse({ type: [Submission] })
   getSubmissionsByUserAndProblem(
     @CurrentUser() user: User,
-    @Param('problemId') problemId: string
+    @Param('problemId', ParseIntPipe) problemId: number
   ): Promise<Submission[]> {
     return this.submissionService.getSubmissionsByProblemAndUser(user, problemId);
   }
@@ -66,7 +67,7 @@ export class SubmissionController {
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: SubmissionResponseDto })
   getSubmissionById(
-    @Param('submissionId') submissionId: string
+    @Param('submissionId', ParseIntPipe) submissionId: number
   ): Promise<SubmissionResponseDto> {
     return this.submissionService.getSubmissionById(submissionId);
   }

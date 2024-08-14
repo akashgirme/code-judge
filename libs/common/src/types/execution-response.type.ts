@@ -1,12 +1,11 @@
 import { z } from 'zod';
-import { ExecutionType } from '../enum';
+import { StatusMessage } from '../enum';
 
 export const ExecutionCallbackSchema = z.object({
-  requestId: z.string().uuid(),
-  executionType: z.nativeEnum(ExecutionType),
+  submissionId: z.number(),
   totalTestCases: z.number(),
   testCasesPassed: z.number(),
-  stderr: z.string().optional(),
+  statusMessage: z.nativeEnum(StatusMessage),
 });
 
 export type ExecutionCallback = z.infer<typeof ExecutionCallbackSchema>;

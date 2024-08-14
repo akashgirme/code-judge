@@ -16,6 +16,7 @@ import { SubmissionModule } from '../submission/submission.module';
 import { SolutionModule } from '../solution/solution.module';
 import { APP_GUARD } from '@nestjs/core';
 import { ExecutionModule } from '../execution/execution.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -35,6 +36,25 @@ import { ExecutionModule } from '../execution/execution.module';
         limit: 10,
       },
     ]),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('QUEUE_HOST'),
+          port: parseInt(configService.get<string>('QUEUE_PORT')),
+          username: configService.get<string>('QUEUE_USERNAME'),
+          password: configService.get<string>('QUEUE_PASSWORD'),
+        },
+      }),
+    }),
+    BullModule.registerQueue({
+      name: 'CODE_EXECUTION',
+      defaultJobOptions: {
+        removeOnComplete: 10 * 1000,
+        removeOnFail: 10 * 1000,
+      },
+    }),
     AbilityModule,
     AuthModule,
     UserModule,

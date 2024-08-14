@@ -1,22 +1,19 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from '../entities';
 import { Repository } from 'typeorm';
 import { AllSubmissionsDto, CreateSubmissionDto } from '../dto';
-import { SubmissionStatus } from '../enums';
+import { SubmissionState } from '../enums';
 import { getPaginationMeta } from '../../common/utility';
 import { SubmissionsQueryDto } from '../dto/submissions-query.dto';
 import { SortOrder } from '../../common/types';
-import { ExecutionService } from '../../execution/services';
 import { UpdateSubmission } from '../types';
+import { ProblemService } from '../../problem/services';
+import { StatusMessage } from '@code-judge/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class SubmissionService {
@@ -24,22 +21,22 @@ export class SubmissionService {
   constructor(
     @InjectRepository(Submission) private submissionRepo: Repository<Submission>,
     private readonly storageService: StorageService,
-    @Inject(forwardRef(() => ExecutionService))
-    private readonly executionService: ExecutionService
+    private readonly problemService: ProblemService,
+    @InjectQueue('CODE_EXECUTION') private executionQueue: Queue
   ) {}
 
   async createSubmission(user: User, { problemId, code, language }: CreateSubmissionDto) {
-    const submissionSlug = `submissions/${
+    const problem = await this.problemService.getProblemById(problemId);
+    const path = `submissions/${problem.slug}/${language}/${
       user.id
-    }/${problemId}/${Date.now()}.${language}`;
-    await this.storageService.putObject(submissionSlug, code);
+    }/solution-${Date.now()}.txt`;
+    await this.storageService.putObject(path, code);
 
     const submissionObj = this.submissionRepo.create({
-      slug: submissionSlug,
+      path,
       language,
       user,
-      status: SubmissionStatus.PENDING,
-      problem: { id: problemId },
+      problem,
     });
 
     const submission = await this.submissionRepo.save(submissionObj);
@@ -47,9 +44,11 @@ export class SubmissionService {
     this.logger.log('Submission created with id: ', submission.id);
 
     /**
-     * Send submission for execution.
+     * Add submission in Queue for execution.
      */
-    await this.executionService.executeSubmission(problemId, submission.id);
+    await this.executionQueue.add('execute', {
+      payload: { problemId, submissionId: submission.id },
+    });
 
     this.logger.log('Code excution request send for submission: ', submission.id);
 
@@ -60,20 +59,17 @@ export class SubmissionService {
     submissionId,
     totalTestCases,
     testCasesPassed,
-    stderr,
+    statusMessage,
+    state,
+    finished,
   }: UpdateSubmission) {
     const submission = await this.getSubmissionById(submissionId);
 
-    this.logger.log('Standard Error occured: ', stderr);
-
-    const status =
-      totalTestCases === testCasesPassed
-        ? SubmissionStatus.ACCEPTED
-        : SubmissionStatus.FAILED;
-
-    submission.status = status;
+    submission.state = state;
+    submission.statusMessage = statusMessage;
     submission.totalTestCases = totalTestCases;
     submission.testCasesPassed = testCasesPassed;
+    submission.finished = finished;
 
     const updatedSubmission = await this.submissionRepo.save(submission);
 
@@ -83,7 +79,7 @@ export class SubmissionService {
   }
 
   async getSubmissionsByProblem(
-    problemId: string,
+    problemId: number,
     body: SubmissionsQueryDto
   ): Promise<AllSubmissionsDto> {
     const { pageIndex = 0, pageSize = 10 } = body;
@@ -117,7 +113,7 @@ export class SubmissionService {
 
   async getSubmissionsByProblemAndUser(
     user: User,
-    problemId: string
+    problemId: number
   ): Promise<Submission[]> {
     const submissions = await this.submissionRepo
       .createQueryBuilder('submission')
@@ -129,7 +125,7 @@ export class SubmissionService {
     return submissions;
   }
 
-  async getSubmissionById(id: string) {
+  async getSubmissionById(id: number) {
     const submission = await this.submissionRepo.findOneBy({ id });
 
     if (!submission) {
@@ -139,7 +135,7 @@ export class SubmissionService {
       );
     }
 
-    const code = await this.storageService.getObject(submission.slug);
+    const code = await this.storageService.getObject(submission.path);
 
     return { ...submission, code };
   }

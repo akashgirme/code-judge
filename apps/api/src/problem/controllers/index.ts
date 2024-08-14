@@ -1,2 +1,2 @@
 export { ProblemController } from './problem.controller';
-export { TopicController } from './topic.controller';
+export { TagController } from './topic.controller';

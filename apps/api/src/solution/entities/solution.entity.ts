@@ -28,6 +28,7 @@ export class Solution {
     type: 'enum',
     enum: Languages,
   })
+  @Column('enum', { enum: Languages })
   language: Languages;
 
   @ManyToOne(() => User, (user) => user.solutions)
