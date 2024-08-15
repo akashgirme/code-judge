@@ -16,8 +16,8 @@ export const PublicProblemsView = () => {
             <CardHeader>
               <CardTitle>{problem.title}</CardTitle>
               <CardDescription className="flex gap-3">
-                {problem.topics?.map((topic) => (
-                  <Badge>{topic.name}</Badge>
+                {problem.tags?.map((tags) => (
+                  <Badge>{tags.name}</Badge>
                 ))}
               </CardDescription>
             </CardHeader>

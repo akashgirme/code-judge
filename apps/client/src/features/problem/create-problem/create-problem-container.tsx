@@ -16,7 +16,7 @@ export const CreateProblemContainer = () => {
       const { id } = await createProblem({
         createProblemDto: {
           ...data,
-          topicIds: data.topics.map((topic) => topic.value),
+          tagIds: data.tags.map((tag) => tag.value),
         },
       }).unwrap();
       navigate(`/problems/${id}`);
@@ -27,14 +27,9 @@ export const CreateProblemContainer = () => {
 
   const defaultValues: CreateProblemModel = {
     title: '',
-    internalNotes: '',
-    topics: [],
+    tags: [],
     description: '',
-    difficulty: 'EASY',
-    solution: '',
-    solutionLanguage: 'c',
-    testCasesInput: '',
-    testCasesOutput: '',
+    difficulty: 'Easy',
   };
 
   return <CreateProblemLogic defaultValues={defaultValues} onSubmit={handleSubmit} />;

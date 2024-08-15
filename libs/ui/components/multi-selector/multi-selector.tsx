@@ -16,13 +16,13 @@ import { Badge } from '../ui/badge';
 import { cn } from '../../lib';
 
 export interface Option {
-  value: string;
+  value: number;
   label: string;
   disable?: boolean;
   /** fixed option that can't be removed. */
   fixed?: boolean;
   /** Group the options by providing key. */
-  [key: string]: string | boolean | undefined;
+  [key: number]: number | boolean | undefined;
 }
 interface GroupOption {
   [key: string]: Option[];
@@ -96,7 +96,7 @@ export function useDebounce<T>(value: T, delay?: number): T {
   return debouncedValue;
 }
 
-function transToGroupOption(options: Option[], groupBy?: string) {
+function transToGroupOption(options: Option[], groupBy?: number) {
   if (options.length === 0) {
     return {};
   }
@@ -108,7 +108,7 @@ function transToGroupOption(options: Option[], groupBy?: string) {
 
   const groupOption: GroupOption = {};
   options.forEach((option) => {
-    const key = (option[groupBy] as string) || '';
+    const key = (option[groupBy] as number) || '';
     if (!groupOption[key]) {
       groupOption[key] = [];
     }
@@ -251,7 +251,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             e.preventDefault();
             e.stopPropagation();
           }}
-          onSelect={(value: string) => {
+          onSelect={(value: number) => {
             if (selected.length >= maxSelected) {
               onMaxSelected?.(selected.length);
               return;
