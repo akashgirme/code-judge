@@ -49,7 +49,9 @@ export const AllSubmissionsView = () => {
                 <Typography variant="h3">{submission.state}</Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h3">{`${submission.testCasesPassed}/${submission.totalTestCases}`}</Typography>
+                <Typography variant="h3">{`${submission.testCasesPassed ?? '--'}/${
+                  submission.totalTestCases ?? '--'
+                }`}</Typography>
               </TableCell>
               <TableCell>
                 <Typography variant="h3">{submission.createdAt}</Typography>
