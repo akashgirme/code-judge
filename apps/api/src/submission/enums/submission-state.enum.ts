@@ -1,6 +1,7 @@
 export enum SubmissionState {
-  PENDING = 'PENDING',
-  STARTED = ' STARTED',
-  RUNNING = 'RUNNING',
-  SUCCESS = 'SUCCESS',
+  PENDING = 'Pending',
+  STARTED = ' Started',
+  RUNNING = 'Running',
+  SUCCESS = 'Success',
+  ERROR = 'Error',
 }
