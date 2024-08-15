@@ -9,12 +9,9 @@ import {
   ProblemDifficultyField,
   ProblemExpectedOutputField,
   ProblemInputTestCasesField,
-  ProblemInternalNotesField,
-  ProblemSolutionField,
-  ProblemSolutionLangaugeField,
   ProblemStatusField,
   ProblemTitleField,
-  ProblemTopicsField,
+  ProblemTagsField,
 } from '../components/form-fields';
 import { Action, Can, Subject } from '../../auth/ability';
 
@@ -50,7 +47,7 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
                   <ProblemTitleField />
                 </div>
                 <div className="col-span-1 flex justify-evenly flex-wrap gap-5 ">
-                  <ProblemTopicsField />
+                  <ProblemTagsField />
                 </div>
                 <div className="col-span-1">
                   <ProblemDifficultyField />
@@ -60,23 +57,6 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
                 <div>
                   <ProblemDescriptionField />
                 </div>
-              </div>
-              <div className=" w-1/4 ">
-                <ProblemSolutionLangaugeField />
-              </div>
-              <div>
-                <ProblemSolutionField />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <ProblemInputTestCasesField />
-                </div>
-                <div className="col-span-1">
-                  <ProblemExpectedOutputField />
-                </div>
-              </div>
-              <div>
-                <ProblemInternalNotesField />
               </div>
               <Can I={Action.UpdateOwn} a={Subject.Problem}>
                 {problemId && (

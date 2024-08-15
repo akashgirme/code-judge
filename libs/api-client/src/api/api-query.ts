@@ -88,7 +88,7 @@ const injectedRtkApi = api.injectEndpoints({
           authorId: queryArg.authorId,
           difficulty: queryArg.difficulty,
           status: queryArg.status,
-          topicIds: queryArg.topicIds,
+          tagIds: queryArg.tagIds,
         },
       }),
     }),
@@ -106,7 +106,7 @@ const injectedRtkApi = api.injectEndpoints({
           authorId: queryArg.authorId,
           difficulty: queryArg.difficulty,
           status: queryArg.status,
-          topicIds: queryArg.topicIds,
+          tagIds: queryArg.tagIds,
         },
       }),
     }),
@@ -120,30 +120,66 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.updateProblemDto,
       }),
     }),
+    getProblemForAuthor: build.query<
+      GetProblemForAuthorApiResponse,
+      GetProblemForAuthorApiArg
+    >({
+      query: (queryArg) => ({ url: `/api/problems/author/${queryArg.problemId}` }),
+    }),
     getProblemForAdmin: build.query<
       GetProblemForAdminApiResponse,
       GetProblemForAdminApiArg
     >({
       query: (queryArg) => ({ url: `/api/problems/admin/${queryArg.problemId}` }),
     }),
-    createTopic: build.mutation<CreateTopicApiResponse, CreateTopicApiArg>({
+    changeProblemStatus: build.mutation<
+      ChangeProblemStatusApiResponse,
+      ChangeProblemStatusApiArg
+    >({
       query: (queryArg) => ({
-        url: `/api/topics`,
-        method: 'POST',
-        body: queryArg.createTopicDto,
+        url: `/api/problems/${queryArg.problemId}/change-status`,
+        method: 'PUT',
+        body: queryArg.changeProblemStatusDto,
       }),
     }),
-    getAllTopics: build.query<GetAllTopicsApiResponse, GetAllTopicsApiArg>({
-      query: () => ({ url: `/api/topics` }),
-    }),
-    getTopic: build.query<GetTopicApiResponse, GetTopicApiArg>({
-      query: (queryArg) => ({ url: `/api/topics/${queryArg.topicId}` }),
-    }),
-    updateTopic: build.mutation<UpdateTopicApiResponse, UpdateTopicApiArg>({
+    addTestCasesToProblem: build.mutation<
+      AddTestCasesToProblemApiResponse,
+      AddTestCasesToProblemApiArg
+    >({
       query: (queryArg) => ({
-        url: `/api/topics/${queryArg.topicId}`,
+        url: `/api/problems/add-testcases`,
+        method: 'POST',
+        body: queryArg.addTestCasesDto,
+      }),
+    }),
+    addTestCasesToProblemByAdminOnly: build.mutation<
+      AddTestCasesToProblemByAdminOnlyApiResponse,
+      AddTestCasesToProblemByAdminOnlyApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/problems/admin/add-testcases`,
+        method: 'POST',
+        body: queryArg.addTestCasesDto,
+      }),
+    }),
+    createTag: build.mutation<CreateTagApiResponse, CreateTagApiArg>({
+      query: (queryArg) => ({
+        url: `/api/tags`,
+        method: 'POST',
+        body: queryArg.createTagDto,
+      }),
+    }),
+    getAllTags: build.query<GetAllTagsApiResponse, GetAllTagsApiArg>({
+      query: () => ({ url: `/api/tags` }),
+    }),
+    getTag: build.query<GetTagApiResponse, GetTagApiArg>({
+      query: (queryArg) => ({ url: `/api/tags/${queryArg.tagId}` }),
+    }),
+    updateTag: build.mutation<UpdateTagApiResponse, UpdateTagApiArg>({
+      query: (queryArg) => ({
+        url: `/api/tags/${queryArg.tagId}`,
         method: 'PUT',
-        body: queryArg.createTopicDto,
+        body: queryArg.createTagDto,
       }),
     }),
     createSubmission: build.mutation<CreateSubmissionApiResponse, CreateSubmissionApiArg>(
@@ -155,30 +191,6 @@ const injectedRtkApi = api.injectEndpoints({
         }),
       }
     ),
-    handleExecutionResponseCallback: build.mutation<
-      HandleExecutionResponseCallbackApiResponse,
-      HandleExecutionResponseCallbackApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/submissions/callback`,
-        method: 'POST',
-        body: queryArg.updateSubmissionDto,
-      }),
-    }),
-    getSubmissionsByProblem: build.query<
-      GetSubmissionsByProblemApiResponse,
-      GetSubmissionsByProblemApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/submissions/problem/${queryArg.problemId}`,
-        params: {
-          pageIndex: queryArg.pageIndex,
-          pageSize: queryArg.pageSize,
-          order: queryArg.order,
-          language: queryArg.language,
-        },
-      }),
-    }),
     getSubmissionsByUserAndProblem: build.query<
       GetSubmissionsByUserAndProblemApiResponse,
       GetSubmissionsByUserAndProblemApiArg
@@ -190,18 +202,27 @@ const injectedRtkApi = api.injectEndpoints({
         query: (queryArg) => ({ url: `/api/submissions/${queryArg.submissionId}` }),
       }
     ),
-    getSolution: build.query<GetSolutionApiResponse, GetSolutionApiArg>({
-      query: (queryArg) => ({
-        url: `/api/solutions`,
-        params: { problemId: queryArg.problemId, language: queryArg.language },
-      }),
-    }),
-    addSolution: build.mutation<AddSolutionApiResponse, AddSolutionApiArg>({
+    createSolution: build.mutation<CreateSolutionApiResponse, CreateSolutionApiArg>({
       query: (queryArg) => ({
         url: `/api/solutions`,
         method: 'POST',
-        body: queryArg.addSolutionDto,
+        body: queryArg.createSolutionDto,
       }),
+    }),
+    getAllSolutions: build.query<GetAllSolutionsApiResponse, GetAllSolutionsApiArg>({
+      query: (queryArg) => ({
+        url: `/api/solutions`,
+        params: {
+          pageIndex: queryArg.pageIndex,
+          pageSize: queryArg.pageSize,
+          order: queryArg.order,
+          problemId: queryArg.problemId,
+          language: queryArg.language,
+        },
+      }),
+    }),
+    getSolutionById: build.query<GetSolutionByIdApiResponse, GetSolutionByIdApiArg>({
+      query: (queryArg) => ({ url: `/api/solutions/${queryArg.solutionId}` }),
     }),
   }),
   overrideExisting: false,
@@ -246,14 +267,14 @@ export type GetAllUsersApiArg = {
 };
 export type ChangeUserRoleApiResponse = /** status 200  */ User;
 export type ChangeUserRoleApiArg = {
-  userId: string;
+  userId: number;
   changeUserRoleDto: ChangeUserRoleDto;
 };
 export type CreateProblemApiResponse = /** status 200  */ Problem;
 export type CreateProblemApiArg = {
   createProblemDto: CreateProblemDto;
 };
-export type GetProblemsApiResponse = /** status 200  */ ProblemsResponseDto;
+export type GetProblemsApiResponse = /** status 200  */ AllProblemsDto;
 export type GetProblemsApiArg = {
   pageIndex: number;
   pageSize: number;
@@ -262,9 +283,9 @@ export type GetProblemsApiArg = {
   authorId?: string;
   difficulty?: ProblemDifficulty;
   status?: PostStatus;
-  topicIds?: string[];
+  tagIds?: number[];
 };
-export type GetProblemsForAdminApiResponse = /** status 200  */ ProblemsResponseDto;
+export type GetProblemsForAdminApiResponse = /** status 200  */ AllProblemsDto;
 export type GetProblemsForAdminApiArg = {
   pageIndex: number;
   pageSize: number;
@@ -273,68 +294,81 @@ export type GetProblemsForAdminApiArg = {
   authorId?: string;
   difficulty?: ProblemDifficulty;
   status?: PostStatus;
-  topicIds?: string[];
+  tagIds?: number[];
 };
-export type GetProblemApiResponse = /** status 200  */ ProblemResponseDto;
+export type GetProblemApiResponse = /** status 200  */ ProblemDto;
 export type GetProblemApiArg = {
-  problemId: string;
+  problemId: number;
 };
 export type UpdateProblemApiResponse = /** status 200  */ Problem;
 export type UpdateProblemApiArg = {
-  problemId: string;
+  problemId: number;
   updateProblemDto: UpdateProblemDto;
 };
-export type GetProblemForAdminApiResponse = /** status 200  */ ProblemResponseAdminDto;
+export type GetProblemForAuthorApiResponse = /** status 200  */ AuthorProblemDto;
+export type GetProblemForAuthorApiArg = {
+  problemId: number;
+};
+export type GetProblemForAdminApiResponse = /** status 200  */ AdminProblemDto;
 export type GetProblemForAdminApiArg = {
-  problemId: string;
+  problemId: number;
 };
-export type CreateTopicApiResponse = /** status 200  */ Topic;
-export type CreateTopicApiArg = {
-  createTopicDto: CreateTopicDto;
+export type ChangeProblemStatusApiResponse = /** status 200  */ Problem;
+export type ChangeProblemStatusApiArg = {
+  problemId: number;
+  changeProblemStatusDto: ChangeProblemStatusDto;
 };
-export type GetAllTopicsApiResponse = /** status 200  */ Topic[];
-export type GetAllTopicsApiArg = void;
-export type GetTopicApiResponse = /** status 200  */ Topic;
-export type GetTopicApiArg = {
-  topicId: string;
+export type AddTestCasesToProblemApiResponse = /** status 200  */ SuccessMessageDto;
+export type AddTestCasesToProblemApiArg = {
+  addTestCasesDto: AddTestCasesDto;
 };
-export type UpdateTopicApiResponse = /** status 200  */ Topic;
-export type UpdateTopicApiArg = {
-  topicId: string;
-  createTopicDto: CreateTopicDto;
+export type AddTestCasesToProblemByAdminOnlyApiResponse =
+  /** status 200  */ SuccessMessageDto;
+export type AddTestCasesToProblemByAdminOnlyApiArg = {
+  addTestCasesDto: AddTestCasesDto;
+};
+export type CreateTagApiResponse = /** status 200  */ Tag;
+export type CreateTagApiArg = {
+  createTagDto: CreateTagDto;
+};
+export type GetAllTagsApiResponse = /** status 200  */ Tag[];
+export type GetAllTagsApiArg = void;
+export type GetTagApiResponse = /** status 200  */ Tag;
+export type GetTagApiArg = {
+  tagId: number;
+};
+export type UpdateTagApiResponse = /** status 200  */ Tag;
+export type UpdateTagApiArg = {
+  tagId: number;
+  createTagDto: CreateTagDto;
 };
 export type CreateSubmissionApiResponse = /** status 200  */ Submission;
 export type CreateSubmissionApiArg = {
   createSubmissionDto: CreateSubmissionDto;
 };
-export type HandleExecutionResponseCallbackApiResponse = unknown;
-export type HandleExecutionResponseCallbackApiArg = {
-  updateSubmissionDto: UpdateSubmissionDto;
+export type GetSubmissionsByUserAndProblemApiResponse = /** status 200  */ Submission[];
+export type GetSubmissionsByUserAndProblemApiArg = {
+  problemId: number;
 };
-export type GetSubmissionsByProblemApiResponse = /** status 200  */ AllSubmissionsDto;
-export type GetSubmissionsByProblemApiArg = {
-  problemId: string;
+export type GetSubmissionByIdApiResponse = /** status 200  */ SubmissionDto;
+export type GetSubmissionByIdApiArg = {
+  submissionId: number;
+};
+export type CreateSolutionApiResponse = /** status 200  */ SolutionDto;
+export type CreateSolutionApiArg = {
+  createSolutionDto: CreateSolutionDto;
+};
+export type GetAllSolutionsApiResponse = /** status 200  */ string;
+export type GetAllSolutionsApiArg = {
   pageIndex: number;
   pageSize: number;
   order?: SortOrder;
-  language: Language;
+  problemId: number;
+  language: SupportedLanguages;
 };
-export type GetSubmissionsByUserAndProblemApiResponse = /** status 200  */ Submission[];
-export type GetSubmissionsByUserAndProblemApiArg = {
-  problemId: string;
-};
-export type GetSubmissionByIdApiResponse = /** status 200  */ SubmissionResponseDto;
-export type GetSubmissionByIdApiArg = {
-  submissionId: string;
-};
-export type GetSolutionApiResponse = /** status 200  */ string;
-export type GetSolutionApiArg = {
-  problemId: string;
-  language: object;
-};
-export type AddSolutionApiResponse = /** status 200  */ SuccessMessageDto;
-export type AddSolutionApiArg = {
-  addSolutionDto: AddSolutionDto;
+export type GetSolutionByIdApiResponse = /** status 200  */ SolutionDto;
+export type GetSolutionByIdApiArg = {
+  solutionId: number;
 };
 export type SuccessMessageDto = {
   message: string;
@@ -344,7 +378,7 @@ export type InitiateSignInDto = {
 };
 export type UserRole = 'user' | 'problem_admin' | 'super_admin';
 export type User = {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -389,119 +423,159 @@ export type AllUsersDto = {
 export type ChangeUserRoleDto = {
   role: UserRole;
 };
-export type ProblemDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
-export type Topic = {
-  id: string;
+export type ProblemDifficulty = 'Easy' | 'Medium' | 'Hard';
+export type Tag = {
+  id: number;
   name: string;
 };
-export type ProblemStatus = 'unpublished' | 'approved' | 'rejected';
-export type SupportedLanguages = 'c' | 'cpp' | 'java' | 'js' | 'go';
 export type Problem = {
-  id: string;
+  id: number;
   title: string;
   difficulty: ProblemDifficulty;
-  slug: string;
+  hasTestCases: boolean;
+  remark: string;
+  tags: Tag[];
   author: User;
-  topics: Topic[];
-  internalNotes: string;
-  status: ProblemStatus;
-  solutionLanguage: SupportedLanguages;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
 };
 export type CreateProblemDto = {
   title: string;
   difficulty: ProblemDifficulty;
   description: string;
-  solution: string;
-  solutionLanguage: SupportedLanguages;
-  testCasesInput: string;
-  testCasesOutput: string;
-  internalNotes?: string;
-  topicIds: string[];
+  tagIds?: number[];
 };
-export type ProblemsResponseDto = {
+export type AllProblemsDto = {
   problems: Problem[];
   paginationMeta: PaginationResultDto;
 };
 export type SortOrder = 'ASC' | 'DESC';
 export type PostStatus = 'unpublished' | 'approved' | 'rejected';
-export type ProblemResponseDto = {
-  id: string;
+export type ProblemDto = {
+  id: number;
   title: string;
   difficulty: ProblemDifficulty;
-  slug: string;
+  hasTestCases: boolean;
+  remark: string;
+  tags: Tag[];
   author: User;
-  topics: Topic[];
-  internalNotes: string;
-  status: ProblemStatus;
-  solutionLanguage: SupportedLanguages;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
   description: string;
 };
 export type UpdateProblemDto = {
   title?: string;
   difficulty?: ProblemDifficulty;
   description?: string;
-  solution?: string;
-  solutionLanguage?: SupportedLanguages;
-  testCasesInput?: string;
-  testCasesOutput?: string;
-  internalNotes?: string;
-  topicIds?: string[];
-  status?: ProblemStatus;
+  tagIds?: number[];
 };
-export type ProblemResponseAdminDto = {
-  id: string;
+export type AuthorProblemDto = {
+  id: number;
   title: string;
   difficulty: ProblemDifficulty;
-  slug: string;
+  hasTestCases: boolean;
+  remark: string;
+  tags: Tag[];
   author: User;
-  topics: Topic[];
-  internalNotes: string;
-  status: ProblemStatus;
-  solutionLanguage: SupportedLanguages;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
   description: string;
-  solution: string;
   testCasesInput: string;
   testCasesOutput: string;
 };
-export type CreateTopicDto = {
-  topicName: string;
+export type AdminProblemDto = {
+  id: number;
+  title: string;
+  difficulty: ProblemDifficulty;
+  hasTestCases: boolean;
+  remark: string;
+  tags: Tag[];
+  author: User;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  description: string;
+  authorTestCasesInput: string;
+  authorTestCasesOutput: string;
+  additionalTestCasesInput: string;
+  additionalTestCasesOutput: string;
+};
+export type ProblemStatus = 'unpublished' | 'approved' | 'rejected';
+export type ChangeProblemStatusDto = {
+  remark: string;
+  status: ProblemStatus;
+};
+export type AddTestCasesDto = {
+  problemId: number;
+  input: string;
+  output: string;
+};
+export type CreateTagDto = {
+  tagName: string;
 };
 export type Submission = {
-  id: string;
-  slug: string;
-  language: object;
-  testCasesPassed: number;
+  id: number;
+  language: 'c' | 'cpp' | 'java' | 'js' | 'go';
+  state: 'PENDING' | ' STARTED' | 'RUNNING' | 'SUCCESS';
+  statusMessage:
+    | 'Null'
+    | 'Accepted'
+    | 'Wrong Answer'
+    | 'Rejected'
+    | 'Compile error'
+    | 'Runtime error'
+    | 'Time limit exceeded'
+    | 'Memory limit exceeded';
   totalTestCases: number;
-  problem: object;
-  user: object;
+  testCasesPassed: number;
+  finished: boolean;
+  problem: Problem;
+  user: User;
   createdAt: string;
 };
+export type SupportedLanguages = 'c' | 'cpp' | 'java' | 'js' | 'go';
 export type CreateSubmissionDto = {
-  problemId: string;
+  problemId: number;
   code: string;
   language: SupportedLanguages;
 };
-export type UpdateSubmissionDto = {};
-export type AllSubmissionsDto = {
-  submissions: Submission[];
-  paginationMeta: PaginationResultDto;
-};
-export type Language = 'c' | 'cpp' | 'java' | 'js' | 'go';
-export type SubmissionResponseDto = {
-  id: string;
-  slug: string;
-  language: object;
-  testCasesPassed: number;
+export type SubmissionDto = {
+  id: number;
+  language: 'c' | 'cpp' | 'java' | 'js' | 'go';
+  state: 'PENDING' | ' STARTED' | 'RUNNING' | 'SUCCESS';
+  statusMessage:
+    | 'Null'
+    | 'Accepted'
+    | 'Wrong Answer'
+    | 'Rejected'
+    | 'Compile error'
+    | 'Runtime error'
+    | 'Time limit exceeded'
+    | 'Memory limit exceeded';
   totalTestCases: number;
-  problem: object;
-  user: object;
+  testCasesPassed: number;
+  finished: boolean;
+  problem: Problem;
+  user: User;
   createdAt: string;
   code: string;
 };
-export type AddSolutionDto = {
-  problemId: string;
-  code: string;
-  language: object;
+export type SolutionDto = {
+  id: number;
+  language: 'c' | 'cpp' | 'java' | 'js' | 'go';
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  description: string;
+};
+export type Languages = 'c' | 'cpp' | 'java' | 'js' | 'go';
+export type CreateSolutionDto = {
+  problemId: number;
+  description: string;
+  language: Languages;
 };
 export const {
   useGetDataQuery,
@@ -522,16 +596,19 @@ export const {
   useGetProblemsForAdminQuery,
   useGetProblemQuery,
   useUpdateProblemMutation,
+  useGetProblemForAuthorQuery,
   useGetProblemForAdminQuery,
-  useCreateTopicMutation,
-  useGetAllTopicsQuery,
-  useGetTopicQuery,
-  useUpdateTopicMutation,
+  useChangeProblemStatusMutation,
+  useAddTestCasesToProblemMutation,
+  useAddTestCasesToProblemByAdminOnlyMutation,
+  useCreateTagMutation,
+  useGetAllTagsQuery,
+  useGetTagQuery,
+  useUpdateTagMutation,
   useCreateSubmissionMutation,
-  useHandleExecutionResponseCallbackMutation,
-  useGetSubmissionsByProblemQuery,
   useGetSubmissionsByUserAndProblemQuery,
   useGetSubmissionByIdQuery,
-  useGetSolutionQuery,
-  useAddSolutionMutation,
+  useCreateSolutionMutation,
+  useGetAllSolutionsQuery,
+  useGetSolutionByIdQuery,
 } = injectedRtkApi;

@@ -9,36 +9,26 @@ import { useLocalStorage } from '../../hooks';
 import { debounce } from '../../../utils';
 import {
   problemTitleValidations,
-  problemInternalNotesValidations,
-  problemTopicsValidations,
+  problemTagsValidations,
   problemDescriptionValidations,
-  problemSolutionLangaugeValidations,
-  problemSolutionValidations,
-  problemInputTestCasesValidations,
-  problemExpectedOutputValidations,
   problemDifficultyValidations,
 } from '../components/form-fields';
 
 const CreateProblemSchema = z.object({
   ...problemTitleValidations,
   ...problemDifficultyValidations,
-  ...problemTopicsValidations,
+  ...problemTagsValidations,
   ...problemDescriptionValidations,
-  ...problemSolutionLangaugeValidations,
-  ...problemSolutionValidations,
-  ...problemInputTestCasesValidations,
-  ...problemExpectedOutputValidations,
-  ...problemInternalNotesValidations,
 });
 
 export type CreateProblemModel = z.infer<typeof CreateProblemSchema>;
 
-interface CreatePostLogicProps {
+interface CreateProblemLogicProps {
   defaultValues: CreateProblemModel;
   onSubmit: (data: CreateProblemModel) => Promise<void>;
 }
 
-export const CreateProblemLogic: React.FC<CreatePostLogicProps> = ({
+export const CreateProblemLogic: React.FC<CreateProblemLogicProps> = ({
   defaultValues,
   onSubmit,
 }) => {

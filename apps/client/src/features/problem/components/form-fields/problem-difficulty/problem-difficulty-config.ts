@@ -7,5 +7,5 @@ export const questionConfig = {
 export const modelKey = 'difficulty';
 
 export const problemDifficultyValidations = {
-  [modelKey]: z.enum(['EASY', 'MEDIUM', 'HARD']),
+  [modelKey]: z.enum(['Easy', 'Medium', 'Hard']),
 };

@@ -16,15 +16,15 @@ export const ProblemDifficultyField = () => {
   const data = [
     {
       label: 'Easy',
-      value: 'EASY',
+      value: 'Easy',
     },
     {
       label: 'Medium',
-      value: 'MEDIUM',
+      value: 'Medium',
     },
     {
       label: 'Hard',
-      value: 'HARD',
+      value: 'Hard',
     },
   ];
   return (
