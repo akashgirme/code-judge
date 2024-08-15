@@ -127,6 +127,11 @@ export class ExecutionService extends WorkerHost {
         state: SubmissionState.SUCCESS,
       });
     } catch (error) {
+      await this.submissionService.updateSubmission({
+        submissionId,
+        state: SubmissionState.ERROR,
+      });
+
       if (axios.isAxiosError(error)) {
         // Axios error with response
         this.logger.error('Execution server responded with error', error.response?.data);
