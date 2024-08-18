@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@code-judge/api-client": ["libs/api-client/src/index.ts"],
+      "@code-judge/common": ["libs/common/src/index.ts"],
+      "@code-judge/ui": ["libs/ui/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,13 +1,17 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
+import { Problem, Tag } from '../problem/entities';
 import { User } from '../user/entities';
+import { Submission } from '../submission/entities';
+import { Solution } from '../solution/entities';
 
 const commonTypeOrmConfig: DataSourceOptions = {
   logging: true,
   type: 'postgres',
-  entities: [User],
+  entities: [User, Problem, Tag, Solution, Submission],
   synchronize: false,
+  logNotifications: true,
   ssl: true,
 };
 
@@ -26,6 +30,7 @@ export const getTypeOrmConfig = async (
   };
 };
 
+//TODO: Issue with migration generation > unable to locate @code-judge/common lib
 const datasource = new DataSource({
   ...commonTypeOrmConfig,
   // url: process.env.DB_URL,

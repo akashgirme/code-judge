@@ -1,49 +1,39 @@
-import NxWelcome from './nx-welcome';
-
-import { Route, Routes, Link } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { persistor, store } from './store';
+import Home from './home/page';
+import SignIn from './auth/sign-in/page';
+import SignInWithOtp from './auth/sign-in-with-otp/page';
+import SignInWithTokenPage from './auth/sign-in-with-token/page';
+import { AppBar } from '../components';
+import Onboard from './auth/onboard/page';
+import PublicProblems from './problem/public-problems/page';
+import CreateProblem from './admin/problem/create-problem/page';
+import UpdateProblem from './admin/problem/edit-problem/page';
+import { PersistGate } from 'redux-persist/integration/react';
+import Dashboard from './admin/dashboard/page';
+import ProblemDetailScreen from './problem/[problemId]/page';
 
 export function App() {
   return (
-    <div>
-      <NxWelcome title="client" />
-
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
-    </div>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <AppBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/problems" element={<PublicProblems />} />
+          <Route path="problems/:problemId" element={<ProblemDetailScreen />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/auth/initiate-sign-in" element={<SignIn />} />
+          <Route path="/auth/sign-in-with-otp" element={<SignInWithOtp />} />
+          <Route path="/auth/sign-in-with-token" element={<SignInWithTokenPage />} />
+          <Route path="/auth/onboard" element={<Onboard />} />
+          <Route path="/problems" element={<PublicProblems />} />
+          <Route path="/problems/create" element={<CreateProblem />} />
+          <Route path="/problems/update/:problemId" element={<UpdateProblem />} />
+        </Routes>
+      </PersistGate>
+    </Provider>
   );
 }
 
