@@ -30,7 +30,6 @@
     "@hookform/resolvers": "^3.9.0",
     "@monaco-editor/react": "^4.6.0",
     "@nestjs/axios": "^3.0.2",
-    "@nestjs/bullmq": "^10.2.0",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^3.2.2",

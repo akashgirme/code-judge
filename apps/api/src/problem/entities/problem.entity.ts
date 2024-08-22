@@ -55,11 +55,6 @@ export class Problem {
   })
   hasTestCases: boolean;
 
-  @ApiProperty()
-  @Column('text', { nullable: true })
-  // @Exclude({ toPlainOnly: true })
-  remark: string;
-
   @ApiProperty({ type: [Tag] })
   @ManyToMany(() => Tag, (tag) => tag.problems)
   @JoinTable()

@@ -35,7 +35,7 @@ export type AppAbility = MongoAbility<PossibleAbilities, Conditions>;
 @Injectable()
 export class AbilityFactory {
   defineAbilityForUser(user: User) {
-    const { can, cannot, build } = new AbilityBuilder(
+    const { can, build } = new AbilityBuilder(
       createMongoAbility<PossibleAbilities, Conditions>
     );
 
@@ -44,16 +44,16 @@ export class AbilityFactory {
         can(Action.Manage, 'all');
       // eslint-disable-next-line no-fallthrough
       case UserRole.PROBLEM_ADMIN:
-        can(Action.Manage, Problem);
-        can(Action.Manage, Tag);
+        can(Action.Read, Problem);
+        can(Action.Create, Problem);
+        can(Action.Update, Problem);
+        can(Action.Read, Tag);
+        can(Action.Update, Tag);
+        can(Action.Create, Tag);
         can(Action.Manage, Submission);
       // eslint-disable-next-line no-fallthrough
       case UserRole.USER:
-        can(Action.ReadOwn, Problem);
-        can(Action.Create, Problem);
-        can(Action.UpdateOwn, Problem);
         can(Action.ReadOwn, Submission);
-        cannot(Action.Delete, Problem);
     }
 
     return build({
