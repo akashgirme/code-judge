@@ -53,8 +53,9 @@ export class SubmissionController {
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: SubmissionDto })
   getSubmissionById(
+    @CurrentUser() user: User,
     @Param('submissionId', ParseIntPipe) submissionId: number
   ): Promise<SubmissionDto> {
-    return this.submissionService.getSubmission(submissionId);
+    return this.submissionService.getSubmission(user, submissionId);
   }
 }
