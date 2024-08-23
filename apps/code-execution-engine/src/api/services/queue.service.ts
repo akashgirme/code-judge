@@ -1,15 +1,15 @@
 import { Queue, QueueOptions, Job, Worker } from 'bullmq';
 import { injectable } from 'tsyringe';
 import IORedis from 'ioredis';
-import { CodeExecutionQueueJobTypes, Queues } from '../enums';
-import { ExecutionService } from './execution.service';
+import { QueueJobTypes, Queues } from '../enums';
+import { HandleResultService } from './handle-result.service';
 
 @injectable()
 export class QueueService {
   private queues!: Record<string, Queue>;
   private connection: IORedis;
-  private codeExecutionQueue!: Queue;
-  private codeExecutionQueueWorker!: Worker;
+  private workersJobQueue!: Queue;
+  private workersJobQueueWorker!: Worker;
 
   private static instance: QueueService;
 
@@ -20,7 +20,7 @@ export class QueueService {
     },
   };
 
-  constructor(private executionService: ExecutionService) {
+  constructor(private handleResultService: HandleResultService) {
     const redisUrl = process.env.REDIS_URL ?? '';
     const url = new URL(redisUrl);
     this.connection = new IORedis({
@@ -38,7 +38,7 @@ export class QueueService {
     QueueService.instance = this;
 
     this.instantiateQueues();
-    this.instantiateCodeExecutionQueueWorkers();
+    this.instantiateworkersJobQueueWorkers();
   }
 
   async instantiateQueues() {
@@ -47,48 +47,51 @@ export class QueueService {
       connection: this.connection,
     };
 
-    this.codeExecutionQueue = new Queue(Queues.CODE_EXECUTION, options);
-    this.queues[Queues.CODE_EXECUTION] = this.codeExecutionQueue;
+    this.workersJobQueue = new Queue(Queues.WORKERS_JOB_QUEUE, options);
+    this.queues[Queues.WORKERS_JOB_QUEUE] = this.workersJobQueue;
   }
 
   getQueue(name: Queues) {
     return this.queues[name];
   }
 
-  async instantiateCodeExecutionQueueWorkers() {
-    this.codeExecutionQueueWorker = new Worker(
-      Queues.CODE_EXECUTION,
+  async instantiateworkersJobQueueWorkers() {
+    this.workersJobQueueWorker = new Worker(
+      Queues.WORKERS_JOB_QUEUE,
       async (job: Job) => {
         switch (job.name) {
-          case CodeExecutionQueueJobTypes.EXECUTE_CODE:
-            await this.executionService.executeCode(job.data);
+          case QueueJobTypes.C_CODE_EXECUTION:
             break;
         }
       },
       { connection: this.connection }
     );
 
-    this.codeExecutionQueueWorker.on('completed', (job: Job, value) => {
+    this.workersJobQueueWorker.on('completed', (job: Job, value) => {
       console.log(
-        `[${Queues.CODE_EXECUTION}] Completed job with data\n
-          Data: ${job.asJSON().data}\n
+        `[${Queues.WORKERS_JOB_QUEUE}] Completed job \n
+          With data: ${job.asJSON().data}\n
           ID: ${job.id}\n
           value: ${value}\n
         `
       );
+
+      this.handleResultService.handleSuccessfulJob(job.data.id);
     });
 
-    this.codeExecutionQueueWorker.on(
+    this.workersJobQueueWorker.on(
       'failed',
       (job: Job | undefined, error, prev: string) => {
         console.log(
-          `[${Queues.CODE_EXECUTION}] Failed job with data\n
+          `[${Queues.WORKERS_JOB_QUEUE}] Failed job\n
           Data: ${job?.asJSON().data}\n
           ID: ${job?.id}\n
           value: ${error}\n,
           prev: ${prev}
         `
         );
+
+        this.handleResultService.handleFailedJob(job?.data.id);
       }
     );
   }
