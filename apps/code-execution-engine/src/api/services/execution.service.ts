@@ -3,6 +3,7 @@ import { ExecutionRequestPayload, Languages } from '@code-judge/common';
 import { FileHandleService } from './file-handle.service';
 import { QueueJobTypes, Queues } from '../enums';
 import { QueueService } from './queue.service';
+import { logger } from '../utils';
 
 @injectable()
 export class ExecutionService {
@@ -30,7 +31,7 @@ export class ExecutionService {
     const queue = this.queueService.getQueue(Queues.WORKERS_JOB_QUEUE);
     await queue.add(this.getJobType(language), { id: submissionId });
 
-    console.log(`Job has been added to the queue for submission: ${submissionId}`);
+    logger.info(`Job has been added to the queue for submission: ${submissionId}`);
   }
   private getJobType(language: Languages) {
     switch (language) {

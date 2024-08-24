@@ -9,6 +9,7 @@ import {
   javaLanguageScript,
   javascriptScript,
 } from '../../scripts';
+import { logger } from '../utils';
 
 @injectable()
 export class FileHandleService {
@@ -32,7 +33,7 @@ export class FileHandleService {
     try {
       await fs.mkdir(workingDir, { recursive: true });
     } catch (error) {
-      console.log(`Failed to create working directory: ${workingDir}`, error);
+      logger.info(`Failed to create working directory: ${workingDir}`, error);
       throw error;
     }
 
@@ -56,7 +57,7 @@ export class FileHandleService {
         fs.writeFile(standardErrorFilePath, ''),
       ]);
     } catch (error) {
-      console.log(`Error storing files in ${workingDir}:`, error);
+      logger.info(`Error storing files in ${workingDir}:`, error);
       throw error;
     }
   }

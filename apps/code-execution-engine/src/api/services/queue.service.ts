@@ -1,8 +1,9 @@
 import { Queue, QueueOptions, Job, Worker } from 'bullmq';
 import { injectable } from 'tsyringe';
 import IORedis from 'ioredis';
-import { QueueJobTypes, Queues } from '../enums';
+import { Queues } from '../enums';
 import { HandleResultService } from './handle-result.service';
+import { logger } from '../utils';
 
 @injectable()
 export class QueueService {
@@ -59,16 +60,13 @@ export class QueueService {
     this.workersJobQueueWorker = new Worker(
       Queues.WORKERS_JOB_QUEUE,
       async (job: Job) => {
-        switch (job.name) {
-          case QueueJobTypes.C_CODE_EXECUTION:
-            break;
-        }
+        logger.info(job);
       },
       { connection: this.connection }
     );
 
     this.workersJobQueueWorker.on('completed', (job: Job, value) => {
-      console.log(
+      logger.info(
         `[${Queues.WORKERS_JOB_QUEUE}] Completed job \n
           With data: ${job.asJSON().data}\n
           ID: ${job.id}\n
@@ -82,7 +80,7 @@ export class QueueService {
     this.workersJobQueueWorker.on(
       'failed',
       (job: Job | undefined, error, prev: string) => {
-        console.log(
+        logger.info(
           `[${Queues.WORKERS_JOB_QUEUE}] Failed job\n
           Data: ${job?.asJSON().data}\n
           ID: ${job?.id}\n

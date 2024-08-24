@@ -19,7 +19,7 @@ fi
 
 # Execute the compiled program
 echo "Executing \${EXECUTABLE}..."
-"\${EXECUTABLE}" < "\${STDIN_FILE}" > "\${STDOUT_FILE}" 2>> "\${STDERR_FILE}"
+./"\${EXECUTABLE}" < "\${STDIN_FILE}" > "\${STDOUT_FILE}" 2>> "\${STDERR_FILE}"
 
 # Check if execution was successful
 if [ $? -ne 0 ]; then
@@ -54,7 +54,7 @@ fi
 
 # Execute the compiled program
 echo "Executing \${EXECUTABLE}..."
-"\${EXECUTABLE}" < "\${STDIN_FILE}" > "\${STDOUT_FILE}" 2>> "\${STDERR_FILE}"
+./"\${EXECUTABLE}" < "\${STDIN_FILE}" > "\${STDOUT_FILE}" 2>> "\${STDERR_FILE}"
 
 # Check if execution was successful
 if [ $? -ne 0 ]; then
@@ -123,7 +123,7 @@ fi
 
 # Execute the compiled program
 echo "Executing \${EXECUTABLE}..."
-"./\${EXECUTABLE}" < "\${STDIN_FILE}" > "\${STDOUT_FILE}" 2>> "\${STDERR_FILE}"
+./"\${EXECUTABLE}" < "\${STDIN_FILE}" > "\${STDOUT_FILE}" 2>> "\${STDERR_FILE}"
 
 # Check if execution was successful
 if [ $? -ne 0 ]; then
