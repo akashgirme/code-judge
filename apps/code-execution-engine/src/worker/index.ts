@@ -80,7 +80,7 @@ const execute = async (job: Job) => {
     }
 
     metadata = `status=${status}\ntime=${executionTime.toFixed(
-      3
+      4
     )}\nmemory=${memoryUsage}`;
 
     // Write updated metadata to the file
