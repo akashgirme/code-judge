@@ -59,16 +59,26 @@ export class ExecutionService {
   }: ExecutionRequestPayload): Promise<void> {
     const executionServerUrl =
       this.configService.get<string>('CODE_EXECUTION_REQUEST_URL') ?? '';
+    const apiKey = this.configService.get<string>('EXECUTION_API_KEY') ?? '';
 
     try {
       const response = await firstValueFrom(
-        this.httpService.post(executionServerUrl, {
-          submissionId,
-          sourceCode,
-          language,
-          testCasesInput,
-          expectedOutput,
-        })
+        this.httpService.post(
+          executionServerUrl,
+          {
+            submissionId,
+            sourceCode,
+            language,
+            testCasesInput,
+            expectedOutput,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+            },
+          }
+        )
       );
 
       this.logger.log(`Response Status Code: ${response.status}`);
@@ -100,6 +110,9 @@ export class ExecutionService {
     totalTestCases,
     testCasesPassed,
     statusMessage,
+    stderr,
+    time,
+    memory,
   }: ExecutionCallback) {
     await this.submissionService.updateSubmission({
       submissionId,
@@ -107,6 +120,9 @@ export class ExecutionService {
       testCasesPassed,
       statusMessage,
       state: SubmissionState.SUCCESS,
+      stderr,
+      time,
+      memory,
       finished: true,
     });
   }

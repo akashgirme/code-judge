@@ -56,6 +56,9 @@ export class SubmissionService {
     testCasesPassed,
     statusMessage,
     state,
+    stderr,
+    time,
+    memory,
     finished,
   }: UpdateSubmission) {
     const submission = await this.getSubmissionById(submissionId);
@@ -64,7 +67,15 @@ export class SubmissionService {
     submission.statusMessage = statusMessage;
     submission.totalTestCases = totalTestCases;
     submission.testCasesPassed = testCasesPassed;
+    submission.time = time;
+    submission.memory = memory;
     submission.finished = finished;
+
+    if (stderr) {
+      const stderrPath = `submissions/stderr/${submission.id}/stderr.txt`;
+      await this.storageService.putObject(stderrPath, stderr);
+      submission.stderrPath = stderrPath;
+    }
 
     const updatedSubmission = await this.submissionRepo.save(submission);
 
@@ -104,7 +115,11 @@ export class SubmissionService {
       );
     }
     const code = await this.storageService.getObject(submission.path);
-    return plainToClass(SubmissionDto, { ...submission, code });
+    let stderr = '';
+    if (submission.stderrPath) {
+      stderr = await this.storageService.getObject(submission.stderrPath);
+    }
+    return plainToClass(SubmissionDto, { ...submission, code, stderr });
   }
 
   async getSubmissionById(id: number) {

@@ -5,8 +5,12 @@ import { Request, Response, NextFunction } from 'express';
 export class VerifyCallbackMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const apiKey = req.headers['x-api-key'];
+    console.log('apikey', apiKey);
 
-    if (!apiKey || apiKey !== process.env.EXECUTION_API_KEY) {
+    const expectedApiKey = process.env.EXECUTION_API_KEY;
+    console.log('expectedApiKey', expectedApiKey);
+
+    if (!apiKey || apiKey !== expectedApiKey) {
       throw new UnauthorizedException('Invalid API key');
     }
 
