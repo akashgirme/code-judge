@@ -95,4 +95,83 @@ export class FileHandleService {
         throw new Error(`Unsupported language: ${language}`);
     }
   }
+
+  async processResult(jobDir: string): Promise<{
+    status: string;
+    testCasesPassed?: number;
+    totalTestCases?: number;
+    stderr?: string;
+    time?: number;
+    memory?: number;
+  }> {
+    try {
+      // Read metadata.txt
+      const metadataPath = path.join(jobDir, 'metadata.txt');
+      const stderrPath = path.join(jobDir, 'stderr.txt');
+      const metadata = await fs.readFile(metadataPath, 'utf-8');
+      const stderr = await fs.readFile(stderrPath, 'utf-8');
+      const statusMatch = metadata.match(/status=(\w+)/);
+      const timeMatch = metadata.match(/time=(\w+)/);
+      const memoryMatch = metadata.match(/memory=(\w+)/);
+
+      const status = statusMatch ? statusMatch[1] : 'unknown';
+      const time = parseInt(timeMatch ? timeMatch[1] : '0');
+      const memory = parseInt(memoryMatch ? memoryMatch[1] : '0');
+
+      if (status !== 'successful') {
+        return { status, stderr, time, memory };
+      }
+
+      // Read output.txt and stdout.txt
+      const outputPath = path.join(jobDir, 'output.txt');
+      const stdoutPath = path.join(jobDir, 'stdout.txt');
+      const expectedOutput = await fs.readFile(outputPath, 'utf-8');
+      const actualOutput = await fs.readFile(stdoutPath, 'utf-8');
+
+      // Split the content into lines
+      const expectedLines = expectedOutput.trim().split('\n');
+      const actualLines = actualOutput.trim().split('\n');
+
+      // Compare lines and count matching test cases
+      const totalTestCases = expectedLines.length;
+      let testCasesPassed = 0;
+
+      for (let i = 0; i < totalTestCases; i++) {
+        if (expectedLines[i] === actualLines[i]) {
+          testCasesPassed++;
+        }
+      }
+
+      return { status, testCasesPassed, totalTestCases, time, memory };
+    } catch (error) {
+      logger.error('Error processing results:', error);
+      return { status: 'error' };
+    }
+  }
+
+  async deleteDirectory(jobDir: string): Promise<void> {
+    try {
+      const files = await fs.readdir(jobDir);
+
+      // Loop through all files and directories
+      for (const file of files) {
+        const filePath = path.join(jobDir, file);
+        const stat = await fs.lstat(filePath);
+
+        if (stat.isDirectory()) {
+          // Recursively delete subdirectory
+          await this.deleteDirectory(filePath);
+        } else {
+          // Delete file
+          await fs.unlink(filePath);
+        }
+      }
+
+      // Finally, remove the empty directory
+      await fs.rmdir(jobDir);
+      logger.info(`Directory ${jobDir} deleted successfully`);
+    } catch (err) {
+      logger.error(`Error deleting directory ${jobDir}:`, err);
+    }
+  }
 }

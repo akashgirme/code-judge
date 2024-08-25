@@ -1,16 +1,28 @@
 import express from 'express';
 import 'reflect-metadata';
+import { container } from 'tsyringe';
 import executionRouter from './routers/execution.router';
+import { StartupService } from './services';
 
-const app = express();
-app.use(express.json());
+async function bootstrap() {
+  const startupService = container.resolve(StartupService);
+  startupService.initialize();
 
-app.get('/health', (req, res) => res.json({ success: true }));
+  const app = express();
+  app.use(express.json());
 
-app.use('/api/submissions', executionRouter);
+  app.get('/health', (req, res) => res.json({ success: true }));
 
-const port = process.env.PORT || 3333;
-const server = app.listen(port, () => {
-  console.log(`🚀 Code-Execution-Engine is running on: http://localhost:${port}/api`);
+  app.use('/api/submissions', executionRouter);
+
+  const port = process.env.PORT || 3333;
+  const server = app.listen(port, () => {
+    console.log(`🚀 Code-Execution-Engine is running on: http://localhost:${port}/api`);
+  });
+  server.on('error', console.error);
+}
+
+bootstrap().catch((error) => {
+  console.error('Application failed to start', error);
+  process.exit(1);
 });
-server.on('error', console.error);

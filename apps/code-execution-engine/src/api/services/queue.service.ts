@@ -1,27 +1,25 @@
-import { Queue, QueueOptions, Job, Worker } from 'bullmq';
-import { injectable } from 'tsyringe';
+import { Queue, QueueOptions } from 'bullmq';
+import { injectable, singleton } from 'tsyringe';
 import IORedis from 'ioredis';
 import { Queues } from '../enums';
-import { HandleResultService } from './handle-result.service';
-import { logger } from '../utils';
 
 @injectable()
+@singleton()
 export class QueueService {
   private queues!: Record<string, Queue>;
-  private connection: IORedis;
+  public connection: IORedis;
   private workersJobQueue!: Queue;
-  private workersJobQueueWorker!: Worker;
-
+  private workersResultJobQueue!: Queue;
   private static instance: QueueService;
 
   private static QUEUE_OPTIONS: Omit<QueueOptions, 'connection'> = {
     defaultJobOptions: {
       removeOnComplete: true,
-      removeOnFail: false,
+      removeOnFail: true,
     },
   };
 
-  constructor(private handleResultService: HandleResultService) {
+  constructor() {
     const redisUrl = process.env.REDIS_URL ?? '';
     const url = new URL(redisUrl);
     this.connection = new IORedis({
@@ -39,7 +37,6 @@ export class QueueService {
     QueueService.instance = this;
 
     this.instantiateQueues();
-    this.instantiateworkersJobQueueWorkers();
   }
 
   async instantiateQueues() {
@@ -50,47 +47,12 @@ export class QueueService {
 
     this.workersJobQueue = new Queue(Queues.WORKERS_JOB_QUEUE, options);
     this.queues[Queues.WORKERS_JOB_QUEUE] = this.workersJobQueue;
+
+    this.workersResultJobQueue = new Queue(Queues.WORKERS_RESULT_JOB_QUEUE, options);
+    this.queues[Queues.WORKERS_RESULT_JOB_QUEUE] = this.workersResultJobQueue;
   }
 
   getQueue(name: Queues) {
     return this.queues[name];
-  }
-
-  async instantiateworkersJobQueueWorkers() {
-    this.workersJobQueueWorker = new Worker(
-      Queues.WORKERS_JOB_QUEUE,
-      async (job: Job) => {
-        logger.info(job);
-      },
-      { connection: this.connection }
-    );
-
-    this.workersJobQueueWorker.on('completed', (job: Job, value) => {
-      logger.info(
-        `[${Queues.WORKERS_JOB_QUEUE}] Completed job \n
-          With data: ${job.asJSON().data}\n
-          ID: ${job.id}\n
-          value: ${value}\n
-        `
-      );
-
-      this.handleResultService.handleSuccessfulJob(job.data.id);
-    });
-
-    this.workersJobQueueWorker.on(
-      'failed',
-      (job: Job | undefined, error, prev: string) => {
-        logger.info(
-          `[${Queues.WORKERS_JOB_QUEUE}] Failed job\n
-          Data: ${job?.asJSON().data}\n
-          ID: ${job?.id}\n
-          value: ${error}\n,
-          prev: ${prev}
-        `
-        );
-
-        this.handleResultService.handleFailedJob(job?.data.id);
-      }
-    );
   }
 }
