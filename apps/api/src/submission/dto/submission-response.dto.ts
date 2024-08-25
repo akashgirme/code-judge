@@ -6,6 +6,12 @@ export class SubmissionDto extends Submission {
   @Exclude()
   path: string;
 
+  @Exclude()
+  stderrPath: string;
+
   @ApiProperty()
   code: string;
+
+  @ApiProperty()
+  stderr: string;
 }
