@@ -13,7 +13,7 @@
         "target": "node",
         "compiler": "tsc",
         "outputPath": "dist/apps/code-execution-engine",
-        "main": "apps/code-execution-engine/src/main.ts",
+        "main": "apps/code-execution-engine/src/api/main.ts",
         "tsConfig": "apps/code-execution-engine/tsconfig.app.json",
         "assets": ["apps/code-execution-engine/src/assets"],
         "isolatedConfig": true,

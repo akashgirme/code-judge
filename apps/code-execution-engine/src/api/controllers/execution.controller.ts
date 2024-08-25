@@ -2,6 +2,7 @@ import { injectable } from 'tsyringe';
 import { Request, Response } from 'express';
 import { ExecutionService } from '../services';
 import { ExecutionRequestSchema } from '@code-judge/common';
+import { logger } from '../utils';
 
 @injectable()
 export class ExecutionController {
@@ -15,11 +16,11 @@ export class ExecutionController {
         return;
       }
 
-      const response = await this.executionService.executeCode(req.body);
+      await this.executionService.executeCode(req.body);
       res.setHeader('Content-Type', 'application/json');
-      res.status(200).json(response);
+      res.status(200).json({ message: 'Execution created successfully' });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
