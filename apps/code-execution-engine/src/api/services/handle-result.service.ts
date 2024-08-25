@@ -90,6 +90,8 @@ export class HandleResultService {
       return StatusMessage.COMPILE_ERROR;
     } else if (status == 'execution-error') {
       return StatusMessage.EXECUTION_ERROR;
+    } else if (status == 'runtime-error') {
+      return StatusMessage.RUNTIME_ERROR;
     } else if (status == 'memory-exceeded') {
       return StatusMessage.MEMORY_LIMIT_EXCEEDED;
     } else if (status == 'time-limit-exceeded') {

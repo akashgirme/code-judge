@@ -110,13 +110,13 @@ export class FileHandleService {
       const stderrPath = path.join(jobDir, 'stderr.txt');
       const metadata = await fs.readFile(metadataPath, 'utf-8');
       const stderr = await fs.readFile(stderrPath, 'utf-8');
-      const statusMatch = metadata.match(/status=(\w+)/);
-      const timeMatch = metadata.match(/time=(\w+)/);
-      const memoryMatch = metadata.match(/memory=(\w+)/);
+      const statusMatch = metadata.match(/status=([\w-]+)/);
+      const timeMatch = metadata.match(/time=([\d.]+)/);
+      const memoryMatch = metadata.match(/memory=(\d+)/);
 
       const status = statusMatch ? statusMatch[1] : 'unknown';
-      const time = parseInt(timeMatch ? timeMatch[1] : '0');
-      const memory = parseInt(memoryMatch ? memoryMatch[1] : '0');
+      const time = timeMatch ? parseFloat(timeMatch[1]) : 0;
+      const memory = memoryMatch ? parseInt(memoryMatch[1]) : 0;
 
       if (status !== 'successful') {
         return { status, stderr, time, memory };

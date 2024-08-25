@@ -1,5 +1,4 @@
-export const cppScript = `
-#!/bin/bash
+export const cppScript = `#!/bin/bash
 
 CODE_FILE="main.cpp"
 STDIN_FILE="stdin.txt"
@@ -34,8 +33,7 @@ echo "status=successful" > "\${METADATA_FILE}"
 rm -f "\${EXECUTABLE}"
 `;
 
-export const cScript = `
-#!/bin/bash
+export const cScript = `#!/bin/bash
 
 CODE_FILE="main.c"
 STDIN_FILE="stdin.txt"
@@ -70,8 +68,7 @@ echo "status=successful" > "\${METADATA_FILE}"
 rm -f "\${EXECUTABLE}"
 `;
 
-export const javaLanguageScript = `
-#!/bin/bash
+export const javaLanguageScript = `#!/bin/bash
 
 CODE_FILE="Main.java"
 STDIN_FILE="stdin.txt"
@@ -105,8 +102,7 @@ echo "status=successful" > "\${METADATA_FILE}"
 rm -f Main.class
 `;
 
-export const goScript = `
-#!/bin/bash
+export const goScript = `#!/bin/bash
 
 CODE_FILE="main.go"
 STDIN_FILE="stdin.txt"
@@ -141,8 +137,7 @@ echo "status=successful" > "\${METADATA_FILE}"
 rm -f "\${EXECUTABLE}"
 `;
 
-export const javascriptScript = `
-#!/bin/bash
+export const javascriptScript = `#!/bin/bash
 
 CODE_FILE="main.js"
 STDIN_FILE="stdin.txt"
@@ -159,6 +154,6 @@ if [ $? -ne 0 ]; then
   exit 0
 fi
 
-echo "Compilation and execution completed successfully."
+echo "Execution completed successfully."
 echo "status=successful" > "\${METADATA_FILE}"
 `;
