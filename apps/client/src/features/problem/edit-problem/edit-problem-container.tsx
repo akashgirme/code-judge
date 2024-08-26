@@ -10,7 +10,8 @@ import {
 
 export const EditProblemContainer = () => {
   const navigate = useNavigate();
-  const { problemId = ' ' } = useParams();
+  const { problemId: id } = useParams();
+  const problemId = Number(id);
   const { data, isSuccess } = useGetProblemForAdminQuery({ problemId });
 
   const [updatePost] = useUpdateProblemMutation({
@@ -23,23 +24,17 @@ export const EditProblemContainer = () => {
       problemId,
       updateProblemDto: {
         ...data,
-        topicIds: data.topics.map((topic) => topic.value),
+        tagIds: data.tags.map((topic) => topic.value),
       },
     }).unwrap();
-    navigate(`/problems/${id}`);
+    navigate(`/admin/problems/${id}/add-testcases`);
   };
 
   const defaultValues: CreateProblemModel = {
     title: data?.title || '',
-    internalNotes: data?.internalNotes || '',
-    topics: data?.topics.map((topic) => ({ value: topic.id, label: topic.name })) || [],
+    tags: data?.tags.map((tag) => ({ value: tag.id, label: tag.name })) || [],
     description: data?.description || '',
-    difficulty: data?.difficulty || 'EASY',
-    status: data?.status || 'unpublished',
-    solution: data?.solution || '',
-    solutionLanguage: data?.solutionLanguage || 'c',
-    testCasesInput: data?.testCasesInput || '',
-    testCasesOutput: data?.testCasesOutput || '',
+    difficulty: data?.difficulty || 'Easy',
   };
 
   if (!isSuccess) return null;

@@ -120,12 +120,6 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.updateProblemDto,
       }),
     }),
-    getProblemForAuthor: build.query<
-      GetProblemForAuthorApiResponse,
-      GetProblemForAuthorApiArg
-    >({
-      query: (queryArg) => ({ url: `/api/problems/author/${queryArg.problemId}` }),
-    }),
     getProblemForAdmin: build.query<
       GetProblemForAdminApiResponse,
       GetProblemForAdminApiArg
@@ -145,16 +139,6 @@ const injectedRtkApi = api.injectEndpoints({
     addTestCasesToProblem: build.mutation<
       AddTestCasesToProblemApiResponse,
       AddTestCasesToProblemApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/problems/add-testcases`,
-        method: 'POST',
-        body: queryArg.addTestCasesDto,
-      }),
-    }),
-    addTestCasesToProblemByAdminOnly: build.mutation<
-      AddTestCasesToProblemByAdminOnlyApiResponse,
-      AddTestCasesToProblemByAdminOnlyApiArg
     >({
       query: (queryArg) => ({
         url: `/api/problems/admin/add-testcases`,
@@ -202,6 +186,9 @@ const injectedRtkApi = api.injectEndpoints({
         query: (queryArg) => ({ url: `/api/submissions/${queryArg.submissionId}` }),
       }
     ),
+    handleCallback: build.mutation<HandleCallbackApiResponse, HandleCallbackApiArg>({
+      query: () => ({ url: `/api/execution/callback`, method: 'POST' }),
+    }),
     createSolution: build.mutation<CreateSolutionApiResponse, CreateSolutionApiArg>({
       query: (queryArg) => ({
         url: `/api/solutions`,
@@ -305,10 +292,6 @@ export type UpdateProblemApiArg = {
   problemId: number;
   updateProblemDto: UpdateProblemDto;
 };
-export type GetProblemForAuthorApiResponse = /** status 200  */ AuthorProblemDto;
-export type GetProblemForAuthorApiArg = {
-  problemId: number;
-};
 export type GetProblemForAdminApiResponse = /** status 200  */ AdminProblemDto;
 export type GetProblemForAdminApiArg = {
   problemId: number;
@@ -320,11 +303,6 @@ export type ChangeProblemStatusApiArg = {
 };
 export type AddTestCasesToProblemApiResponse = /** status 200  */ SuccessMessageDto;
 export type AddTestCasesToProblemApiArg = {
-  addTestCasesDto: AddTestCasesDto;
-};
-export type AddTestCasesToProblemByAdminOnlyApiResponse =
-  /** status 200  */ SuccessMessageDto;
-export type AddTestCasesToProblemByAdminOnlyApiArg = {
   addTestCasesDto: AddTestCasesDto;
 };
 export type CreateTagApiResponse = /** status 200  */ Tag;
@@ -354,6 +332,8 @@ export type GetSubmissionByIdApiResponse = /** status 200  */ SubmissionDto;
 export type GetSubmissionByIdApiArg = {
   submissionId: number;
 };
+export type HandleCallbackApiResponse = unknown;
+export type HandleCallbackApiArg = void;
 export type CreateSolutionApiResponse = /** status 200  */ SolutionDto;
 export type CreateSolutionApiArg = {
   createSolutionDto: CreateSolutionDto;
@@ -424,6 +404,7 @@ export type ChangeUserRoleDto = {
   role: UserRole;
 };
 export type ProblemDifficulty = 'Easy' | 'Medium' | 'Hard';
+export type ProblemStatus = 'unpublished' | 'approved' | 'rejected';
 export type Tag = {
   id: number;
   name: string;
@@ -432,8 +413,8 @@ export type Problem = {
   id: number;
   title: string;
   difficulty: ProblemDifficulty;
+  status: ProblemStatus;
   hasTestCases: boolean;
-  remark: string;
   tags: Tag[];
   author: User;
   createdAt: string;
@@ -456,8 +437,8 @@ export type ProblemDto = {
   id: number;
   title: string;
   difficulty: ProblemDifficulty;
+  status: ProblemStatus;
   hasTestCases: boolean;
-  remark: string;
   tags: Tag[];
   author: User;
   createdAt: string;
@@ -471,12 +452,12 @@ export type UpdateProblemDto = {
   description?: string;
   tagIds?: number[];
 };
-export type AuthorProblemDto = {
+export type AdminProblemDto = {
   id: number;
   title: string;
   difficulty: ProblemDifficulty;
+  status: ProblemStatus;
   hasTestCases: boolean;
-  remark: string;
   tags: Tag[];
   author: User;
   createdAt: string;
@@ -486,26 +467,7 @@ export type AuthorProblemDto = {
   testCasesInput: string;
   testCasesOutput: string;
 };
-export type AdminProblemDto = {
-  id: number;
-  title: string;
-  difficulty: ProblemDifficulty;
-  hasTestCases: boolean;
-  remark: string;
-  tags: Tag[];
-  author: User;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string;
-  description: string;
-  authorTestCasesInput: string;
-  authorTestCasesOutput: string;
-  additionalTestCasesInput: string;
-  additionalTestCasesOutput: string;
-};
-export type ProblemStatus = 'unpublished' | 'approved' | 'rejected';
 export type ChangeProblemStatusDto = {
-  remark: string;
   status: ProblemStatus;
 };
 export type AddTestCasesDto = {
@@ -519,18 +481,22 @@ export type CreateTagDto = {
 export type Submission = {
   id: number;
   language: 'c' | 'cpp' | 'java' | 'js' | 'go';
-  state: 'PENDING' | ' STARTED' | 'RUNNING' | 'SUCCESS';
+  state: 'Pending' | ' Started' | 'Running' | 'Success' | 'Error';
   statusMessage:
     | 'Null'
     | 'Accepted'
     | 'Wrong Answer'
     | 'Rejected'
     | 'Compile error'
+    | 'Execution error'
     | 'Runtime error'
     | 'Time limit exceeded'
-    | 'Memory limit exceeded';
+    | 'Memory limit exceeded'
+    | 'Unexpected error';
   totalTestCases: number;
   testCasesPassed: number;
+  time: number;
+  memory: number;
   finished: boolean;
   problem: Problem;
   user: User;
@@ -545,23 +511,28 @@ export type CreateSubmissionDto = {
 export type SubmissionDto = {
   id: number;
   language: 'c' | 'cpp' | 'java' | 'js' | 'go';
-  state: 'PENDING' | ' STARTED' | 'RUNNING' | 'SUCCESS';
+  state: 'Pending' | ' Started' | 'Running' | 'Success' | 'Error';
   statusMessage:
     | 'Null'
     | 'Accepted'
     | 'Wrong Answer'
     | 'Rejected'
     | 'Compile error'
+    | 'Execution error'
     | 'Runtime error'
     | 'Time limit exceeded'
-    | 'Memory limit exceeded';
+    | 'Memory limit exceeded'
+    | 'Unexpected error';
   totalTestCases: number;
   testCasesPassed: number;
+  time: number;
+  memory: number;
   finished: boolean;
   problem: Problem;
   user: User;
   createdAt: string;
   code: string;
+  stderr: string;
 };
 export type SolutionDto = {
   id: number;
@@ -596,11 +567,9 @@ export const {
   useGetProblemsForAdminQuery,
   useGetProblemQuery,
   useUpdateProblemMutation,
-  useGetProblemForAuthorQuery,
   useGetProblemForAdminQuery,
   useChangeProblemStatusMutation,
   useAddTestCasesToProblemMutation,
-  useAddTestCasesToProblemByAdminOnlyMutation,
   useCreateTagMutation,
   useGetAllTagsQuery,
   useGetTagQuery,
@@ -608,6 +577,7 @@ export const {
   useCreateSubmissionMutation,
   useGetSubmissionsByUserAndProblemQuery,
   useGetSubmissionByIdQuery,
+  useHandleCallbackMutation,
   useCreateSolutionMutation,
   useGetAllSolutionsQuery,
   useGetSolutionByIdQuery,

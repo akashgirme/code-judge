@@ -13,7 +13,7 @@ import {
   GetProblemsForAdminApiArg,
   Problem,
   ProblemStatus,
-  useGetProblemsQuery,
+  useGetProblemsForAdminQuery,
 } from '@code-judge/api-client';
 import { EditPencil } from 'iconoir-react';
 import { TagBadges } from '../components';
@@ -24,8 +24,6 @@ import { Link } from 'react-router-dom';
 export const AllProblemsView = () => {
   const [searchParams, setSearchParams, removeSearchParams] = useSearchParams();
 
-  // TODO: Form should auto-fill values from url , during refresh for Tags Field
-  // * Currently not working because in URL , we receive only tagId ,and not tagName
   const filterObj: GetProblemsForAdminApiArg = {
     pageIndex: Number(searchParams.get('pageIndex')) || 0,
     // pageSize: Number(searchParams.get('pageSize')) || 10,
@@ -38,13 +36,13 @@ export const AllProblemsView = () => {
     data: { problems = [] } = {},
     isFetching,
     isLoading,
-  } = useGetProblemsQuery(filterObj);
+  } = useGetProblemsForAdminQuery(filterObj);
   return (
-    <div className="grid gap-6">
-      <div className="w-full flex flex-col gap-3 relative min-h-32 ">
+    <div className="grid gap-3">
+      <div className="w-full flex flex-col gap-3 pt-2 px-3">
         <Can I={Action.Create} a={Subject.Problem}>
-          <Link className="w-max" to="/problems/create">
-            <Button variant="outline">Create Post</Button>
+          <Link className="w-max" to="/admin/problems/create">
+            <Button variant="outline">Create Problem</Button>
           </Link>
         </Can>
       </div>
@@ -53,6 +51,8 @@ export const AllProblemsView = () => {
           <TableHead>Problem Title</TableHead>
           <TableHead>Difficulty</TableHead>
           <TableHead>Tags</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Actions</TableHead>
         </TableHeader>
         <TableBody>
           {problems?.map((problem: Problem) => (
@@ -67,6 +67,42 @@ export const AllProblemsView = () => {
               </TableCell>
               <TableCell>
                 <TagBadges tags={problem.tags} />
+              </TableCell>
+              <TableCell>
+                <Typography variant="h3">{problem.status}</Typography>
+              </TableCell>
+              <TableCell className="grid grid-cols-3">
+                <a
+                  href={`/admin/problems/${problem.id}/change-status`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Button className="gap-1">
+                    <EditPencil />
+                    <Typography variant="h3">Change Status</Typography>
+                  </Button>
+                </a>
+
+                <a
+                  href={`/admin/problems/${problem.id}/edit`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Button className="gap-1">
+                    <EditPencil />
+                    <Typography variant="h3">Edit problem</Typography>
+                  </Button>
+                </a>
+                <a
+                  href={`/admin/problems/${problem.id}/add-testcases`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Button className="gap-1">
+                    <EditPencil />
+                    <Typography variant="h3">Edit Testcases</Typography>
+                  </Button>
+                </a>
               </TableCell>
             </TableRow>
           ))}

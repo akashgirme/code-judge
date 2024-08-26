@@ -127,6 +127,7 @@ export class ProblemService {
         'problem.id',
         'problem.title',
         'problem.difficulty',
+        'problem.status',
         'problem.createdAt',
         'problem.updatedAt',
         'problem.deletedAt',

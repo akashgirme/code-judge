@@ -4,7 +4,7 @@ export const questionConfig = {
   label: 'Input TestCases',
 };
 
-export const modelKey = 'testCasesInput';
+export const modelKey = 'input';
 
 export const problemInputTestCasesValidations = {
   [modelKey]: z

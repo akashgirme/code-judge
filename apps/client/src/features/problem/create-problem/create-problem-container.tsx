@@ -19,7 +19,7 @@ export const CreateProblemContainer = () => {
           tagIds: data.tags.map((tag) => tag.value),
         },
       }).unwrap();
-      navigate(`/problems/${id}`);
+      navigate(`/problems/add-testcases/${id}`);
     } catch (error) {
       handleError(error as Error);
     }

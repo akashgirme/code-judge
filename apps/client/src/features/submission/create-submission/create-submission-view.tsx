@@ -38,15 +38,15 @@ export const CreateSubmissionView: React.FC<CreateSubmissionViewProps> = ({
           <div>
             <CodeEditor language={selectedLanguage} />
           </div>
-          <div>
+          <div className="flex w-full">
             <Button
               isActive={isValid}
               variant="default"
               type="submit"
               isLoading={isLoading}
-              className="md:w-72 mx-auto"
+              className="md:w-72 mx-auto "
             >
-              Submit
+              {isLoading ? 'Pending...' : 'Submit'}
             </Button>
           </div>
         </div>

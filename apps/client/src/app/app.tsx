@@ -13,6 +13,9 @@ import UpdateProblem from './admin/problem/edit-problem/page';
 import { PersistGate } from 'redux-persist/integration/react';
 import Dashboard from './admin/dashboard/page';
 import ProblemDetailScreen from './problem/[problemId]/page';
+import AddTestCases from './admin/problem/add-testcases/page';
+import AllProblems from './admin/problem/all-problems/page';
+import ChangeProblemStatus from './admin/problem/change-status/page';
 
 export function App() {
   return (
@@ -28,9 +31,17 @@ export function App() {
           <Route path="/auth/sign-in-with-otp" element={<SignInWithOtp />} />
           <Route path="/auth/sign-in-with-token" element={<SignInWithTokenPage />} />
           <Route path="/auth/onboard" element={<Onboard />} />
-          <Route path="/problems" element={<PublicProblems />} />
-          <Route path="/problems/create" element={<CreateProblem />} />
-          <Route path="/problems/update/:problemId" element={<UpdateProblem />} />
+          <Route path="/admin/problems" element={<AllProblems />} />
+          <Route path="/admin/problems/create" element={<CreateProblem />} />
+          <Route
+            path="/admin/problems/:problemId/add-testcases"
+            element={<AddTestCases />}
+          />
+          <Route path="/admin/problems/:problemId/edit" element={<UpdateProblem />} />
+          <Route
+            path="/admin/problems/:problemId/change-status"
+            element={<ChangeProblemStatus />}
+          />
         </Routes>
       </PersistGate>
     </Provider>

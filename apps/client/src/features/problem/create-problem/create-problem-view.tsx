@@ -7,13 +7,9 @@ import { useParams } from 'react-router-dom';
 import {
   ProblemDescriptionField,
   ProblemDifficultyField,
-  ProblemExpectedOutputField,
-  ProblemInputTestCasesField,
-  ProblemStatusField,
   ProblemTitleField,
   ProblemTagsField,
 } from '../components/form-fields';
-import { Action, Can, Subject } from '../../auth/ability';
 
 interface CreateProblemViewProps {
   form: UseFormReturn<CreateProblemModel>;
@@ -58,13 +54,6 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
                   <ProblemDescriptionField />
                 </div>
               </div>
-              <Can I={Action.UpdateOwn} a={Subject.Problem}>
-                {problemId && (
-                  <div className=" w-1/4 ">
-                    <ProblemStatusField />
-                  </div>
-                )}
-              </Can>
               <Button
                 isActive={isValid}
                 variant="default"
