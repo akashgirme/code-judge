@@ -42,6 +42,10 @@ export class Problem {
   @Exclude({ toPlainOnly: true })
   slug: string;
 
+  @ApiProperty({
+    enum: ProblemStatus,
+    enumName: 'ProblemStatus',
+  })
   @Column({
     type: 'enum',
     enum: ProblemStatus,
@@ -54,11 +58,6 @@ export class Problem {
     default: false,
   })
   hasTestCases: boolean;
-
-  @ApiProperty()
-  @Column('text', { nullable: true })
-  // @Exclude({ toPlainOnly: true })
-  remark: string;
 
   @ApiProperty({ type: [Tag] })
   @ManyToMany(() => Tag, (tag) => tag.problems)

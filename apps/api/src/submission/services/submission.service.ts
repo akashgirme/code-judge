@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,10 +11,9 @@ import { Submission } from '../entities';
 import { Repository } from 'typeorm';
 import { UpdateSubmission } from '../types';
 import { ProblemService } from '../../problem/services';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
 import { CreateSubmissionDto, SubmissionDto } from '../dto';
 import { plainToClass } from 'class-transformer';
+import { ExecutionService } from '../../execution/services';
 
 @Injectable()
 export class SubmissionService {
@@ -18,7 +22,7 @@ export class SubmissionService {
     @InjectRepository(Submission) private submissionRepo: Repository<Submission>,
     private readonly storageService: StorageService,
     private readonly problemService: ProblemService,
-    @InjectQueue('CODE_EXECUTION') private executionQueue: Queue
+    private readonly executionService: ExecutionService
   ) {}
 
   async createSubmission(user: User, { problemId, code, language }: CreateSubmissionDto) {
@@ -39,12 +43,7 @@ export class SubmissionService {
 
     this.logger.log('Submission created with id: ', submission.id);
 
-    /**
-     * Add submission in Queue for execution.
-     */
-    await this.executionQueue.add('execute', {
-      payload: { problemId, submissionId: submission.id },
-    });
+    await this.executionService.executeSubmission(problem, submission);
 
     this.logger.log('Code excution request send for submission: ', submission.id);
 
@@ -57,6 +56,9 @@ export class SubmissionService {
     testCasesPassed,
     statusMessage,
     state,
+    stderr,
+    time,
+    memory,
     finished,
   }: UpdateSubmission) {
     const submission = await this.getSubmissionById(submissionId);
@@ -65,7 +67,15 @@ export class SubmissionService {
     submission.statusMessage = statusMessage;
     submission.totalTestCases = totalTestCases;
     submission.testCasesPassed = testCasesPassed;
+    submission.time = time;
+    submission.memory = memory;
     submission.finished = finished;
+
+    if (stderr) {
+      const stderrPath = `submissions/stderr/${submission.id}/stderr.txt`;
+      await this.storageService.putObject(stderrPath, stderr);
+      submission.stderrPath = stderrPath;
+    }
 
     const updatedSubmission = await this.submissionRepo.save(submission);
 
@@ -91,10 +101,25 @@ export class SubmissionService {
     return submissions;
   }
 
-  async getSubmission(submissionId: number): Promise<SubmissionDto> {
-    const submission = await this.getSubmissionById(submissionId);
+  async getSubmission(user: User, submissionId: number): Promise<SubmissionDto> {
+    const submission = await this.submissionRepo
+      .createQueryBuilder('submission')
+      .leftJoinAndSelect('submission.user', 'user')
+      .select(['submission', 'user.id', 'user.firstName', 'user.lastName'])
+      .where('submission.id = :submissionId', { submissionId })
+      .getOne();
+
+    if (submission.user.id !== user.id) {
+      throw new ForbiddenException(
+        `You don't have permission to read this submission '${submissionId}'`
+      );
+    }
     const code = await this.storageService.getObject(submission.path);
-    return plainToClass(SubmissionDto, { ...submission, code });
+    let stderr = '';
+    if (submission.stderrPath) {
+      stderr = await this.storageService.getObject(submission.stderrPath);
+    }
+    return plainToClass(SubmissionDto, { ...submission, code, stderr });
   }
 
   async getSubmissionById(id: number) {

@@ -6,6 +6,7 @@ import { User } from '../user/entities';
 import { Submission } from '../submission/entities';
 import { Solution } from '../solution/entities';
 
+const db_url = process.env.DB_URL;
 const commonTypeOrmConfig: DataSourceOptions = {
   logging: true,
   type: 'postgres',
@@ -40,7 +41,7 @@ const datasource = new DataSource({
       ca: fs.readFileSync('./db-ssl-certificate.crt').toString(),
     },
   },
-  url: '',
+  url: db_url,
   migrations: ['db/migrations/*{.ts,.js}'],
 });
 

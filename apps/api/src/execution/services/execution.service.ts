@@ -1,23 +1,20 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { ProblemService, TestCaseService } from '../../problem/services';
+import { TestCaseService } from '../../problem/services';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
-import { ExecutionRequestPayload } from '@code-judge/common';
+import { ExecutionCallback, ExecutionRequestPayload } from '@code-judge/common';
 import { SubmissionService } from '../../submission/services/submission.service';
 import axios from 'axios';
-import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
 import { SubmissionState } from '../../submission/enums';
 import { StorageService } from '../../object-store/storage.service';
+import { Problem } from '../../problem/entities';
+import { Submission } from '../../submission/entities';
 
-@Processor('CODE_EXECUTION')
 @Injectable()
-export class ExecutionService extends WorkerHost {
+export class ExecutionService {
   private logger = new Logger(ExecutionService.name);
   constructor(
-    @Inject(forwardRef(() => ProblemService))
-    private readonly problemService: ProblemService,
     @Inject(forwardRef(() => StorageService))
     private readonly storageService: StorageService,
     @Inject(forwardRef(() => SubmissionService))
@@ -26,54 +23,9 @@ export class ExecutionService extends WorkerHost {
     private readonly testCaseService: TestCaseService,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService
-  ) {
-    super();
-  }
+  ) {}
 
-  @OnWorkerEvent('active')
-  async onActive(job: Job) {
-    this.logger.log(
-      `Processing job ${job.id} of type ${job.name} with data ${job.data}...`
-    );
-    const { submissionId } = job.data.payload;
-
-    await this.submissionService.updateSubmission({
-      submissionId,
-      state: SubmissionState.STARTED,
-    });
-  }
-
-  @OnWorkerEvent('progress')
-  async inProgress(job: Job) {
-    const { submissionId } = job.data.payload;
-
-    await this.submissionService.updateSubmission({
-      submissionId,
-      state: SubmissionState.RUNNING,
-    });
-  }
-
-  /**
-   *  BullMQ not support @Process() from @nestjs/bullmq
-   * Hence need to use switch case
-   */
-  async process(job: Job): Promise<void> {
-    switch (job.name) {
-      case 'execute': {
-        const { problemId, submissionId } = job.data.payload;
-        await this.executeSubmission(problemId, submissionId);
-        break;
-      }
-    }
-    return;
-  }
-
-  async executeSubmission(problemId: number, submissionId: number) {
-    const [problem, submission] = await Promise.all([
-      this.problemService.getProblemById(problemId),
-      this.submissionService.getSubmissionById(submissionId),
-    ]);
-
+  async executeSubmission(problem: Problem, submission: Submission) {
     const { language, path } = submission;
     const { slug } = problem;
 
@@ -83,7 +35,7 @@ export class ExecutionService extends WorkerHost {
     ]);
 
     const requestPayloadObj: ExecutionRequestPayload = {
-      submissionId,
+      submissionId: submission.id,
       sourceCode,
       language,
       testCasesInput: testCases.input,
@@ -95,7 +47,7 @@ export class ExecutionService extends WorkerHost {
 
   /**
    * This method send request to execution-server with payload.
-   * @param {ExecutionRequestPayload}
+   * @param {Object} ExecutionRequestPayload;
    * @returns {Promise<void>}
    */
   async sendRequestToExecutionServer({
@@ -107,25 +59,36 @@ export class ExecutionService extends WorkerHost {
   }: ExecutionRequestPayload): Promise<void> {
     const executionServerUrl =
       this.configService.get<string>('CODE_EXECUTION_REQUEST_URL') ?? '';
+    const apiKey = this.configService.get<string>('EXECUTION_API_KEY') ?? '';
 
     try {
       const response = await firstValueFrom(
-        this.httpService.post(executionServerUrl, {
-          submissionId,
-          sourceCode,
-          testCasesInput,
-          expectedOutput,
-          language,
-        })
+        this.httpService.post(
+          executionServerUrl,
+          {
+            submissionId,
+            sourceCode,
+            language,
+            testCasesInput,
+            expectedOutput,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+            },
+          }
+        )
       );
 
       this.logger.log(`Response Status Code: ${response.status}`);
       this.logger.log(`Received Data: `, response.data);
 
-      await this.submissionService.updateSubmission({
-        ...response.data,
-        state: SubmissionState.SUCCESS,
-      });
+      if (response.data.message)
+        await this.submissionService.updateSubmission({
+          submissionId,
+          state: SubmissionState.STARTED,
+        });
     } catch (error) {
       await this.submissionService.updateSubmission({
         submissionId,
@@ -140,5 +103,27 @@ export class ExecutionService extends WorkerHost {
         this.logger.error("Execution server didn't response");
       }
     }
+  }
+
+  async handleSubmissionCallback({
+    submissionId,
+    totalTestCases,
+    testCasesPassed,
+    statusMessage,
+    stderr,
+    time,
+    memory,
+  }: ExecutionCallback) {
+    await this.submissionService.updateSubmission({
+      submissionId,
+      totalTestCases,
+      testCasesPassed,
+      statusMessage,
+      state: SubmissionState.SUCCESS,
+      stderr,
+      time,
+      memory,
+      finished: true,
+    });
   }
 }

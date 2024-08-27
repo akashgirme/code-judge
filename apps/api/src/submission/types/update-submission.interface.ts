@@ -7,5 +7,8 @@ export interface UpdateSubmission {
   testCasesPassed?: number;
   statusMessage?: StatusMessage;
   state: SubmissionState;
+  stderr?: string;
+  time?: number;
+  memory?: number;
   finished?: boolean;
 }

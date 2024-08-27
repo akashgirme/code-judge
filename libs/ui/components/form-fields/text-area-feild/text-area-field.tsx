@@ -37,7 +37,8 @@ const textAreaFieldLabelStyles = cva(
 
 const textAreaFieldInputStyles = cva(
   [
-    'outline-none min-h-[90px] rounded-[12px]  text-neutral-600 dark:text-white px-[15px] py-2 peer w-full bg-transparent border z-10',
+    'outline-none min-h-[90px] rounded-[10px]  text-neutral-600 dark:text-white px-[15px] py-2 peer w-full bg-transparent border z-10',
+    'whitespace-pre-wrap',
   ],
   {
     variants: {

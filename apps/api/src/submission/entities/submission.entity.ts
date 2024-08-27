@@ -23,6 +23,11 @@ export class Submission {
   @Exclude({ toPlainOnly: true })
   path: string;
 
+  @ApiHideProperty()
+  @Column('varchar', { nullable: true })
+  @Exclude({ toPlainOnly: true })
+  stderrPath: string;
+
   @ApiProperty({
     type: 'enum',
     enum: Languages,
@@ -55,6 +60,14 @@ export class Submission {
   @ApiProperty({ type: Number })
   @Column('int', { nullable: true })
   testCasesPassed: number;
+
+  @ApiProperty({ type: Number })
+  @Column('float8', { nullable: true })
+  time: number;
+
+  @ApiProperty({ type: Number })
+  @Column('int', { nullable: true })
+  memory: number;
 
   @ApiProperty({ type: Boolean })
   @Column('boolean', { default: false })

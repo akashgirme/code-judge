@@ -16,13 +16,13 @@ import { Badge } from '../ui/badge';
 import { cn } from '../../lib';
 
 export interface Option {
-  value: number;
+  value: string;
   label: string;
   disable?: boolean;
   /** fixed option that can't be removed. */
   fixed?: boolean;
   /** Group the options by providing key. */
-  [key: number]: number | boolean | undefined;
+  [key: string]: string | boolean | undefined;
 }
 interface GroupOption {
   [key: string]: Option[];
@@ -56,7 +56,7 @@ interface MultipleSelectorProps {
   hidePlaceholderWhenSelected?: boolean;
   disabled?: boolean;
   /** Group the options base on provided key. */
-  groupBy?: string;
+  groupBy?: number;
   className?: string;
   badgeClassName?: string;
   /**
@@ -108,7 +108,7 @@ function transToGroupOption(options: Option[], groupBy?: number) {
 
   const groupOption: GroupOption = {};
   options.forEach((option) => {
-    const key = (option[groupBy] as number) || '';
+    const key = (option[groupBy] as string) || '';
     if (!groupOption[key]) {
       groupOption[key] = [];
     }
@@ -251,7 +251,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             e.preventDefault();
             e.stopPropagation();
           }}
-          onSelect={(value: number) => {
+          onSelect={(value: string) => {
             if (selected.length >= maxSelected) {
               onMaxSelected?.(selected.length);
               return;

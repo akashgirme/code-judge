@@ -1,15 +1,9 @@
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Problem } from '../entities';
 import { Repository } from 'typeorm';
 import {
   AllProblemsDto,
-  AuthorProblemDto,
   ChangeProblemStatusDto,
   CreateProblemDto,
   AdminProblemDto,
@@ -27,7 +21,6 @@ import { getPaginationMeta } from '../../common/utility';
 import { ProblemStatus } from '../enums';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
 import { SortOrder } from '../../common/types';
-import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ProblemService {
@@ -64,23 +57,12 @@ export class ProblemService {
   }
 
   async updateProblem(
-    user: User,
     problemId: number,
     { title, difficulty, description, tagIds }: UpdateProblemDto
   ) {
-    const ability = this.abilityFactory.defineAbilityForUser(user);
-
     const { tags } = await this.tagService.findTags(tagIds);
 
     const problem = await this.getProblemById(problemId);
-
-    // If user doesn't have access to update problem & is trying to update a different persons problem
-    if (!ability.can(Action.Update, Problem) && problem.author.id !== user.id) {
-      throw new ForbiddenException(
-        'Permission Error',
-        `You do not have permission edit this problem '${problemId}'`
-      );
-    }
 
     if (description) {
       await this.storageService.putObject(
@@ -107,67 +89,24 @@ export class ProblemService {
       `problems/${slug}/description.md`
     );
 
-    return plainToClass(ProblemDto, { ...problem, description });
-  }
-
-  async getProblemForAuthor(user: User, problemId: number): Promise<AuthorProblemDto> {
-    const problem = await this.problemRepo
-      .createQueryBuilder('problem')
-      .leftJoinAndSelect('problem.author', 'author')
-      .select(['problem', 'problem.remark'])
-      .where('problem.id = :problemId', { problemId })
-      .andWhere('author.id = :userId', { userId: user.id })
-      .getOne();
-
-    const [description, { input, output }] = await Promise.all([
-      this.storageService.getObject(`problems/${problem.slug}/description.md`),
-      this.testCaseService.getTestCases(problem.slug),
-    ]);
-
-    return plainToClass(AuthorProblemDto, {
-      ...problem,
-      description,
-      testCasesInput: input,
-      testCasesOutput: output,
-    });
+    return { ...problem, description };
   }
 
   async getProblemForAdmin(problemId: number): Promise<AdminProblemDto> {
     const problem = await this.getProblemById(problemId);
 
     const { slug } = problem;
-    let description, testcases, additionalTestcases;
-    try {
-      const promises = [
-        this.storageService.getObject(`problems/${slug}/description.md`),
-        this.testCaseService.getTestCases(slug),
-        this.testCaseService.getAdditionalTestCases(slug),
-      ];
+    const [description, testcases] = await Promise.all([
+      this.storageService.getObject(`problems/${slug}/description.md`),
+      this.testCaseService.getTestCases(slug),
+    ]);
 
-      const results = await Promise.all(
-        promises.map(async (promise) => {
-          try {
-            return await promise;
-          } catch (error) {
-            console.error(error);
-            return null; // Return null if the promise fails
-          }
-        })
-      );
-
-      [description, testcases, additionalTestcases] = results;
-    } catch (error) {
-      this.logger.error('An error occurred:', error);
-    }
-
-    return plainToClass(AdminProblemDto, {
+    return {
       ...problem,
       description,
-      authorTestCasesInput: testcases?.input ?? '',
-      authorTestCasesOutput: testcases?.output ?? '',
-      additionalTestCasesInput: additionalTestcases?.input ?? '',
-      additionalTestCasesOutput: additionalTestcases?.output ?? '',
-    });
+      testCasesInput: testcases?.input ?? '',
+      testCasesOutput: testcases?.output ?? '',
+    };
   }
 
   getProblemsForPublic(body: ProblemsQueryDto): Promise<AllProblemsDto> {
@@ -188,6 +127,7 @@ export class ProblemService {
         'problem.id',
         'problem.title',
         'problem.difficulty',
+        'problem.status',
         'problem.createdAt',
         'problem.updatedAt',
         'problem.deletedAt',
@@ -280,42 +220,23 @@ export class ProblemService {
     return problem;
   }
 
-  async changeProblemStatus(
-    problemId: number,
-    { remark, status }: ChangeProblemStatusDto
-  ) {
+  async changeProblemStatus(problemId: number, { status }: ChangeProblemStatusDto) {
     const problem = await this.getProblemById(problemId);
 
     problem.status = status;
-    problem.remark = remark;
 
     return this.problemRepo.save(problem);
   }
 
-  async addTestCasesToProblem(
-    user: User,
-    { problemId, input, output }: AddTestCasesDto
-  ): Promise<SuccessMessageDto> {
-    const problem = await this.getProblemById(problemId);
-    if (problem.author.id !== user.id) {
-      throw new ForbiddenException(
-        `You are not allowed to add testcases to problem with id: ${problemId}`
-      );
-    }
-
-    await this.testCaseService.saveTestCases(problem.slug, input, output);
-    problem.hasTestCases = true;
-    await this.problemRepo.save(problem);
-    return { message: 'TestCases added successfully' };
-  }
-
-  async addAdditionalTestCasesToProblem({
+  async addTestCasesToProblem({
     problemId,
     input,
     output,
   }: AddTestCasesDto): Promise<SuccessMessageDto> {
     const problem = await this.getProblemById(problemId);
-    await this.testCaseService.saveAdditionalTestCases(problem.slug, input, output);
+    await this.testCaseService.saveTestCases(problem.slug, input, output);
+    problem.hasTestCases = true;
+    await this.problemRepo.save(problem);
     return { message: 'TestCases added successfully' };
   }
 

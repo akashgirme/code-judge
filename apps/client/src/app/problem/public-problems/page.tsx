@@ -1,5 +1,4 @@
 'use client';
-
 import { PublicProblemsContainer } from '../../../features/problem';
 
 const PublicProblems = () => {

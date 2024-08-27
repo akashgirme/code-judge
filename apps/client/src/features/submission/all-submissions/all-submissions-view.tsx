@@ -1,4 +1,6 @@
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   Table,
@@ -11,63 +13,126 @@ import {
 } from '@code-judge/ui';
 import {
   Submission,
+  useGetSubmissionByIdQuery,
   useGetSubmissionsByUserAndProblemQuery,
 } from '@code-judge/api-client';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { SubmissionDetailsContainer } from '../submission-details';
+import { useAppDispatch, useAppSelector } from '../../../app/store';
+import { setSubmission } from '../submissionSlice';
+import { useState } from 'react';
+import { CheckIcon, CircleX, Clock3, MemoryStick } from 'lucide-react';
+
+function getIcon(statusMessage: string) {
+  switch (statusMessage) {
+    case 'Accepted':
+      return <CheckIcon className="h-4 w-4" />;
+    default:
+      return <CircleX className="h-4 w-4" />;
+  }
+}
 
 export const AllSubmissionsView = () => {
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
+
   const { problemId: pid } = useParams();
   const problemId = Number(pid);
+
+  const dispatch = useAppDispatch();
+  const { submission } = useAppSelector((state) => state.submission);
+
   const { data, isFetching, isLoading } = useGetSubmissionsByUserAndProblemQuery({
     problemId,
   });
-  if (isFetching || isLoading) {
+
+  const { data: submissionDetails, isLoading: getSubmissionIsLoading } =
+    useGetSubmissionByIdQuery(
+      { submissionId: selectedSubmissionId ?? 0 },
+      { skip: selectedSubmissionId === null }
+    );
+
+  if (submissionDetails && selectedSubmissionId !== null) {
+    dispatch(setSubmission(submissionDetails));
+    setSelectedSubmissionId(null);
+  }
+
+  const handleGetSubmission = (id: number) => {
+    setSelectedSubmissionId(id);
+  };
+
+  if (isFetching || isLoading || getSubmissionIsLoading) {
     return (
       <Card>
         <CardContent>Loading...</CardContent>
       </Card>
     );
   }
+
+  if (submission) {
+    return <SubmissionDetailsContainer submission={submission} />;
+  }
+
   return (
     <div className="grid gap-4 pt-4 h-full">
       <Table>
         <TableHeader>
-          <TableHead>Message</TableHead>
-          <TableHead>State</TableHead>
-          <TableHead>TestCases Passed</TableHead>
-          <TableHead>CreatedAt</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Language</TableHead>
+          <TableHead>Runtime</TableHead>
+          <TableHead>Memory</TableHead>
         </TableHeader>
         <TableBody>
           {data?.map((submission: Submission) => (
             <TableRow key={submission.id}>
-              <TableCell>
-                <Link target="_blank" to={'#'}>
-                  <Typography variant="h3">{submission.statusMessage}</Typography>
-                </Link>
+              <TableCell className="text-left pl-0">
+                <Button
+                  type="submit"
+                  variant="link"
+                  className="flex flex-col items-start"
+                  onClick={() => handleGetSubmission(submission.id)}
+                >
+                  <Typography
+                    variant="h3"
+                    style={{
+                      color: submission.statusMessage === 'Accepted' ? 'green' : 'red',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {getIcon(submission.statusMessage)}
+                    {submission.statusMessage}
+                  </Typography>
+                  <Typography variant="h6">
+                    {new Date(submission.createdAt).toLocaleDateString('en-GB')}
+                  </Typography>
+                </Button>
               </TableCell>
               <TableCell>
-                <Typography variant="h3">{submission.state}</Typography>
+                <Badge>{submission.language}</Badge>
               </TableCell>
               <TableCell>
-                <Typography variant="h3">{`${submission.testCasesPassed ?? '--'}/${
-                  submission.totalTestCases ?? '--'
-                }`}</Typography>
+                <Clock3 />
+                {submission.statusMessage === 'Accepted' ? (
+                  <Typography variant="caption">{`${
+                    submission.time * 1000
+                  } ms`}</Typography>
+                ) : (
+                  'N/A'
+                )}
               </TableCell>
               <TableCell>
-                <Typography variant="h3">{submission.createdAt}</Typography>
+                <MemoryStick />
+                {submission.statusMessage === 'Accepted' ? (
+                  <Typography variant="caption">{`${(submission.memory / 1024).toFixed(
+                    1
+                  )} MB`}</Typography>
+                ) : (
+                  'N/A'
+                )}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </div>
-  );
-};
-
-AllSubmissionsView.Loading = function AllProblemsViewLoading() {
-  return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <div className=" w-44 h-44 rounded-full border-t-2 animate-spin " />
     </div>
   );
 };

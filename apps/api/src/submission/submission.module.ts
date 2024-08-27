@@ -7,7 +7,7 @@ import { SubmissionController } from './controllers/submission.controller';
 import { SubmissionService } from './services/submission.service';
 import { StorageModule } from '../object-store/storage.module';
 import { PassportModule } from '@nestjs/passport';
-import { BullModule } from '@nestjs/bullmq';
+import { ExecutionModule } from '../execution/execution.module';
 
 @Module({
   imports: [
@@ -16,13 +16,7 @@ import { BullModule } from '@nestjs/bullmq';
     AbilityModule,
     StorageModule,
     forwardRef(() => ProblemModule),
-    BullModule.registerQueue({
-      name: 'CODE_EXECUTION',
-      defaultJobOptions: {
-        removeOnComplete: 10 * 1000,
-        removeOnFail: 10 * 1000,
-      },
-    }),
+    forwardRef(() => ExecutionModule),
   ],
   controllers: [SubmissionController],
   providers: [SubmissionService],
