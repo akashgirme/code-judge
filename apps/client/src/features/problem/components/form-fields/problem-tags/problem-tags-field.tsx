@@ -12,7 +12,7 @@ export const ProblemTagsField = () => {
   const options: Option[] = useMemo(() => {
     return (
       data?.map((tag) => {
-        return { label: tag.name, value: tag.id } as Option;
+        return { label: tag.name, value: tag.id.toString() } as Option;
       }) || []
     );
   }, [data]);

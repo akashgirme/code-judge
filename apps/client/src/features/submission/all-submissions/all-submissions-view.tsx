@@ -19,8 +19,18 @@ import {
 import { useParams } from 'react-router-dom';
 import { SubmissionDetailsContainer } from '../submission-details';
 import { useAppDispatch, useAppSelector } from '../../../app/store';
-import { removeSubmission, setSubmission } from '../submissionSlice';
+import { setSubmission } from '../submissionSlice';
 import { useState } from 'react';
+import { CheckIcon, CircleX, Clock3, MemoryStick } from 'lucide-react';
+
+function getIcon(statusMessage: string) {
+  switch (statusMessage) {
+    case 'Accepted':
+      return <CheckIcon className="h-4 w-4" />;
+    default:
+      return <CircleX className="h-4 w-4" />;
+  }
+}
 
 export const AllSubmissionsView = () => {
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
@@ -59,12 +69,7 @@ export const AllSubmissionsView = () => {
   }
 
   if (submission) {
-    return (
-      <SubmissionDetailsContainer
-        submission={submission}
-        onBack={() => dispatch(removeSubmission())}
-      />
-    );
+    return <SubmissionDetailsContainer submission={submission} />;
   }
 
   return (
@@ -73,22 +78,30 @@ export const AllSubmissionsView = () => {
         <TableHeader>
           <TableHead>Status</TableHead>
           <TableHead>Language</TableHead>
-          <TableHead>Testcases</TableHead>
           <TableHead>Runtime</TableHead>
           <TableHead>Memory</TableHead>
         </TableHeader>
         <TableBody>
           {data?.map((submission: Submission) => (
             <TableRow key={submission.id}>
-              <TableCell>
+              <TableCell className="text-left pl-0">
                 <Button
                   type="submit"
                   variant="link"
-                  className="flex flex-col justify-left"
+                  className="flex flex-col items-start"
                   onClick={() => handleGetSubmission(submission.id)}
                 >
-                  <Typography variant="h3">{submission.statusMessage}</Typography>
-                  <Typography variant="caption">
+                  <Typography
+                    variant="h3"
+                    style={{
+                      color: submission.statusMessage === 'Accepted' ? 'green' : 'red',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {getIcon(submission.statusMessage)}
+                    {submission.statusMessage}
+                  </Typography>
+                  <Typography variant="h6">
                     {new Date(submission.createdAt).toLocaleDateString('en-GB')}
                   </Typography>
                 </Button>
@@ -97,17 +110,24 @@ export const AllSubmissionsView = () => {
                 <Badge>{submission.language}</Badge>
               </TableCell>
               <TableCell>
-                <Typography variant="h3">{`${submission.testCasesPassed ?? '--'}/${
-                  submission.totalTestCases ?? '--'
-                }`}</Typography>
+                <Clock3 />
+                {submission.statusMessage === 'Accepted' ? (
+                  <Typography variant="caption">{`${
+                    submission.time * 1000
+                  } ms`}</Typography>
+                ) : (
+                  'N/A'
+                )}
               </TableCell>
               <TableCell>
-                <Typography variant="caption">{submission.time * 1000} ms</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography variant="caption">
-                  {(submission.memory / 1024).toFixed(1)} MB
-                </Typography>
+                <MemoryStick />
+                {submission.statusMessage === 'Accepted' ? (
+                  <Typography variant="caption">{`${(submission.memory / 1024).toFixed(
+                    1
+                  )} MB`}</Typography>
+                ) : (
+                  'N/A'
+                )}
               </TableCell>
             </TableRow>
           ))}

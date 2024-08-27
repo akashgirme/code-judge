@@ -26,44 +26,46 @@ export const InitiateSignInView: React.FC<InitiateSignInViewProps> = ({
   } = form;
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Card className="w-full max-w-sm">
-        <FormProvider {...form}>
-          <CardHeader>
-            <PageHeader
-              title="Login"
-              description={'Login to start solving problems'}
-              hideBackButton
-              hideLogo
-              prevRoute="/auth/sign-in"
-            />
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <SocialSignInButtons />
-            <OR />
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="grid gap-4">
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@email.com"
-                  {...register('email')}
-                  className="w-full"
-                />
-                <Button
-                  isActive={isValid}
-                  variant="default"
-                  type="submit"
-                  isLoading={isLoading}
-                  className="w-full"
-                >
-                  Continue with email
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </FormProvider>
-      </Card>
+    <div className="flex flex-col h-screen">
+      <div className="flex-grow flex items-center justify-center">
+        <Card className="w-full max-w-sm">
+          <FormProvider {...form}>
+            <CardHeader>
+              <PageHeader
+                title="Login"
+                description={'Login to start solving problems'}
+                hideBackButton
+                hideLogo
+                prevRoute="/auth/sign-in"
+              />
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <SocialSignInButtons />
+              <OR />
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="grid gap-4">
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@email.com"
+                    {...register('email')}
+                    className="w-full"
+                  />
+                  <Button
+                    isActive={isValid}
+                    variant="default"
+                    type="submit"
+                    isLoading={isLoading}
+                    className="w-full"
+                  >
+                    Continue with email
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </FormProvider>
+        </Card>
+      </div>
     </div>
   );
 };

@@ -1,15 +1,19 @@
 import React from 'react';
 import { SubmissionDetailsView } from './submissions-details-view';
 import { SubmissionDto } from '@code-judge/api-client';
+import { useAppDispatch } from '../../../app/store';
+import { removeSubmission } from '../submissionSlice';
 
 interface SubmissionDetailsContainerProps {
   submission: SubmissionDto;
-  onBack: any;
 }
 
 export const SubmissionDetailsContainer: React.FC<SubmissionDetailsContainerProps> = ({
   submission,
-  onBack,
 }) => {
-  return <SubmissionDetailsView submission={submission} onBack={onBack} />;
+  const dispatch = useAppDispatch();
+  const handleOnBack = () => {
+    dispatch(removeSubmission());
+  };
+  return <SubmissionDetailsView submission={submission} handleOnBack={handleOnBack} />;
 };

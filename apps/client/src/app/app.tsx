@@ -16,12 +16,14 @@ import ProblemDetailScreen from './problem/[problemId]/page';
 import AddTestCases from './admin/problem/add-testcases/page';
 import AllProblems from './admin/problem/all-problems/page';
 import ChangeProblemStatus from './admin/problem/change-status/page';
+import { Toaster } from 'sonner';
 
 export function App() {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <AppBar />
+        <Toaster position="bottom-right" />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/problems" element={<PublicProblems />} />
@@ -31,6 +33,8 @@ export function App() {
           <Route path="/auth/sign-in-with-otp" element={<SignInWithOtp />} />
           <Route path="/auth/sign-in-with-token" element={<SignInWithTokenPage />} />
           <Route path="/auth/onboard" element={<Onboard />} />
+
+          <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/problems" element={<AllProblems />} />
           <Route path="/admin/problems/create" element={<CreateProblem />} />
           <Route

@@ -37,6 +37,13 @@ export const AllProblemsView = () => {
     isFetching,
     isLoading,
   } = useGetProblemsForAdminQuery(filterObj);
+  if (isLoading || isFetching) {
+    return (
+      <div>
+        <Typography variant="h1">Loading...</Typography>
+      </div>
+    );
+  }
   return (
     <div className="grid gap-3">
       <div className="w-full flex flex-col gap-3 pt-2 px-3">
@@ -108,14 +115,6 @@ export const AllProblemsView = () => {
           ))}
         </TableBody>
       </Table>
-    </div>
-  );
-};
-
-AllProblemsView.Loading = function AllProblemsViewLoading() {
-  return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <div className=" w-44 h-44 rounded-full border-t-2 animate-spin " />
     </div>
   );
 };
