@@ -15,10 +15,12 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { createBlacklistFilter } from 'redux-persist-transform-filter';
 import { ability, defineAbilityForUser } from '../features/auth/ability/ability-factory';
 import storage from 'redux-persist/lib/storage';
+import { submissionReducer } from '../features/submission/submissionSlice';
 
 const rootReducer = combineReducers({
   [api.reducerPath]: api.reducer,
   auth: authReducer,
+  submission: submissionReducer,
 });
 
 //TODO: Uncomment this when refresh-token is able to store

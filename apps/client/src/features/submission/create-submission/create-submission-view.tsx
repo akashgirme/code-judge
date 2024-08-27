@@ -1,22 +1,20 @@
 import { Controller, FormProvider, UseFormReturn } from 'react-hook-form';
 import { CodeEditor } from '../../../components/code-editor';
 import { LanguageSelectField } from '../components/langauge-select/language-select-field';
-import { useCreateSubmissionMutation } from '@code-judge/api-client';
 import { CreateSubmissionModel } from './create-submission-logic';
-import { Button } from '@code-judge/ui';
+import { Button, Card } from '@code-judge/ui';
 
 interface CreateSubmissionViewProps {
   form: UseFormReturn<CreateSubmissionModel>;
   onSubmit: (data: CreateSubmissionModel) => void;
+  isLoading: boolean;
 }
 
 export const CreateSubmissionView: React.FC<CreateSubmissionViewProps> = ({
   form,
   onSubmit,
+  isLoading,
 }) => {
-  const [_createSubmission, { isLoading }] = useCreateSubmissionMutation({
-    fixedCacheKey: 'createProblem',
-  });
   const {
     formState: { isValid },
     handleSubmit,
@@ -35,20 +33,22 @@ export const CreateSubmissionView: React.FC<CreateSubmissionViewProps> = ({
               <LanguageSelectField onChange={onChange} value={value} />
             )}
           />
-          <div>
-            <CodeEditor language={selectedLanguage} />
-          </div>
-          <div>
-            <Button
-              isActive={isValid}
-              variant="default"
-              type="submit"
-              isLoading={isLoading}
-              className="md:w-72 mx-auto"
-            >
-              Submit
-            </Button>
-          </div>
+          <Card className="h-full grid gap-1">
+            <div>
+              <CodeEditor language={selectedLanguage} />
+            </div>
+            <div className="flex w-full">
+              <Button
+                isActive={isValid}
+                variant="default"
+                type="submit"
+                isLoading={isLoading}
+                className="md:w-72 mx-auto "
+              >
+                {isLoading ? 'Pending...' : 'Submit'}
+              </Button>
+            </div>
+          </Card>
         </div>
       </form>
     </FormProvider>

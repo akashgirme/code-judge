@@ -1,6 +1,17 @@
-import { Badge, Card, CardDescription, CardHeader, CardTitle } from '@code-judge/ui';
-import { useGetProblemsQuery } from '@code-judge/api-client';
+import {
+  Button,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Typography,
+} from '@code-judge/ui';
+import { Problem, useGetProblemsQuery } from '@code-judge/api-client';
 import { Link } from 'react-router-dom';
+import { TagBadges } from '../components';
 
 export const PublicProblemsView = () => {
   const { data: { problems = [] } = {} } = useGetProblemsQuery({
@@ -9,21 +20,35 @@ export const PublicProblemsView = () => {
   });
 
   return (
-    <div className="grid gap-6">
-      {problems?.map((problem) => (
-        <Link key={`post-${problem.id}`} to={`/problems/${problem.id}`}>
-          <Card className="" key={problem.id}>
-            <CardHeader>
-              <CardTitle>{problem.title}</CardTitle>
-              <CardDescription className="flex gap-3">
-                {problem.tags?.map((tags) => (
-                  <Badge>{tags.name}</Badge>
-                ))}
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-      ))}
-    </div>
+    <Card>
+      <Table>
+        <TableHeader>
+          <TableHead>Problem Title</TableHead>
+          <TableHead>Tags</TableHead>
+          <TableHead>Difficulty</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableHeader>
+        <TableBody>
+          {problems?.map((problem: Problem) => (
+            <TableRow key={problem.id}>
+              <TableCell>
+                <Typography variant="h3">{problem.title}</Typography>
+              </TableCell>
+              <TableCell>
+                <TagBadges tags={problem.tags} />
+              </TableCell>
+              <TableCell>
+                <Typography variant="body1">{problem.difficulty}</Typography>
+              </TableCell>
+              <TableCell>
+                <Button>
+                  <Link to={`/problems/${problem.id}`}>View Problem</Link>
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Card>
   );
 };

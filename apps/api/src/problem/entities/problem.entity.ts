@@ -42,6 +42,10 @@ export class Problem {
   @Exclude({ toPlainOnly: true })
   slug: string;
 
+  @ApiProperty({
+    enum: ProblemStatus,
+    enumName: 'ProblemStatus',
+  })
   @Column({
     type: 'enum',
     enum: ProblemStatus,

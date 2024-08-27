@@ -19,11 +19,13 @@ export type CreateSubmissionModel = z.infer<typeof CreateSubmissionSchema>;
 interface CreateSubmissionLogicProps {
   defaultValues: CreateSubmissionModel;
   onSubmit: (data: CreateSubmissionModel) => Promise<void>;
+  isLoading: boolean;
 }
 
 export const CreateSubmissionLogic: React.FC<CreateSubmissionLogicProps> = ({
   defaultValues,
   onSubmit,
+  isLoading,
 }) => {
   const { problemId: id } = useParams();
   const problemId = Number(id);
@@ -39,6 +41,7 @@ export const CreateSubmissionLogic: React.FC<CreateSubmissionLogicProps> = ({
 
   const watch = form.watch;
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetStoredValue = useCallback(
     debounce((values: CreateSubmissionModel) => {
       setStoredValue(values);
@@ -55,12 +58,14 @@ export const CreateSubmissionLogic: React.FC<CreateSubmissionLogicProps> = ({
       subscription.unsubscribe();
       clearStoredValue();
     };
-  }, [watch, clearStoredValue, setStoredValue]);
+  }, [watch, clearStoredValue, setStoredValue, debouncedSetStoredValue]);
 
   const handleSubmit: SubmitHandler<CreateSubmissionModel> = async (data) => {
     await onSubmit(data);
     clearStoredValue();
   };
 
-  return <CreateSubmissionView form={form} onSubmit={handleSubmit} />;
+  return (
+    <CreateSubmissionView form={form} onSubmit={handleSubmit} isLoading={isLoading} />
+  );
 };

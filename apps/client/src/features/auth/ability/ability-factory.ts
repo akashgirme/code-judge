@@ -60,11 +60,7 @@ export const defineAbilityForUser = (userRole: UserRole) => {
       can(Action.Manage, Subject.Submission);
     // eslint-disable-next-line no-fallthrough
     case 'user':
-      can(Action.ReadOwn, Subject.Problem);
-      can(Action.Create, Subject.Problem);
-      can(Action.Update, Subject.Problem);
       can(Action.ReadOwn, Subject.Submission);
-      cannot(Action.Delete, Subject.Problem);
   }
 
   return build();

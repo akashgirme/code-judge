@@ -24,7 +24,7 @@ export const ProblemDescriptionField = () => {
     formState: { errors },
   } = useFormContext();
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMarkdownInput(e.target.value);
     onChange(e.target.value);
   };
