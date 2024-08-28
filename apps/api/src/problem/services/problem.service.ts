@@ -62,7 +62,7 @@ export class ProblemService {
   ) {
     const { tags } = await this.tagService.findTags(tagIds);
 
-    const problem = await this.getProblemById(problemId);
+    const problem = await this.findProblemById(problemId);
 
     if (description) {
       await this.storageService.putObject(
@@ -82,7 +82,7 @@ export class ProblemService {
   }
 
   async getProblem(problemId: number): Promise<ProblemDto> {
-    const problem = await this.getProblemById(problemId);
+    const problem = await this.findProblemById(problemId);
     const { slug } = problem;
 
     const description = await this.storageService.getObject(
@@ -93,7 +93,7 @@ export class ProblemService {
   }
 
   async getProblemForAdmin(problemId: number): Promise<AdminProblemDto> {
-    const problem = await this.getProblemById(problemId);
+    const problem = await this.findProblemById(problemId);
 
     const { slug } = problem;
     const [description, testcases] = await Promise.all([
@@ -194,7 +194,7 @@ export class ProblemService {
     return { problems, paginationMeta };
   }
 
-  async getProblemById(problemId: number): Promise<Problem> {
+  async findProblemById(problemId: number): Promise<Problem> {
     const problem = await this.problemRepo
       .createQueryBuilder('problem')
       .leftJoinAndSelect('problem.author', 'author')
@@ -211,17 +211,14 @@ export class ProblemService {
       .getOne();
 
     if (!problem) {
-      throw new NotFoundException(
-        'Problem not found',
-        `Problem with id '${problemId}' not found`
-      );
+      throw new NotFoundException(`Problem not found with id ${problemId}`);
     }
 
     return problem;
   }
 
   async changeProblemStatus(problemId: number, { status }: ChangeProblemStatusDto) {
-    const problem = await this.getProblemById(problemId);
+    const problem = await this.findProblemById(problemId);
 
     problem.status = status;
 
@@ -233,11 +230,11 @@ export class ProblemService {
     input,
     output,
   }: AddTestCasesDto): Promise<SuccessMessageDto> {
-    const problem = await this.getProblemById(problemId);
+    const problem = await this.findProblemById(problemId);
     await this.testCaseService.saveTestCases(problem.slug, input, output);
     problem.hasTestCases = true;
     await this.problemRepo.save(problem);
-    return { message: 'TestCases added successfully' };
+    return { message: 'Testcases added successfully' };
   }
 
   private convertTitletoSlug(title: string) {

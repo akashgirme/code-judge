@@ -28,14 +28,13 @@ export class UserOtpService {
     const otpDetails = await this.cacheService.fetchOtpDetailsFromCache(user.id);
 
     if (!otpDetails) {
-      throw new ForbiddenException('Otp expired! Please resend otp');
+      throw new ForbiddenException('OTP expired! Please resend OTP');
     }
 
-    if (otpDetails.otpAttempts > 5) {
-      throw new ForbiddenException(
-        'Cannot validate otp',
-        'Too Many Attempts, Please send new otp to continue.'
-      );
+    if (otpDetails.otpAttempts >= 5) {
+      console.log(otpDetails.otpAttempts);
+      await this.cacheService.deleteOptDetailsFromCache(otpDetails.userId);
+      throw new ForbiddenException('Too Many Attempts, Please send new OTP to continue.');
     }
 
     const match = await bcrypt.compare(otp, otpDetails.otp);
@@ -44,7 +43,7 @@ export class UserOtpService {
     await this.cacheService.storeOtpDetailsInCache(otpDetails, user.id);
 
     if (!match) {
-      throw new ForbiddenException('Incorrect otp', `Provided otp is incorrect ${otp}`);
+      throw new ForbiddenException(`Incorrect OTP, Provided OTP is incorrect ${otp}`);
     }
   }
 }

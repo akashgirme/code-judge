@@ -60,13 +60,13 @@ export class AuthService {
 
     await this.mailService.sendMail({
       to: email,
-      subject: `Secure link to log in to example.com | ${new Date().toLocaleString()} `,
+      subject: `Secure link to log in to Code-Judge | ${new Date().toLocaleString()} `,
       htmlBody: verifyEmailWithOtpMjml,
       data: { otp, validationUrl },
     });
 
     return {
-      message: `To continue click the link send to ${email} or enter otp`,
+      message: `To continue click the link send to ${email} or enter OTP received in email`,
     };
   }
 

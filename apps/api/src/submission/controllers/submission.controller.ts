@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Logger,
   Param,
   ParseIntPipe,
   Post,
@@ -23,8 +22,6 @@ import {} from '../dto/submissions-query.dto';
 @ApiTags('submissions')
 @Controller('submissions')
 export class SubmissionController {
-  private logger = new Logger(SubmissionController.name);
-
   constructor(private readonly submissionService: SubmissionService) {}
 
   @Post('/')

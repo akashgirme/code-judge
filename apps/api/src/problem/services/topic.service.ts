@@ -27,7 +27,7 @@ export class TagService {
 
     if (tag) {
       throw new BadRequestException(
-        `A tag already exists for the given tagName = ${tagName}`
+        `A tag already exists for the given tagName: ${tagName}`
       );
     }
   }
@@ -49,7 +49,7 @@ export class TagService {
     const tag = await this.tagRepo.findOne({ where: { id: tagId } });
 
     if (!tag) {
-      throw new NotFoundException(`No tag found for tag id = ${tagId}`);
+      throw new NotFoundException(`No tag found for tag id: ${tagId}`);
     }
     return tag;
   }
