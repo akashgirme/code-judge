@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { SubmissionService } from '../services/submission.service';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import { CreateSubmissionDto, SubmissionDto } from '../dto';
@@ -29,7 +29,7 @@ export class SubmissionController {
 
   @Post('/')
   @UseGuards(AuthGuard(), AbilityGuard)
-  @ApiOkResponse({ type: Submission })
+  @ApiCreatedResponse({ type: Submission })
   async createSubmission(
     @CurrentUser() user: User,
     @Body() body: CreateSubmissionDto

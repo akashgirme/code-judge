@@ -25,7 +25,7 @@ import {
   UpdateProblemDto,
 } from '../dto';
 import { Problem } from '../entities';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
 import { CheckAbilities } from '../../ability/ability.decorator';
@@ -39,7 +39,7 @@ export class ProblemController {
   @Post('/')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.Create, subject: Problem })
-  @ApiOkResponse({ type: Problem })
+  @ApiCreatedResponse({ type: Problem })
   createProblem(
     @CurrentUser() user: User,
     @Body() body: CreateProblemDto
