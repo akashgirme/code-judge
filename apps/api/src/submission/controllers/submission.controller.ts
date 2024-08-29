@@ -17,7 +17,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { Action } from '../../ability/ability.factory';
-import {} from '../dto/submissions-query.dto';
+import { Throttle } from '@nestjs/throttler';
+
+const RATE_LIMIT_TIME_IN_MILISECONDS = 30 * 1000; // 30s
 
 @ApiTags('submissions')
 @Controller('submissions')
@@ -25,6 +27,7 @@ export class SubmissionController {
   constructor(private readonly submissionService: SubmissionService) {}
 
   @Post('/')
+  @Throttle({ default: { limit: 3, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @UseGuards(AuthGuard(), AbilityGuard)
   @ApiCreatedResponse({ type: Submission })
   async createSubmission(

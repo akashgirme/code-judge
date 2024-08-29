@@ -37,7 +37,7 @@ export class UserOtpService {
       throw new ForbiddenException('Too Many Attempts, Please send new OTP to continue.');
     }
 
-    const match = await bcrypt.compare(otp, otpDetails.otp);
+    const match = bcrypt.compare(otp, otpDetails.otp);
 
     otpDetails.otpAttempts++;
     await this.cacheService.storeOtpDetailsInCache(otpDetails, user.id);

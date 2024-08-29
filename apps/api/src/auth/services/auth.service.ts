@@ -82,7 +82,7 @@ export class AuthService {
       );
 
       if (firstName !== existingUser.firstName || lastName !== existingUser.lastName) {
-        this.usersService.editProfile(existingUser, { firstName, lastName });
+        await this.usersService.editProfile(existingUser, { firstName, lastName });
       }
 
       const redirectUrl = `${this.configService.get(

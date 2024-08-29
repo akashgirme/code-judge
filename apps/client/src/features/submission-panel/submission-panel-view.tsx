@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  Label,
   Tabs,
   TabsContent,
   TabsList,
