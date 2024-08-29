@@ -9,16 +9,18 @@ RUN npm install
 
 RUN npx nx reset
 
+ARG VITE_API_SERVER_URL
+ENV VITE_API_SERVER_URL=${VITE_API_SERVER_URL}
+
 RUN npx nx build client
 
 FROM node:20-alpine AS production
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/src/monorepo
 
 COPY --from=build /usr/src/monorepo/dist ./dist
 
-CMD [ "node", "dist/apps/client/main" ]
+RUN npm install -g serve
+
+CMD [ "serve","-s", "dist/apps/client", "-l", "4200", "--cors" ]
 
