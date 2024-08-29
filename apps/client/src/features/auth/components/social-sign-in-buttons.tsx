@@ -9,9 +9,8 @@ export const SocialSignInButtons = () => {
 
   return (
     <div className="grid gap-4">
-      <Button variant="outline" onClick={onGoogleSignInClick}>
-        {/* TODO: Remove this Icon component */}
-        <Icon className="h-5 w-5 " icon={GoogleIcon} />
+      <Button variant="outline" className="gap-2" onClick={onGoogleSignInClick}>
+        <Icon className="h-5 w-5" icon={GoogleIcon} />
         Continue with Google
       </Button>
     </div>

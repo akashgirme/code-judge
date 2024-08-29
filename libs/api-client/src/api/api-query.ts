@@ -257,7 +257,7 @@ export type ChangeUserRoleApiArg = {
   userId: number;
   changeUserRoleDto: ChangeUserRoleDto;
 };
-export type CreateProblemApiResponse = /** status 200  */ Problem;
+export type CreateProblemApiResponse = /** status 201  */ Problem;
 export type CreateProblemApiArg = {
   createProblemDto: CreateProblemDto;
 };
@@ -305,7 +305,7 @@ export type AddTestCasesToProblemApiResponse = /** status 200  */ SuccessMessage
 export type AddTestCasesToProblemApiArg = {
   addTestCasesDto: AddTestCasesDto;
 };
-export type CreateTagApiResponse = /** status 200  */ Tag;
+export type CreateTagApiResponse = /** status 201  */ Tag;
 export type CreateTagApiArg = {
   createTagDto: CreateTagDto;
 };
@@ -320,7 +320,7 @@ export type UpdateTagApiArg = {
   tagId: number;
   createTagDto: CreateTagDto;
 };
-export type CreateSubmissionApiResponse = /** status 200  */ Submission;
+export type CreateSubmissionApiResponse = /** status 201  */ Submission;
 export type CreateSubmissionApiArg = {
   createSubmissionDto: CreateSubmissionDto;
 };

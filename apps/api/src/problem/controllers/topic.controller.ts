@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { AbilityGuard } from '../../ability/ability.guard';
 import { CreateTagDto } from '../dto';
@@ -25,7 +25,7 @@ export class TagController {
 
   @Post('/')
   @CheckAbilities({ action: Action.Create, subject: Tag })
-  @ApiOkResponse({ type: Tag })
+  @ApiCreatedResponse({ type: Tag })
   createTag(@Body() body: CreateTagDto): Promise<Tag> {
     return this.tagService.createTag(body);
   }

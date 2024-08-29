@@ -18,7 +18,7 @@ export class ExecutionController {
 
       await this.executionService.executeCode(req.body);
       res.setHeader('Content-Type', 'application/json');
-      res.status(200).json({ message: 'Execution created successfully' });
+      res.status(200).json({ message: 'Execution request received successfully' });
     } catch (error) {
       logger.error(error);
       res.status(500).json({ error: 'Internal Server Error' });

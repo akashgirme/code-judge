@@ -26,7 +26,7 @@ export class SubmissionService {
   ) {}
 
   async createSubmission(user: User, { problemId, code, language }: CreateSubmissionDto) {
-    const problem = await this.problemService.getProblemById(problemId);
+    const problem = await this.problemService.findProblemById(problemId);
     const path = `submissions/${problem.slug}/${language}/${
       user.id
     }/solution-${Date.now()}.txt`;
@@ -111,7 +111,7 @@ export class SubmissionService {
 
     if (submission.user.id !== user.id) {
       throw new ForbiddenException(
-        `You don't have permission to read this submission '${submissionId}'`
+        `You don't have permission to read this submission: '${submissionId}'`
       );
     }
     const code = await this.storageService.getObject(submission.path);
@@ -126,10 +126,7 @@ export class SubmissionService {
     const submission = await this.submissionRepo.findOneBy({ id });
 
     if (!submission) {
-      throw new NotFoundException(
-        'Submission not found',
-        `Submission with id ${id} not found`
-      );
+      throw new NotFoundException(`Submission with id '${id}' not found`);
     }
 
     return submission;

@@ -12,7 +12,7 @@ import axios from 'axios';
 @singleton()
 export class HandleResultService {
   private resultJobQueueWorker: Worker;
-  private connection;
+  private readonly connection;
 
   constructor(
     private queueService: QueueService,

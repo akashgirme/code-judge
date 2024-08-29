@@ -60,13 +60,13 @@ export class AuthService {
 
     await this.mailService.sendMail({
       to: email,
-      subject: `Secure link to log in to example.com | ${new Date().toLocaleString()} `,
+      subject: `Secure link to log in to Code-Judge | ${new Date().toLocaleString()} `,
       htmlBody: verifyEmailWithOtpMjml,
       data: { otp, validationUrl },
     });
 
     return {
-      message: `To continue click the link send to ${email} or enter otp`,
+      message: `To continue click the link send to ${email} or enter OTP received in email`,
     };
   }
 
@@ -82,7 +82,7 @@ export class AuthService {
       );
 
       if (firstName !== existingUser.firstName || lastName !== existingUser.lastName) {
-        this.usersService.editProfile(existingUser, { firstName, lastName });
+        await this.usersService.editProfile(existingUser, { firstName, lastName });
       }
 
       const redirectUrl = `${this.configService.get(

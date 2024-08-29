@@ -66,4 +66,8 @@ export class AuthCacheService {
   fetchOtpDetailsFromCache(userId: number): Promise<OtpDetails> {
     return this.cacheManager.get(`user-otp:${userId}`);
   }
+
+  deleteOptDetailsFromCache(userId: number) {
+    return this.cacheManager.del(`user-otp:${userId}`);
+  }
 }

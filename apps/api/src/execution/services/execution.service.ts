@@ -47,7 +47,7 @@ export class ExecutionService {
 
   /**
    * This method send request to execution-server with payload.
-   * @param {Object} ExecutionRequestPayload;
+   * @param {ExecutionRequestPayload};
    * @returns {Promise<void>}
    */
   async sendRequestToExecutionServer({

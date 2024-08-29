@@ -31,7 +31,7 @@ import { ExecutionModule } from '../execution/execution.module';
     CacheModule.registerAsync(RedisOptions),
     ThrottlerModule.forRoot([
       {
-        ttl: 30 * 1000,
+        ttl: 30 * 1000, // 30s
         limit: 10,
       },
     ]),

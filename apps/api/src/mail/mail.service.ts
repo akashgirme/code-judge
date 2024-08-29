@@ -31,7 +31,7 @@ export class MailService {
           Data: subject,
         },
       },
-      Source: '"Online-Coding-Judge" <noreply@akashgirme.me>',
+      Source: `"Code-Judge" <${this.configService.get<string>('SES_EMAIL_SENDER')}>`,
     };
 
     try {

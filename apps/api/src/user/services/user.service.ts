@@ -7,12 +7,14 @@ import { PaginationDto } from '../../common/dto';
 import { ChangeUserRoleDto, CreateUserDto, EditProfileDto, OnboardUserDto } from '../dto';
 import { MailService } from '../../mail/mail.service';
 import { welcomeMjml } from '../../mail/mjml';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private repo: Repository<User>,
-    private mailService: MailService
+    private mailService: MailService,
+    private configService: ConfigService
   ) {}
 
   findAccountByEmail(email: string): Promise<User | null> {
@@ -40,7 +42,7 @@ export class UserService {
     const currentUser = await this.findAccountById(user.id);
 
     if (!currentUser) {
-      throw new NotFoundException(`User not found with id: ${user.id}`);
+      throw new NotFoundException(`User not found with id: '${user.id}'`);
     }
 
     currentUser.firstName = firstName;
@@ -51,7 +53,7 @@ export class UserService {
 
     this.mailService.sendMail({
       to: updatedUser.email,
-      subject: 'Welcome to example.com!',
+      subject: 'Welcome to Code-Judge',
       htmlBody: welcomeMjml,
       data: {
         firstName: updatedUser.firstName,
@@ -72,9 +74,9 @@ export class UserService {
 
   async changeUserRole(userId: number, { role }: ChangeUserRoleDto) {
     const user = await this.findAccountById(userId);
-    if (!user) throw new NotFoundException('User Not Found');
+    if (!user) throw new NotFoundException(`User not found with id: ${userId}`);
 
-    if (user.email === 'akash17g@gmail.com') {
+    if (user.email === `${this.configService.get<string>('PRIMARY_ADMIN_EMAIL')}`) {
       throw new BadRequestException('Cannot change the role of primary admin');
     }
 

@@ -23,23 +23,16 @@ const rootReducer = combineReducers({
   submission: submissionReducer,
 });
 
-//TODO: Uncomment this when refresh-token is able to store
-//because if there is no refresh token then session won't refresh and if we lost authToken then have to login again to get it.
-// const accessTokenBlackListFilter = createBlacklistFilter('auth', ['accessToken']);
+const accessTokenBlackListFilter = createBlacklistFilter('auth', ['accessToken']);
 
 const persistConfig: PersistConfig<RootState> = {
   key: 'root',
   storage,
   whitelist: ['auth'],
-  // transforms: [accessTokenBlackListFilter],
+  transforms: [accessTokenBlackListFilter],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-
-// const reducers = {
-//   [api.reducerPath]: api.reducer,
-//   auth: authReducer,
-// };
 
 export const store = configureStore({
   reducer: persistedReducer,
