@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { ExecutionRequestPayload, Languages } from '@code-judge/common';
 import { FileHandleService } from './file-handle.service';
-import { QueueJobTypes, Queues } from '../enums';
+import { Queues } from '../enums';
 import { QueueService } from './queue.service';
 import { logger } from '../utils';
 
@@ -18,7 +18,7 @@ export class ExecutionService {
     expectedOutput,
     language,
   }: ExecutionRequestPayload): Promise<void> {
-    //Isolate the job - Add file to volume dir.
+    // Add file such as input, code, output etc. in respective dir..
     await this.fileHandleService.storeFiles(
       submissionId,
       language,
@@ -28,23 +28,27 @@ export class ExecutionService {
     );
 
     // Add Job to Queue
-    const queue = this.queueService.getQueue(Queues.WORKERS_JOB_QUEUE);
-    await queue.add(this.getJobType(language), { id: submissionId });
+    const queue = this.queueService.getQueue(this.getJobQueue(language));
+    await queue.add(
+      `${language}`,
+      { id: submissionId },
+      { removeOnComplete: true, removeOnFail: { age: 10 } }
+    );
 
     logger.info(`Job has been added to the queue for submission: ${submissionId}`);
   }
-  private getJobType(language: Languages) {
+  private getJobQueue(language: Languages) {
     switch (language) {
       case Languages.C:
-        return QueueJobTypes.C_CODE_EXECUTION;
+        return Queues.C_JOB_QUEUE;
       case Languages.CPP:
-        return QueueJobTypes.CPP_CODE_EXECUTION;
+        return Queues.CPP_JOB_QUEUE;
       case Languages.GO:
-        return QueueJobTypes.GO_CODE_EXECUTION;
+        return Queues.GO_JOB_QUEUE;
       case Languages.JAVA:
-        return QueueJobTypes.JAVA_CODE_EXECUTION;
+        return Queues.JAVA_JOB_QUEUE;
       case Languages.JAVASCRIPT:
-        return QueueJobTypes.JAVASCRIPT_CODE_EXECUTION;
+        return Queues.JS_JOB_QUEUE;
       default:
         throw new Error(`Unsupported language: ${language}`);
     }

@@ -10,9 +10,8 @@ dotenv.config();
 const execPromise = util.promisify(exec);
 const logger = pino();
 
-const QUEUE_NAME = process.env.JOB_QUEUE || 'code-execution';
-const JOB_TYPE = process.env.JOB_TYPE || 'c-code-execution';
-const RESULT_JOB_QUEUE = process.env.RESULT_JOB_QUEUE || 'workers-result-job-queue';
+const JOB_QUEUE_NAME = process.env.JOB_QUEUE || 'C-QUEUE';
+const RESULT_JOB_QUEUE = process.env.RESULT_JOB_QUEUE || 'RESULT-JOB-QUEUE';
 const SUCCESSFUL_JOB = process.env.SUCCESSFUL_JOB || 'successful-job';
 const FAILED_JOB = process.env.FAILED_JOB || 'failed-job';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
@@ -36,12 +35,13 @@ const execute = async (job: Job) => {
   const workingDir = process.env.WORKING_DIR ?? '/tmp';
   const scriptPath = `${workingDir}/${jobId}/script.sh`;
   const metadataPath = `${workingDir}/${jobId}/metadata.txt`;
+  const exitCodeFilePath = `${workingDir}/${jobId}/exit_code.txt`;
 
   // Create commands to set limits and execute the script
   const ulimitCommand = `ulimit -v ${memoryLimit}; ulimit -t ${maxWallTimeLimit}`;
   const changeDirCommand = `cd ${workingDir}/${jobId}`;
   const executionCommand = `/usr/bin/time -f "time=%e\nmemory=%M" timeout ${maxWallTimeLimit}s /bin/bash ${scriptPath}`;
-  const fullCommand = `sh -c '${ulimitCommand} && ${changeDirCommand} && ${executionCommand}'`;
+  const fullCommand = `sh -c '${ulimitCommand} && ${changeDirCommand} && ${executionCommand} ; echo $? > ${exitCodeFilePath}'`;
 
   try {
     const { stdout, stderr } = await execPromise(fullCommand);
@@ -49,6 +49,7 @@ const execute = async (job: Job) => {
     // Read the metadata file
     let metadata = '';
     const metadataFileContent = fs.readFileSync(metadataPath, 'utf8');
+    const exitCodeFileContent = fs.readFileSync(exitCodeFilePath, 'utf8');
     let status = '';
     let executionTime = 0;
     let memoryUsage = 0;
@@ -70,12 +71,9 @@ const execute = async (job: Job) => {
       status = 'successful';
     }
 
-    if (stderr.includes('Command terminated by signal 9')) {
+    if (exitCodeFileContent.includes('137')) {
       status = 'memory-exceeded';
-    } else if (
-      stderr.includes('Command terminated by signal 15') ||
-      stderr.includes('Command exited with non-zero status 124')
-    ) {
+    } else if (exitCodeFileContent.includes('124')) {
       status = 'time-limit-exceeded';
     }
 
@@ -93,36 +91,32 @@ const execute = async (job: Job) => {
   } catch (error) {
     logger.error(`Error executing script for job ${jobId}: ${error}`);
     // Write error to metadata file
-    fs.writeFileSync(metadataPath, `status=failed\ntime=0\nmemory=0`);
+    // fs.writeFileSync(metadataPath, `status=failed\ntime=0\nmemory=0`);
   }
 };
 
 function startWorker() {
   const worker = new Worker(
-    QUEUE_NAME,
+    JOB_QUEUE_NAME,
     async (job: Job) => {
-      console.log(`Job: ${job}`);
-      switch (job.name) {
-        case JOB_TYPE:
-          try {
-            await execute(job);
-            logger.info(`Processing job of type: ${job.name}`);
-          } catch (error) {
-            logger.error('Error processing job:', error);
-            throw error;
-          }
+      try {
+        await execute(job);
+        logger.info(`Processing job of type: ${job.name}`);
+      } catch (error) {
+        logger.error('Error processing job:', error);
+        throw error;
       }
     },
     { connection, concurrency: 1 }
   );
 
   worker.on('completed', (job) => {
-    logger.info(`Job ${job.id} of type ${job.name} completed successfully`);
+    logger.info(`Job ${job.id} completed successfully`);
     resultJobQueue.add(SUCCESSFUL_JOB, { id: job.data.id });
   });
 
   worker.on('failed', (job, err) => {
-    logger.error(`Job ${job?.id} of type ${job?.name} failed with error:`, err);
+    logger.error(`Job ${job?.id} failed with error:`, err);
     resultJobQueue.add(FAILED_JOB, { id: job?.data.id });
   });
 

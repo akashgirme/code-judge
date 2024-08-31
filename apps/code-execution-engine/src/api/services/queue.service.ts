@@ -1,21 +1,19 @@
 import { Queue, QueueOptions } from 'bullmq';
-import { injectable, singleton } from 'tsyringe';
+import { injectable } from 'tsyringe';
 import IORedis from 'ioredis';
 import { Queues } from '../enums';
 
 @injectable()
-@singleton()
 export class QueueService {
+  private static instance: QueueService;
+
   private queues!: Record<string, Queue>;
   public connection: IORedis;
-  private workersJobQueue!: Queue;
-  private workersResultJobQueue!: Queue;
-  private static instance: QueueService;
 
   private static QUEUE_OPTIONS: Omit<QueueOptions, 'connection'> = {
     defaultJobOptions: {
       removeOnComplete: true,
-      removeOnFail: true,
+      // removeOnFail: true,
     },
   };
 
@@ -35,7 +33,6 @@ export class QueueService {
 
     this.queues = {};
     QueueService.instance = this;
-
     this.instantiateQueues();
   }
 
@@ -45,11 +42,18 @@ export class QueueService {
       connection: this.connection,
     };
 
-    this.workersJobQueue = new Queue(Queues.WORKERS_JOB_QUEUE, options);
-    this.queues[Queues.WORKERS_JOB_QUEUE] = this.workersJobQueue;
+    const queueNames = [
+      Queues.C_JOB_QUEUE,
+      Queues.CPP_JOB_QUEUE,
+      Queues.GO_JOB_QUEUE,
+      Queues.JAVA_JOB_QUEUE,
+      Queues.JS_JOB_QUEUE,
+      Queues.RESULT_JOB_QUEUE,
+    ];
 
-    this.workersResultJobQueue = new Queue(Queues.WORKERS_RESULT_JOB_QUEUE, options);
-    this.queues[Queues.WORKERS_RESULT_JOB_QUEUE] = this.workersResultJobQueue;
+    for (const queueName of queueNames) {
+      this.queues[queueName] = new Queue(queueName, options);
+    }
   }
 
   getQueue(name: Queues) {

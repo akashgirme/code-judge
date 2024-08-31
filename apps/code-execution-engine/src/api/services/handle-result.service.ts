@@ -24,7 +24,7 @@ export class HandleResultService {
 
   private instantiateWorker(): Worker {
     return new Worker(
-      Queues.WORKERS_RESULT_JOB_QUEUE,
+      Queues.RESULT_JOB_QUEUE,
       async (job: Job) => {
         switch (job.name) {
           case ResultQueueJobType.SUCCESSFUL_JOB:
@@ -63,7 +63,7 @@ export class HandleResultService {
     };
 
     this.sendCallback(callbackObj);
-    this.fileHandleService.deleteDirectory(jobDir);
+    // this.fileHandleService.deleteDirectory(jobDir);
   }
 
   async handleFailedJob(id: number) {

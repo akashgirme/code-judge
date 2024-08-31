@@ -1,14 +1,10 @@
 export enum Queues {
-  WORKERS_JOB_QUEUE = 'workers-job-queue',
-  WORKERS_RESULT_JOB_QUEUE = 'workers-result-job-queue',
-}
-
-export enum QueueJobTypes {
-  C_CODE_EXECUTION = 'c-code-execution',
-  CPP_CODE_EXECUTION = 'cpp-code-execution',
-  GO_CODE_EXECUTION = 'go-code-execution',
-  JAVA_CODE_EXECUTION = 'java-code-execution',
-  JAVASCRIPT_CODE_EXECUTION = 'javascript-code-execution',
+  C_JOB_QUEUE = 'C-QUEUE',
+  CPP_JOB_QUEUE = 'CPP-QUEUE',
+  JAVA_JOB_QUEUE = 'JAVA-QUEUE',
+  GO_JOB_QUEUE = 'GO-QUEUE',
+  JS_JOB_QUEUE = 'JS-QUEUE',
+  RESULT_JOB_QUEUE = 'RESULT-JOB-QUEUE',
 }
 
 export enum ResultQueueJobType {

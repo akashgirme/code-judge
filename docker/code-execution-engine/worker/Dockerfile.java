@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache openjdk11-jre
+RUN apk add --no-cache openjdk11-jre bash coreutils
 
 WORKDIR /usr/src/monorepo
 

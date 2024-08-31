@@ -1,5 +1,7 @@
 FROM node:20-alpine
 
+RUN apk add --no-cache bash coreutils
+
 WORKDIR /usr/src/monorepo
 
 COPY apps/code-execution-engine/src/worker ./

@@ -20,6 +20,7 @@ export class FileHandleService {
   private readonly EXEPECTEDOUTPUTFILE: string = 'output.txt';
   private readonly METADATAFILE: string = 'metadata.txt';
   private readonly SCRIPTFILE: string = 'script.sh';
+  private readonly EXITCODEFILE: string = 'exit_code.txt';
 
   async storeFiles(
     id: number,
@@ -45,6 +46,7 @@ export class FileHandleService {
     const metaDataFilePath = path.join(workingDir, this.METADATAFILE);
     const standardOutputFilePath = path.join(workingDir, this.OUTPUTFILE);
     const standardErrorFilePath = path.join(workingDir, this.ERRORFILE);
+    const exitCodeFilePath = path.join(workingDir, this.EXITCODEFILE);
 
     try {
       await Promise.all([
@@ -55,6 +57,7 @@ export class FileHandleService {
         fs.writeFile(metaDataFilePath, ''),
         fs.writeFile(standardOutputFilePath, ''),
         fs.writeFile(standardErrorFilePath, ''),
+        fs.writeFile(exitCodeFilePath, ''),
       ]);
     } catch (error) {
       logger.info(`Error storing files in ${workingDir}:`, error);

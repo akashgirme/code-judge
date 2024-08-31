@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache build-base
+RUN apk add --no-cache build-base bash coreutils
 
 WORKDIR /usr/src/monorepo
 
