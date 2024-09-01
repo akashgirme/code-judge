@@ -86,7 +86,7 @@ export const CreateSubmissionContainer = () => {
       }).unwrap();
       if (id) {
         setSubmissionId(id);
-        setPollRetries(10);
+        setPollRetries(7);
       } else {
         toast.error('Invalid submission response');
       }

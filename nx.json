@@ -26,6 +26,11 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
+    },
+    "@nx/esbuild:esbuild": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "namedInputs": {
@@ -65,7 +70,12 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/api-e2e/**/*", "apps/code-execution-engine-e2e/**/*"]
+      "exclude": [
+        "apps/api-e2e/**/*",
+        "apps/code-execution-engine-e2e/**/*",
+        "apps/execution-engine/worker-e2e/**/*",
+        "apps/execution-engine/server-e2e/**/*"
+      ]
     },
     {
       "plugin": "@nx/vite/plugin",
