@@ -6,3 +6,4 @@
 ./openapi.json
 /.openapi.json
 openapi.json
+*.yml
