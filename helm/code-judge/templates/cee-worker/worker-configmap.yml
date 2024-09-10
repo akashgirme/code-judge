@@ -3,7 +3,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $.Release.Name }}-worker-{{ .name }}-config
+  name: '{{ $.Release.Name }}-worker-{{ .name }}-config'
+  namespace: {{ .namespace | default "default" }}
 data:
   {{- range $key, $value := .configMap }}
   {{ $key }}: {{ $value | quote }}
