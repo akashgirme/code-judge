@@ -10,13 +10,15 @@ import { ProblemDetailContainer } from '../problem/problem-detail';
 import { CreateSubmissionContainer } from '../submission/create-submission';
 import { AllSubmissionsContainer } from '../submission/all-submissions';
 import { handleComingSoonAlert } from '../../utils/coming-soon-alert';
+import { useState } from 'react';
 
 export const SubmissionPanelView = () => {
+  const [activeTab, setActiveTab] = useState('description');
   return (
     <div className="flex flex-col h-full px-2">
       <div className="grid grid-cols-2 gap-1 pt-1 pb-1">
         <div className="col-span-1">
-          <Tabs defaultValue="description" className="w-full h-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger
@@ -53,7 +55,9 @@ export const SubmissionPanelView = () => {
           </Tabs>
         </div>
         <div className="col-span-1">
-          <CreateSubmissionContainer />
+          <CreateSubmissionContainer
+            onSubmissionSuccess={() => setActiveTab('submissions')}
+          />
         </div>
       </div>
     </div>
