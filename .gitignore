@@ -53,6 +53,5 @@ Thumbs.db
 db/*
 db
 
-
-things-to-consider-before-deployment.txt
-./things-to-consider-before-deployment.txt
+#Helm Chart values.yml file
+helm/code-judge/values.yaml

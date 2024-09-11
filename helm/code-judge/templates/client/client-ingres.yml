@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: '{{ .Release.Name }}-client'
+  namespace: {{ .Values.client.namespace | default "default" }}
+  labels:
+    app: '{{ .Release.Name }}-client'
+    release: {{ .Release.Name }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-protocol: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - www.{{.Values.global.domain}}
+      secretName: client-tls
+  rules:
+  - host: www.{{ .Values.global.domain }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: '{{ .Release.Name }}-client'
+            port:
+              number: {{ .Values.client.service.port }}
