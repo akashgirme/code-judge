@@ -6,14 +6,12 @@ import { removeSubmission } from '../submissionSlice';
 
 interface SubmissionDetailsContainerProps {
   submission: SubmissionDto;
+  handleOnBack: () => void;
 }
 
 export const SubmissionDetailsContainer: React.FC<SubmissionDetailsContainerProps> = ({
   submission,
+  handleOnBack,
 }) => {
-  const dispatch = useAppDispatch();
-  const handleOnBack = () => {
-    dispatch(removeSubmission());
-  };
   return <SubmissionDetailsView submission={submission} handleOnBack={handleOnBack} />;
 };

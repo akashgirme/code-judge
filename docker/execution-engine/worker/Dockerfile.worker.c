@@ -1,7 +1,5 @@
 FROM node:20-alpine AS build
 
-RUN apk add --no-cache build-base coreutils bash
-
 WORKDIR /usr/src/monorepo
 
 COPY package*.json ./
@@ -14,6 +12,8 @@ RUN npx nx reset
 RUN npx nx build worker
 
 FROM node:20-alpine AS production
+
+RUN apk add --no-cache build-base coreutils bash
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}

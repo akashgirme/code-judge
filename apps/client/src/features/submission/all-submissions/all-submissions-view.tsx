@@ -19,8 +19,8 @@ import {
 import { useParams } from 'react-router-dom';
 import { SubmissionDetailsContainer } from '../submission-details';
 import { useAppDispatch, useAppSelector } from '../../../app/store';
-import { setSubmission } from '../submissionSlice';
-import { useState } from 'react';
+import { removeSubmission, setSubmission } from '../submissionSlice';
+import { useEffect, useState } from 'react';
 import { CheckIcon, CircleX, Clock3, MemoryStick } from 'lucide-react';
 
 function getIcon(statusMessage: string) {
@@ -34,6 +34,7 @@ function getIcon(statusMessage: string) {
 
 export const AllSubmissionsView = () => {
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
+  const [trigger, setTrigger] = useState(false);
 
   const { problemId: pid } = useParams();
   const problemId = Number(pid);
@@ -41,7 +42,12 @@ export const AllSubmissionsView = () => {
   const dispatch = useAppDispatch();
   const { submission } = useAppSelector((state) => state.submission);
 
-  const { data, isFetching, isLoading } = useGetSubmissionsByUserAndProblemQuery({
+  const {
+    data: allSubmissions,
+    isFetching,
+    isLoading,
+    refetch,
+  } = useGetSubmissionsByUserAndProblemQuery({
     problemId,
   });
 
@@ -60,6 +66,15 @@ export const AllSubmissionsView = () => {
     setSelectedSubmissionId(id);
   };
 
+  const handleOnBack = () => {
+    dispatch(removeSubmission());
+    setTrigger((prev) => !prev);
+  };
+
+  useEffect(() => {
+    refetch(); // refetch the submissions when `trigger` changes
+  }, [trigger, refetch]); // Refetch is called whenever trigger changes
+
   if (isFetching || isLoading || getSubmissionIsLoading) {
     return (
       <Card>
@@ -69,7 +84,9 @@ export const AllSubmissionsView = () => {
   }
 
   if (submission) {
-    return <SubmissionDetailsContainer submission={submission} />;
+    return (
+      <SubmissionDetailsContainer submission={submission} handleOnBack={handleOnBack} />
+    );
   }
 
   return (
@@ -82,7 +99,7 @@ export const AllSubmissionsView = () => {
           <TableHead>Memory</TableHead>
         </TableHeader>
         <TableBody>
-          {data?.map((submission: Submission) => (
+          {allSubmissions?.map((submission: Submission) => (
             <TableRow key={submission.id}>
               <TableCell className="text-left pl-0">
                 <Button

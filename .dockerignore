@@ -10,7 +10,7 @@ yarn-error.log
 .env*
 .env.local
 .dockerignore
-Dockerfile
+Dockerfile.*
 *.md
 .cache
 dist
