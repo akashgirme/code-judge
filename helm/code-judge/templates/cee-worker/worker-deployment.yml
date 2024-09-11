@@ -18,6 +18,7 @@ spec:
       containers:
         - name: worker
           image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.imagePullPolicy}}
           envFrom:
             - configMapRef:
                 name: '{{ $.Release.Name }}-worker-{{ .name }}-config'

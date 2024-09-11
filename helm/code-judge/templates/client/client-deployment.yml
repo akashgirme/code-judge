@@ -18,7 +18,7 @@ spec:
       containers:
         - name: client
           image: "{{ .Values.client.image.repository }}:{{ .Values.client.image.tag }}"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ .Values.client.image.imagePullPolicy}}
           ports:
             - containerPort: 4200
           envFrom:
