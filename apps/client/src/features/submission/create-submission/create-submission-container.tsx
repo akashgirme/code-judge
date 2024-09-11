@@ -12,7 +12,13 @@ import { useAppDispatch } from '../../../app/store';
 import { useEffect, useState } from 'react';
 import { Check, CircleX } from 'lucide-react';
 
-export const CreateSubmissionContainer = () => {
+interface CreateSubmissionContainerProps {
+  onSubmissionSuccess: () => void;
+}
+
+export const CreateSubmissionContainer: React.FC<CreateSubmissionContainerProps> = ({
+  onSubmissionSuccess,
+}) => {
   const [submissionId, setSubmissionId] = useState<number | null>(null);
   const [pollRetries, setPollRetries] = useState<number>(0);
 
@@ -86,6 +92,7 @@ export const CreateSubmissionContainer = () => {
       }).unwrap();
       if (id) {
         setSubmissionId(id);
+        onSubmissionSuccess();
         setPollRetries(7);
       } else {
         toast.error('Invalid submission response');
@@ -99,7 +106,7 @@ export const CreateSubmissionContainer = () => {
     code: `// You've to manually read the test cases,
     //Input them yourself, and print the outputs for verification.
     `,
-    language: 'c',
+    language: 'cpp',
   };
 
   return (
