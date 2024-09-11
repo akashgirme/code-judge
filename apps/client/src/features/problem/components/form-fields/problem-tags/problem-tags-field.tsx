@@ -1,10 +1,11 @@
 'use client';
 import { Controller, useFormContext } from 'react-hook-form';
-import { modelKey, questionConfig } from './problem-tags-config';
+import { modelKey, problemTagsValidations, questionConfig } from './problem-tags-config';
 import { MultipleSelector, Option } from '@code-judge/ui';
 import { useGetAllTagsQuery } from '@code-judge/api-client';
 import { HelperText } from '@code-judge/ui';
 import { useMemo } from 'react';
+import { z } from 'zod';
 
 export const ProblemTagsField = () => {
   const { data, isLoading, error } = useGetAllTagsQuery();
@@ -27,8 +28,21 @@ export const ProblemTagsField = () => {
           <span className="text-sm">{questionConfig.label}</span>
           <MultipleSelector
             disabled={isLoading || !!error}
-            value={field.value}
-            onChange={field.onChange}
+            // value={field.value}
+            value={field.value?.map((tag: any) => ({
+              label:
+                options.find((opt) => opt.value === tag.value.toString())?.label || '',
+              value: tag.value.toString(),
+            }))}
+            // onChange={field.onChange}
+            onChange={(selectedOptions) => {
+              field.onChange(
+                selectedOptions.map((opt) => ({
+                  label: opt.label,
+                  value: parseInt(opt.value, 10),
+                }))
+              );
+            }}
             placeholder="Select One or More topics"
             defaultOptions={options}
             options={options}

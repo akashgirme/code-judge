@@ -12,6 +12,7 @@ export const CreateProblemContainer = () => {
   });
 
   const handleSubmit = async (data: CreateProblemModel) => {
+    console.log('handle submit triggered');
     try {
       const { id } = await createProblem({
         createProblemDto: {
@@ -19,7 +20,7 @@ export const CreateProblemContainer = () => {
           tagIds: data.tags.map((tag) => tag.value),
         },
       }).unwrap();
-      navigate(`/problems/add-testcases/${id}`);
+      navigate(`/admin/problems/${id}/add-testcases`);
     } catch (error) {
       handleError(error as Error);
     }

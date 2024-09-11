@@ -24,6 +24,8 @@ import { UserService } from '../../user/services';
 import { AuthProvider, TokenType } from '../enums';
 import { AuthCacheService } from './auth-cache.service';
 import { decrypt, encrypt } from '../utility/hash-jwt-token';
+import { hashToken } from '../utility/hash-token';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -145,21 +147,25 @@ export class AuthService {
 
       const user = await this.usersService.findAccountById(id);
 
-      const retrievedRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
+      const storedRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
         user.id
       );
-      const decrypedRefreshToken = decrypt(retrievedRefreshToken);
 
-      if (!user || decrypedRefreshToken !== refreshToken) {
+      const match = await bcrypt.compare(storedRefreshToken, refreshToken);
+
+      // const decrypedRefreshToken = decrypt(retrievedRefreshToken);
+
+      if (!user || !match) {
         throw new UnauthorizedException('Invalid Token');
       }
 
       const { refreshToken: newRefreshToken } =
         await this.tokenService.generateRefreshToken(user);
 
-      this.tokenService.setRefreshTokenCookie(newRefreshToken, res);
       await this.cacheservice.storeRefreshTokenInCache(newRefreshToken, user.id);
       await this.cacheservice.setUserCache(user);
+
+      this.tokenService.setRefreshTokenCookie(newRefreshToken, res);
 
       const { accessToken } = await this.tokenService.generateAccessToken(user);
 
@@ -194,8 +200,9 @@ export class AuthService {
     const { accessToken } = await this.tokenService.generateAccessToken(user);
     const { refreshToken } = await this.tokenService.generateRefreshToken(user);
 
-    const encryptedRefreshToken = encrypt(refreshToken);
-    await this.cacheservice.storeRefreshTokenInCache(encryptedRefreshToken, user.id);
+    // const encryptedRefreshToken = encrypt(refreshToken);
+    const hashedRefreshToken = await hashToken(refreshToken);
+    await this.cacheservice.storeRefreshTokenInCache(hashedRefreshToken, user.id);
 
     this.tokenService.setRefreshTokenCookie(refreshToken, res);
 
