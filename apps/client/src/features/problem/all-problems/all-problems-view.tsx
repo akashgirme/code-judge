@@ -79,37 +79,25 @@ export const AllProblemsView = () => {
                 <Typography variant="h3">{problem.status}</Typography>
               </TableCell>
               <TableCell className="grid grid-cols-3">
-                <a
-                  href={`/admin/problems/${problem.id}/change-status`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <Link to={`/admin/problems/${problem.id}/change-status`}>
                   <Button className="gap-1">
                     <EditPencil />
                     <Typography variant="h3">Change Status</Typography>
                   </Button>
-                </a>
+                </Link>
 
-                <a
-                  href={`/admin/problems/${problem.id}/edit`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <Link to={`/admin/problems/${problem.id}/edit`}>
                   <Button className="gap-1">
                     <EditPencil />
                     <Typography variant="h3">Edit problem</Typography>
                   </Button>
-                </a>
-                <a
-                  href={`/admin/problems/${problem.id}/add-testcases`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                </Link>
+                <Link to={`/admin/problems/${problem.id}/add-testcases`}>
                   <Button className="gap-1">
                     <EditPencil />
                     <Typography variant="h3">Edit Testcases</Typography>
                   </Button>
-                </a>
+                </Link>
               </TableCell>
             </TableRow>
           ))}

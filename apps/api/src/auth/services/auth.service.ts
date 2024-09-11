@@ -24,7 +24,7 @@ import { UserService } from '../../user/services';
 import { AuthProvider, TokenType } from '../enums';
 import { AuthCacheService } from './auth-cache.service';
 import { decrypt, encrypt } from '../utility/hash-jwt-token';
-import { hashToken } from '../utility/hash-token';
+import { compareToken, hashToken } from '../utility/hash-token';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -147,12 +147,11 @@ export class AuthService {
 
       const user = await this.usersService.findAccountById(id);
 
-      const storedRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
+      const hashRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
         user.id
       );
 
-      const match = await bcrypt.compare(storedRefreshToken, refreshToken);
-
+      const match = await bcrypt.compare(refreshToken, hashRefreshToken);
       // const decrypedRefreshToken = decrypt(retrievedRefreshToken);
 
       if (!user || !match) {
