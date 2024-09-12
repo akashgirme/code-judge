@@ -203,9 +203,9 @@ export class AuthService {
     const hashedRefreshToken = await hashToken(refreshToken);
     await this.cacheservice.storeRefreshTokenInCache(hashedRefreshToken, user.id);
 
-    this.tokenService.setRefreshTokenCookie(refreshToken, res);
-
     await this.cacheservice.setUserCache(user);
+
+    this.tokenService.setRefreshTokenCookie(refreshToken, res);
 
     const safeUser = instanceToPlain(user);
 
