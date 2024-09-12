@@ -17,7 +17,7 @@ import {
   ProblemExpectedOutputField,
   ProblemInputTestCasesField,
 } from '../components/form-fields';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TagBadges } from '../components';
 
 interface AddTestCasesViewProps {
@@ -39,6 +39,12 @@ export const AddTestCasesView: React.FC<AddTestCasesViewProps> = ({ form, onSubm
     handleSubmit,
   } = form;
 
+  const navigate = useNavigate();
+
+  const handleSkip = () => {
+    navigate('/admin/problems');
+  };
+
   return (
     <div className="h-full">
       <FormProvider {...form}>
@@ -55,6 +61,9 @@ export const AddTestCasesView: React.FC<AddTestCasesViewProps> = ({ form, onSubm
               {problem?.difficulty}
             </Typography>
             <TagBadges tags={problem?.tags || []} />
+            <Button variant="outline" onClick={handleSkip} className="w-[200px]">
+              Skip
+            </Button>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)}>
