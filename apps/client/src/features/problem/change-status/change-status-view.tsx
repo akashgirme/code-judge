@@ -6,6 +6,12 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Typography,
 } from '@code-judge/ui';
 import {
@@ -13,7 +19,7 @@ import {
   useGetProblemForAdminQuery,
 } from '@code-judge/api-client';
 import { ProblemStatusField } from '../components/form-fields';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { TagBadges } from '../components';
 import { ChangeStatusModel } from './change-status-logic';
 import { MarkdownView } from '../../../components';
@@ -36,6 +42,12 @@ export const ChangeStatusView: React.FC<ChangeStatusViewProps> = ({ form, onSubm
     formState: { isValid },
     handleSubmit,
   } = form;
+
+  const navigate = useNavigate();
+
+  const handleEditProblem = () => {
+    navigate(`/admin/problems/${problemId}/edit`);
+  };
 
   return (
     <div className="h-full">
@@ -79,24 +91,44 @@ export const ChangeStatusView: React.FC<ChangeStatusViewProps> = ({ form, onSubm
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col w-full pl-4 items-left">
-              <div>
-                <MarkdownView content={problem?.description ?? ''} />
+            <Card>
+              <div className="flex flex-col w-full pl-4 items-left">
+                <div>
+                  <MarkdownView content={problem?.description ?? ''} />
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="col-span-1">
-                <p>
-                  <pre>{problem?.testCasesInput}</pre>
-                </p>
-              </div>
-              <div className="col-span-1">
-                <p>
-                  <pre>{problem?.testCasesOutput}</pre>
-                </p>
-              </div>
+            </Card>
+            <div className="grid grid-row gap-2 mt-5">
+              <Typography variant="h2">
+                <b>Testcases</b>
+              </Typography>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-1/2">Input</TableHead>
+                    <TableHead className="w-1/2">Output</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow key={problem?.id || ''}>
+                    <TableCell className="font-mono">
+                      <pre>{problem?.testCasesInput}</pre>
+                    </TableCell>
+                    <TableCell className="font-mono flex">
+                      <pre>{problem?.testCasesOutput}</pre>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
+          <Button
+            variant="default"
+            onClick={handleEditProblem}
+            className=" flex md:w-72 mx-auto mb-3"
+          >
+            Edit Problem
+          </Button>
         </Card>
       </FormProvider>
     </div>
