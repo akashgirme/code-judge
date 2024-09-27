@@ -19,6 +19,8 @@ import {
   RequestSignInWithOtpDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  CheckUsernameDto,
+  UsernameAvailabilityDto,
 } from '../dto';
 import { ConfigService } from '@nestjs/config';
 import { UserOtpService } from './user-otp.service';
@@ -31,7 +33,12 @@ import { UserService } from '../../user/services';
 import { AuthProvider, TokenType } from '../enums';
 import { AuthCacheService } from './auth-cache.service';
 import { decrypt, encrypt } from '../utility/hash-jwt-token';
-import { extractUsername, generatePassword, hashPassword } from '../utility';
+import {
+  extractUsername,
+  generatePassword,
+  generateUsername,
+  hashPassword,
+} from '../utility';
 
 @Injectable()
 export class AuthService {
@@ -45,9 +52,6 @@ export class AuthService {
     private cacheservice: AuthCacheService
   ) {}
 
-  //TODO: log events where needed
-
-  //TODO: Handle username more precisely
   async oAuthSignUp(
     { email, firstName, lastName }: OAuthSignUpDto,
     { provider }: AuthProviderDto
@@ -73,7 +77,18 @@ export class AuthService {
 
     const hashedPassword = await hashPassword(generatedPassword);
 
-    const username = extractUsername(email);
+    // Extract username form email
+    let username = extractUsername(email);
+
+    const existingUserWithUsername = await this.usersService.findUserByUsername(username);
+
+    // If username exists then generate unique username;
+    if (!username || existingUserWithUsername) {
+      this.logger.log(
+        'OAuth Login: Username extracted from email already exists, Generating new username...'
+      );
+      username = await this.getUniqueUsername(firstName.toLocaleLowerCase());
+    }
 
     const user = await this.usersService.create({
       firstName,
@@ -94,7 +109,6 @@ export class AuthService {
     return { redirectUrl };
   }
 
-  //TODO: Handle username more precisely
   async signUp({ username, email, password }: SignUpUserDto) {
     const existingUser = await this.usersService.findVerifiedAccountByEmail(email);
 
@@ -110,9 +124,11 @@ export class AuthService {
 
     const hashedPassword = await hashPassword(password);
 
+    console.log('username & email: ', username, email);
+
     const user = await this.usersService.create({
-      username,
-      email,
+      username: username,
+      email: email,
       password: hashedPassword,
       provider: AuthProvider.EMAIL,
     });
@@ -364,5 +380,29 @@ export class AuthService {
     const safeUser = instanceToPlain(user);
 
     res.json({ accessToken, user: safeUser });
+  }
+
+  async checkUsernameAvailability({
+    username,
+  }: CheckUsernameDto): Promise<UsernameAvailabilityDto> {
+    const user = await this.usersService.findUserByUsername(username);
+
+    if (user) {
+      return { available: false };
+    }
+
+    return { available: true };
+  }
+
+  private async getUniqueUsername(baseUsername: string): Promise<string> {
+    let username = baseUsername;
+    let existingUserWithUsername = await this.usersService.findUserByUsername(username);
+
+    while (existingUserWithUsername) {
+      username = generateUsername(baseUsername); // Generate a new username
+      existingUserWithUsername = await this.usersService.findUserByUsername(username);
+    }
+
+    return username; // Return the unique username
   }
 }

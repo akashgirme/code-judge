@@ -13,3 +13,5 @@ export { VerifyEmailDto } from './verify-email.dto';
 export { RequestSignInWithOtpDto } from './request-sign-in-with-otp.dto';
 export { ForgotPasswordDto } from './forgot-password.dto';
 export { ResetPasswordDto } from './reset-password.dto';
+export { CheckUsernameDto } from './check-username.dto';
+export { UsernameAvailabilityDto } from './user-name-availability.dto';

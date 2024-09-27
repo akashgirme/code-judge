@@ -49,6 +49,7 @@ export class UserService {
   async create({
     firstName,
     lastName,
+    username,
     email,
     password,
     provider,
@@ -57,6 +58,7 @@ export class UserService {
     const createdUser = this.repo.create({
       firstName,
       lastName,
+      username,
       email,
       password,
       provider,

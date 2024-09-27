@@ -11,7 +11,7 @@ const commonTypeOrmConfig: DataSourceOptions = {
   logging: true,
   type: 'postgres',
   entities: [User, Problem, Tag, Solution, Submission],
-  synchronize: false,
+  synchronize: true,
   logNotifications: true,
   ssl: true,
 };
