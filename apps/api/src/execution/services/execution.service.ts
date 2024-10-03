@@ -31,7 +31,7 @@ export class ExecutionService {
 
     const [sourceCode, testCases] = await Promise.all([
       this.storageService.getObject(path),
-      this.testCaseService.getTestCases(slug),
+      this.testCaseService.getPlatformTestCases(slug),
     ]);
 
     const requestPayloadObj: ExecutionRequestPayload = {

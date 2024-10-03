@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Problem } from '../entities';
 import { Repository } from 'typeorm';
@@ -35,34 +41,54 @@ export class ProblemService {
 
   async createProblem(
     user: User,
-    { title, difficulty, description, tagIds }: CreateProblemDto
+    { title, difficulty, description, tagIds, testCases }: CreateProblemDto
   ) {
     const { tags } = await this.tagService.findTags(tagIds);
 
-    const slug = `${this.convertTitletoSlug(title)}-${Date.now()}`;
+    const slug = `${this.convertTitletoSlug(title)}-${Math.random() * 10}}`;
 
     await this.storageService.putObject(`problems/${slug}/description.md`, description);
 
-    const problem = this.problemRepo.create({
+    const problemObj = this.problemRepo.create({
       title,
       difficulty,
       slug,
       tags,
       author: user,
-      hasTestCases: false,
+      hasPlatformTestCases: false,
       status: ProblemStatus.UNPUBLISHED,
     });
 
-    return await this.problemRepo.save(problem);
+    const problem = await this.problemRepo.save(problemObj);
+
+    try {
+      await this.testCaseService.saveAuthorTestCases({
+        problemSlug: problem.slug,
+        input: testCases.input,
+        output: testCases.output,
+      });
+    } catch (error) {
+      this.logger.log('Error while adding author testcases for problem', error);
+      throw new InternalServerErrorException(
+        'An error occurred while saving the test cases. Although the problem has been created, please update the problem to add the test cases again.'
+      );
+    }
+
+    return problem;
   }
 
   async updateProblem(
+    user: User,
     problemId: number,
-    { title, difficulty, description, tagIds }: UpdateProblemDto
+    { title, difficulty, description, tagIds, testCases }: UpdateProblemDto
   ) {
     const { tags } = await this.tagService.findTags(tagIds);
 
     const problem = await this.findProblemById(problemId);
+
+    if (user != problem.author) {
+      throw new BadRequestException('You are not allowed to edit this problem');
+    }
 
     if (description) {
       await this.storageService.putObject(
@@ -78,34 +104,48 @@ export class ProblemService {
       status: ProblemStatus.UNPUBLISHED,
     });
 
-    return this.problemRepo.save(problem);
+    const updatedProblem = await this.problemRepo.save(problem);
+
+    try {
+      await this.testCaseService.saveAuthorTestCases({
+        problemSlug: problem.slug,
+        input: testCases.input,
+        output: testCases.output,
+      });
+    } catch (error) {
+      this.logger.log('Error while updating author testcases for problem', error);
+      throw new InternalServerErrorException('Internal server error!');
+    }
+    return updatedProblem;
   }
 
   async getProblem(problemId: number): Promise<ProblemDto> {
     const problem = await this.findProblemById(problemId);
     const { slug } = problem;
 
-    const description = await this.storageService.getObject(
-      `problems/${slug}/description.md`
-    );
+    const [description, testCases] = await Promise.all([
+      this.storageService.getObject(`problems/${slug}/description.md`),
+      this.testCaseService.getAuthorTestCases(slug),
+    ]);
 
-    return { ...problem, description };
+    return { ...problem, description, testCases };
   }
 
   async getProblemForAdmin(problemId: number): Promise<AdminProblemDto> {
     const problem = await this.findProblemById(problemId);
 
     const { slug } = problem;
-    const [description, testcases] = await Promise.all([
+    const [description, authorTestCases, platformTestCases] = await Promise.all([
       this.storageService.getObject(`problems/${slug}/description.md`),
-      this.testCaseService.getTestCases(slug),
+      this.testCaseService.getAuthorTestCases(slug),
+      this.testCaseService.getPlatformTestCases(slug),
     ]);
 
     return {
       ...problem,
       description,
-      testCasesInput: testcases?.input ?? '',
-      testCasesOutput: testcases?.output ?? '',
+      authorTestCases,
+      platformTestCases,
     };
   }
 
@@ -148,7 +188,7 @@ export class ProblemService {
     }
 
     if (body.difficulty) {
-      // add difficulty filter
+      query.andWhere('problem.difficulty = :difficulty', { difficulty: body.difficulty });
     }
 
     if (body.status) {
@@ -176,7 +216,8 @@ export class ProblemService {
     } else {
       const ability = this.abilityFactory.defineAbilityForUser(user);
       if (ability.can(Action.Manage, Problem)) {
-        // No additional filters for problem admin
+        // only admin can see platform testcases status
+        query.addSelect(['problem.hasPlatformTestCases']);
       } else if (ability.can(Action.ReadOwn, Problem)) {
         query.andWhere('author.id = :authorId', {
           authorId: user.id,
@@ -220,19 +261,31 @@ export class ProblemService {
   async changeProblemStatus(problemId: number, { status }: ChangeProblemStatusDto) {
     const problem = await this.findProblemById(problemId);
 
+    if (!problem.hasPlatformTestCases && status === ProblemStatus.APPROVED) {
+      throw new BadRequestException('Add platform testcases before approve problem');
+    }
+
     problem.status = status;
 
     return this.problemRepo.save(problem);
   }
 
-  async addTestCasesToProblem({
-    problemId,
-    input,
-    output,
-  }: AddTestCasesDto): Promise<SuccessMessageDto> {
+  async addPlatformTestCasesToProblem(
+    problemId: number,
+    { input, output }: AddTestCasesDto
+  ): Promise<SuccessMessageDto> {
     const problem = await this.findProblemById(problemId);
-    await this.testCaseService.saveTestCases(problem.slug, input, output);
-    problem.hasTestCases = true;
+    try {
+      await this.testCaseService.savePlatformTestCases({
+        problemSlug: problem.slug,
+        input,
+        output,
+      });
+    } catch (error) {
+      this.logger.log('Error while adding platform testcases', error);
+      throw new InternalServerErrorException('Internal server while adding testcase');
+    }
+    problem.hasPlatformTestCases = true;
     await this.problemRepo.save(problem);
     return { message: 'Testcases added successfully' };
   }

@@ -54,6 +54,24 @@ export class ProblemController {
     return this.problemService.getProblemsForPublic(query);
   }
 
+  @Get('/:problemId')
+  @ApiOkResponse({ type: ProblemDto })
+  getProblem(@Param('problemId', ParseIntPipe) problemId: number): Promise<ProblemDto> {
+    return this.problemService.getProblem(problemId);
+  }
+
+  @Put('/:problemId')
+  @ApiOkResponse({ type: Problem })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.Update, subject: Problem })
+  updateProblem(
+    @CurrentUser() user: User,
+    @Param('problemId', ParseIntPipe) problemId: number,
+    @Body() body: UpdateProblemDto
+  ): Promise<Problem> {
+    return this.problemService.updateProblem(user, problemId, body);
+  }
+
   @Get('/admin')
   @ApiOkResponse({ type: AllProblemsDto })
   @ApiQuery({ type: () => ProblemsQueryDto })
@@ -66,12 +84,6 @@ export class ProblemController {
     return this.problemService.getProblemsForAdmin(user, query);
   }
 
-  @Get('/:problemId')
-  @ApiOkResponse({ type: ProblemDto })
-  getProblem(@Param('problemId', ParseIntPipe) problemId: number): Promise<ProblemDto> {
-    return this.problemService.getProblem(problemId);
-  }
-
   @Get('/admin/:problemId')
   @ApiOkResponse({ type: AdminProblemDto })
   @UseGuards(AuthGuard(), AbilityGuard)
@@ -82,18 +94,7 @@ export class ProblemController {
     return this.problemService.getProblemForAdmin(problemId);
   }
 
-  @Put('/:problemId')
-  @ApiOkResponse({ type: Problem })
-  @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Update, subject: Problem })
-  updateProblem(
-    @Param('problemId', ParseIntPipe) problemId: number,
-    @Body() body: UpdateProblemDto
-  ): Promise<Problem> {
-    return this.problemService.updateProblem(problemId, body);
-  }
-
-  @Put('/:problemId/change-status')
+  @Put('/admin/:problemId/change-status')
   @ApiOkResponse({ type: Problem })
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.Update, subject: Problem })
@@ -104,11 +105,14 @@ export class ProblemController {
     return this.problemService.changeProblemStatus(problemId, body);
   }
 
-  @Post('/admin/add-testcases')
+  @Post('/admin/:problemId/add-testcases')
   @ApiOkResponse({ type: SuccessMessageDto })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Update, subject: Problem })
-  addTestCasesToProblem(@Body() body: AddTestCasesDto) {
-    return this.problemService.addTestCasesToProblem(body);
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
+  addTestCasesToProblem(
+    @Param('problemId', ParseIntPipe) problemId: number,
+    @Body() body: AddTestCasesDto
+  ) {
+    return this.problemService.addPlatformTestCasesToProblem(problemId, body);
   }
 }

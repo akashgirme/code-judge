@@ -57,7 +57,7 @@ export class Problem {
   @Column({
     default: false,
   })
-  hasTestCases: boolean;
+  hasPlatformTestCases: boolean;
 
   @ApiProperty({ type: [Tag] })
   @ManyToMany(() => Tag, (tag) => tag.problems)
