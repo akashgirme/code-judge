@@ -25,28 +25,28 @@ export class TagController {
 
   @Post('/')
   @CheckAbilities({ action: Action.Create, subject: Tag })
-  @ApiCreatedResponse({ type: Tag })
+  @ApiCreatedResponse({ type: () => Tag })
   createTag(@Body() body: CreateTagDto): Promise<Tag> {
     return this.tagService.createTag(body);
   }
 
   @Get('/')
   @CheckAbilities({ action: Action.Read, subject: Tag })
-  @ApiOkResponse({ type: [Tag] })
+  @ApiOkResponse({ type: () => [Tag] })
   getAllTags(): Promise<Tag[]> {
     return this.tagService.getAllTags();
   }
 
   @Get('/:tagId')
   @CheckAbilities({ action: Action.Read, subject: Tag })
-  @ApiOkResponse({ type: Tag })
+  @ApiOkResponse({ type: () => Tag })
   getTag(@Param('tagId', ParseIntPipe) tagId: number): Promise<Tag> {
     return this.tagService.findTag(tagId);
   }
 
   @Put('/:tagId')
   @CheckAbilities({ action: Action.Update, subject: Tag })
-  @ApiOkResponse({ type: Tag })
+  @ApiOkResponse({ type: () => Tag })
   updateTag(
     @Param('tagId', ParseIntPipe) tagId: number,
     @Body() body: CreateTagDto

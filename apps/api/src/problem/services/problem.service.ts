@@ -1,4 +1,11 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Problem } from '../entities';
 import { Repository } from 'typeorm';
@@ -6,19 +13,15 @@ import {
   AllProblemsDto,
   ChangeProblemStatusDto,
   CreateProblemDto,
-  AdminProblemDto,
-  ProblemDto,
   ProblemsQueryDto,
-  UpdateProblemDto,
-  AddTestCasesDto,
-  SuccessMessageDto,
+  TestCaseDto,
 } from '../dto';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { TagService } from './topic.service';
 import { TestCaseService } from './testcase.service';
 import { getPaginationMeta } from '../../common/utility';
-import { ProblemStatus } from '../enums';
+import { ProblemStatus, TestCaseType } from '../enums';
 import { AbilityFactory, Action } from '../../ability/ability.factory';
 import { SortOrder } from '../../common/types';
 
@@ -35,78 +38,149 @@ export class ProblemService {
 
   async createProblem(
     user: User,
-    { title, difficulty, description, tagIds }: CreateProblemDto
-  ) {
+    { title, difficulty, description, tagIds, testCases }: CreateProblemDto
+  ): Promise<Problem> {
     const { tags } = await this.tagService.findTags(tagIds);
+    const slug = `${this.convertTitletoSlug(title)}-${
+      Math.floor(Math.random() * 90) + 10
+    }}`;
+    const descriptionPath = `problems/${slug}/description.md`;
 
-    const slug = `${this.convertTitletoSlug(title)}-${Date.now()}`;
+    try {
+      await this.storageService.putObject(descriptionPath, description);
+    } catch (error) {
+      this.logger.log('Error while saving description of problem', error);
+      throw new InternalServerErrorException();
+    }
 
-    await this.storageService.putObject(`problems/${slug}/description.md`, description);
+    /**
+     * Start transaction to save problem and test cases
+     */
+    const queryRunner = this.problemRepo.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const problem = this.problemRepo.create({
-      title,
-      difficulty,
-      slug,
-      tags,
-      author: user,
-      hasTestCases: false,
-      status: ProblemStatus.UNPUBLISHED,
-    });
+    let problemId: number;
 
-    return await this.problemRepo.save(problem);
+    try {
+      const newProblem = this.problemRepo.create({
+        title,
+        difficulty,
+        slug,
+        descriptionPath,
+        tags,
+        author: user,
+        hasPlatformTestCases: false,
+        status: ProblemStatus.UNPUBLISHED,
+      });
+
+      const problem = await queryRunner.manager.save(newProblem);
+      problemId = problem.id;
+
+      await Promise.all(
+        testCases.map(async (testCase: TestCaseDto) => {
+          return this.testCaseService.createTestCase(
+            queryRunner,
+            problem,
+            TestCaseType.EXAMPLE,
+            {
+              ...testCase,
+            }
+          );
+        })
+      );
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
+      throw err;
+    }
+    await queryRunner.release();
+
+    return this.getProblemByID(problemId);
   }
 
   async updateProblem(
+    user: User,
     problemId: number,
-    { title, difficulty, description, tagIds }: UpdateProblemDto
-  ) {
-    const { tags } = await this.tagService.findTags(tagIds);
+    { title, difficulty, description, tagIds, testCases }: CreateProblemDto
+  ): Promise<Problem> {
+    const ability = this.abilityFactory.defineAbilityForUser(user);
+    const problem = await this.getProblemByID(problemId);
 
-    const problem = await this.findProblemById(problemId);
-
-    if (description) {
-      await this.storageService.putObject(
-        `problems/${problem.slug}/description.md`,
-        description
-      );
+    // If user doesn't have access to update problem & is trying to update a different person blog post
+    if (!ability.can(Action.UpdateOwn, Problem) && problem.author.id !== user.id) {
+      throw new ForbiddenException('You do not have permission to edit this problem');
     }
 
-    Object.assign(problem, {
+    const { tags } = await this.tagService.findTags(tagIds);
+
+    try {
+      await this.storageService.putObject(problem.descriptionPath, description);
+    } catch (error) {
+      this.logger.log('Error while saving description of problem', error);
+      throw new InternalServerErrorException();
+    }
+
+    /**
+     * Start transaction to update problem and test cases
+     */
+    const queryRunner = this.problemRepo.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    const updatedProblem = queryRunner.manager.create(Problem, {
+      ...problem,
       title,
       difficulty,
       tags,
       status: ProblemStatus.UNPUBLISHED,
     });
 
-    return this.problemRepo.save(problem);
-  }
+    try {
+      await queryRunner.manager.save(updatedProblem);
 
-  async getProblem(problemId: number): Promise<ProblemDto> {
-    const problem = await this.findProblemById(problemId);
-    const { slug } = problem;
+      // Fetch the existing test cases
+      const existingTestCase = await this.testCaseService.getExampleTestCases(
+        updatedProblem.id
+      );
 
-    const description = await this.storageService.getObject(
-      `problems/${slug}/description.md`
-    );
+      // Delete all existing test cases
+      await Promise.all(
+        existingTestCase.map(
+          async (testcase) =>
+            await this.testCaseService.deleteTestCase(queryRunner, testcase.id)
+        )
+      );
 
-    return { ...problem, description };
-  }
+      // Add new edited test cases
+      await Promise.all(
+        testCases.map(async (testCase: TestCaseDto) => {
+          return this.testCaseService.createTestCase(
+            queryRunner,
+            updatedProblem,
+            TestCaseType.EXAMPLE,
+            {
+              ...testCase,
+            }
+          );
+        })
+      );
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      this.logger.error('Error in transcaction:', error.message);
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
 
-  async getProblemForAdmin(problemId: number): Promise<AdminProblemDto> {
-    const problem = await this.findProblemById(problemId);
+      // If transcaction failed change description to previous description
+      await this.storageService.putObject(problem.descriptionPath, problem.description);
+      throw InternalServerErrorException;
+    }
+    await queryRunner.release();
 
-    const { slug } = problem;
-    const [description, testcases] = await Promise.all([
-      this.storageService.getObject(`problems/${slug}/description.md`),
-      this.testCaseService.getTestCases(slug),
-    ]);
-
-    return {
-      ...problem,
-      description,
-      testCasesInput: testcases?.input ?? '',
-      testCasesOutput: testcases?.output ?? '',
-    };
+    return this.getProblemByID(updatedProblem.id);
   }
 
   getProblemsForPublic(body: ProblemsQueryDto): Promise<AllProblemsDto> {
@@ -130,7 +204,6 @@ export class ProblemService {
         'problem.status',
         'problem.createdAt',
         'problem.updatedAt',
-        'problem.deletedAt',
         'author.id',
         'author.firstName',
         'author.lastName',
@@ -148,7 +221,7 @@ export class ProblemService {
     }
 
     if (body.difficulty) {
-      // add difficulty filter
+      query.andWhere('problem.difficulty = :difficulty', { difficulty: body.difficulty });
     }
 
     if (body.status) {
@@ -176,7 +249,8 @@ export class ProblemService {
     } else {
       const ability = this.abilityFactory.defineAbilityForUser(user);
       if (ability.can(Action.Manage, Problem)) {
-        // No additional filters for problem admin
+        // only admin can see platform testcases status
+        query.addSelect(['problem.hasPlatformTestCases']);
       } else if (ability.can(Action.ReadOwn, Problem)) {
         query.andWhere('author.id = :authorId', {
           authorId: user.id,
@@ -194,11 +268,13 @@ export class ProblemService {
     return { problems, paginationMeta };
   }
 
-  async findProblemById(problemId: number): Promise<Problem> {
+  async getProblemByID(problemId: number) {
+    let description: string;
     const problem = await this.problemRepo
       .createQueryBuilder('problem')
       .leftJoinAndSelect('problem.author', 'author')
       .leftJoinAndSelect('problem.tags', 'tag')
+      .leftJoinAndSelect('problem.testCase', 'testCase')
       .select([
         'problem',
         'author.id',
@@ -206,35 +282,52 @@ export class ProblemService {
         'author.lastName',
         'tag.id',
         'tag.name',
+        'testCase',
       ])
       .where('problem.id = :problemId', { problemId })
       .getOne();
 
     if (!problem) {
-      throw new NotFoundException(`Problem not found with id ${problemId}`);
+      throw new NotFoundException(`Problem not found`);
     }
 
-    return problem;
+    // Group test cases by type
+    const exampleTestCases = problem.testCase.filter(
+      (testCase) => testCase.type === TestCaseType.EXAMPLE
+    );
+
+    const actualTestCases = problem.testCase.filter(
+      (testCase) => testCase.type === TestCaseType.ACTUAL
+    );
+
+    try {
+      description = await this.storageService.getObject(problem.descriptionPath);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+
+    return {
+      ...problem,
+      description,
+      testCase: undefined,
+      exampleTestCases,
+      actualTestCases,
+    };
   }
 
-  async changeProblemStatus(problemId: number, { status }: ChangeProblemStatusDto) {
-    const problem = await this.findProblemById(problemId);
+  async changeProblemStatus(
+    problemId: number,
+    { status, remark }: ChangeProblemStatusDto
+  ) {
+    const problem = await this.getProblemByID(problemId);
+
+    if (!problem.hasPlatformTestCases && status === ProblemStatus.APPROVED) {
+      throw new BadRequestException('Add Testcases before approving problem');
+    }
 
     problem.status = status;
-
+    problem.remark = remark;
     return this.problemRepo.save(problem);
-  }
-
-  async addTestCasesToProblem({
-    problemId,
-    input,
-    output,
-  }: AddTestCasesDto): Promise<SuccessMessageDto> {
-    const problem = await this.findProblemById(problemId);
-    await this.testCaseService.saveTestCases(problem.slug, input, output);
-    problem.hasTestCases = true;
-    await this.problemRepo.save(problem);
-    return { message: 'Testcases added successfully' };
   }
 
   private convertTitletoSlug(title: string) {

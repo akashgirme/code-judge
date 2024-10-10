@@ -6,9 +6,12 @@ import {
   Matches,
   IsNumber,
   ArrayUnique,
+  ValidateNested,
 } from 'class-validator';
 import { ProblemDifficulty } from '../enums';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { TestCaseDto } from './create-testcases.dto';
 
 export class CreateProblemDto {
   @ApiProperty()
@@ -36,4 +39,10 @@ export class CreateProblemDto {
   @ArrayUnique({ message: 'Tags array must contain unique TagIds' })
   @IsNumber(undefined, { each: true })
   tagIds?: number[];
+
+  @ApiProperty({ type: [TestCaseDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TestCaseDto)
+  testCases: TestCaseDto[];
 }

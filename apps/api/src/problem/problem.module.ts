@@ -7,10 +7,11 @@ import { AbilityModule } from '../ability/ability.module';
 import { ProblemService, TagService, TestCaseService } from './services';
 import { ProblemController, TagController } from './controllers';
 import { PassportModule } from '@nestjs/passport';
+import { TestCase } from './entities/test-case.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Problem, Tag]),
+    TypeOrmModule.forFeature([Problem, Tag, TestCase]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     AuthModule,
     AbilityModule,

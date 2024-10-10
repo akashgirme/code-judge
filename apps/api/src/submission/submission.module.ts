@@ -7,7 +7,7 @@ import { SubmissionController } from './controllers/submission.controller';
 import { SubmissionService } from './services/submission.service';
 import { StorageModule } from '../object-store/storage.module';
 import { PassportModule } from '@nestjs/passport';
-import { ExecutionModule } from '../execution/execution.module';
+import { QueueModule } from '../queue/queue.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { ExecutionModule } from '../execution/execution.module';
     AbilityModule,
     StorageModule,
     forwardRef(() => ProblemModule),
-    forwardRef(() => ExecutionModule),
+    forwardRef(() => QueueModule),
   ],
   controllers: [SubmissionController],
   providers: [SubmissionService],

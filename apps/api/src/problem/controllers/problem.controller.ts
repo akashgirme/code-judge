@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -9,15 +10,16 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ProblemService } from '../services';
+import { ProblemService, TestCaseService } from '../services';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
 import {
-  AddTestCasesDto,
   AdminProblemDto,
   AllProblemsDto,
+  AuthorProblemDto,
   ChangeProblemStatusDto,
   CreateProblemDto,
+  CreateTestCasesDto,
   ProblemDto,
   ProblemsQueryDto,
   ProblemsQueryValidatorDto,
@@ -30,21 +32,26 @@ import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { Action } from '../../ability/ability.factory';
+import { plainToClass } from 'class-transformer';
 
 @ApiTags('problems')
 @Controller('problems')
 export class ProblemController {
-  constructor(private readonly problemService: ProblemService) {}
+  constructor(
+    private readonly problemService: ProblemService,
+    private testCaseService: TestCaseService
+  ) {}
 
   @Post('/')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.Create, subject: Problem })
-  @ApiCreatedResponse({ type: Problem })
-  createProblem(
+  @ApiCreatedResponse({ type: () => AuthorProblemDto })
+  async createProblem(
     @CurrentUser() user: User,
     @Body() body: CreateProblemDto
-  ): Promise<Problem> {
-    return this.problemService.createProblem(user, body);
+  ): Promise<AuthorProblemDto> {
+    const problem = await this.problemService.createProblem(user, body);
+    return plainToClass(AuthorProblemDto, problem);
   }
 
   @Get('/')
@@ -54,11 +61,51 @@ export class ProblemController {
     return this.problemService.getProblemsForPublic(query);
   }
 
+  @Get('/:problemId')
+  @ApiOkResponse({ type: ProblemDto })
+  async getProblem(
+    @Param('problemId', ParseIntPipe) problemId: number
+  ): Promise<ProblemDto> {
+    const problem = await this.problemService.getProblemByID(problemId);
+    return plainToClass(ProblemDto, problem);
+  }
+
+  @Put('/:problemId')
+  @ApiOkResponse({ type: AuthorProblemDto })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.UpdateOwn, subject: Problem })
+  async updateProblem(
+    @CurrentUser() user: User,
+    @Param('problemId', ParseIntPipe) problemId: number,
+    @Body() body: UpdateProblemDto
+  ): Promise<AuthorProblemDto> {
+    const problem = await this.problemService.updateProblem(user, problemId, body);
+
+    return plainToClass(AuthorProblemDto, problem);
+  }
+
+  @Get('/author/:problemId')
+  @ApiOkResponse({ type: AuthorProblemDto })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.ReadOwn, subject: Problem })
+  async getProblemForAuthor(
+    @CurrentUser() user: User,
+    @Param('problemId', ParseIntPipe) problemId: number
+  ): Promise<AuthorProblemDto> {
+    const problem = await this.problemService.getProblemByID(problemId);
+
+    if (problem.author.id != user.id) {
+      throw new ForbiddenException(`You don't have permission to see this problem`);
+    }
+
+    return plainToClass(AuthorProblemDto, problem);
+  }
+
   @Get('/admin')
   @ApiOkResponse({ type: AllProblemsDto })
-  @ApiQuery({ type: () => ProblemsQueryDto })
+  @ApiQuery({ type: ProblemsQueryDto })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Read, subject: Problem })
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
   getProblemsForAdmin(
     @CurrentUser() user: User,
     @Query() query: ProblemsQueryValidatorDto
@@ -66,49 +113,39 @@ export class ProblemController {
     return this.problemService.getProblemsForAdmin(user, query);
   }
 
-  @Get('/:problemId')
-  @ApiOkResponse({ type: ProblemDto })
-  getProblem(@Param('problemId', ParseIntPipe) problemId: number): Promise<ProblemDto> {
-    return this.problemService.getProblem(problemId);
-  }
-
   @Get('/admin/:problemId')
   @ApiOkResponse({ type: AdminProblemDto })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Read, subject: Problem })
-  getProblemForAdmin(
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
+  async getProblemForAdmin(
     @Param('problemId', ParseIntPipe) problemId: number
   ): Promise<AdminProblemDto> {
-    return this.problemService.getProblemForAdmin(problemId);
+    const problem = await this.problemService.getProblemByID(problemId);
+
+    return plainToClass(AdminProblemDto, problem);
   }
 
-  @Put('/:problemId')
-  @ApiOkResponse({ type: Problem })
+  @Put('/admin/:problemId/change-status')
+  @ApiOkResponse({ type: AuthorProblemDto })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Update, subject: Problem })
-  updateProblem(
-    @Param('problemId', ParseIntPipe) problemId: number,
-    @Body() body: UpdateProblemDto
-  ): Promise<Problem> {
-    return this.problemService.updateProblem(problemId, body);
-  }
-
-  @Put('/:problemId/change-status')
-  @ApiOkResponse({ type: Problem })
-  @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Update, subject: Problem })
-  changeProblemStatus(
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
+  async changeProblemStatus(
     @Param('problemId', ParseIntPipe) problemId: number,
     @Body() body: ChangeProblemStatusDto
-  ): Promise<Problem> {
-    return this.problemService.changeProblemStatus(problemId, body);
+  ): Promise<AuthorProblemDto> {
+    const problem = await this.problemService.changeProblemStatus(problemId, body);
+    return plainToClass(AuthorProblemDto, problem);
   }
 
-  @Post('/admin/add-testcases')
-  @ApiOkResponse({ type: SuccessMessageDto })
+  @Post('/admin/:problemId/add-testcases')
+  @ApiOkResponse({ type: AdminProblemDto })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.Update, subject: Problem })
-  addTestCasesToProblem(@Body() body: AddTestCasesDto) {
-    return this.problemService.addTestCasesToProblem(body);
+  @CheckAbilities({ action: Action.Manage, subject: Problem })
+  async addTestCasesToProblem(
+    @Param('problemId', ParseIntPipe) problemId: number,
+    @Body() body: CreateTestCasesDto
+  ): Promise<AdminProblemDto> {
+    const problem = await this.testCaseService.addTestCases(problemId, body);
+    return plainToClass(AdminProblemDto, problem);
   }
 }

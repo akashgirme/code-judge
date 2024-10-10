@@ -20,20 +20,32 @@ export class User {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ApiProperty()
-  @Column({ nullable: true })
+  @ApiProperty({ type: String })
+  @Column('varchar')
+  username: string;
+
+  @ApiProperty({ type: String })
+  @Column('varchar', { nullable: true })
   firstName?: string;
 
-  @ApiProperty()
-  @Column({ nullable: true })
+  @ApiProperty({ type: String })
+  @Column('varchar', { nullable: true })
   lastName?: string;
 
-  @ApiProperty()
-  @Column()
+  @ApiProperty({ type: String })
+  @Column('varchar')
   email: string;
 
-  @ApiProperty()
-  @Column({ default: false })
+  @ApiProperty({ type: Boolean })
+  @Column('boolean', { default: false })
+  isEmailVerified: boolean;
+
+  @Column('varchar')
+  @Exclude({ toPlainOnly: true })
+  password: string;
+
+  @ApiProperty({ type: Boolean })
+  @Column('boolean', { default: false })
   hasOnboarded: boolean;
 
   @Column({
