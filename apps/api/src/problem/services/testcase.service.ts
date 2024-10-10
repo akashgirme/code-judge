@@ -1,62 +1,114 @@
-import { Injectable } from '@nestjs/common';
-import { StorageService } from '../../object-store/storage.service';
-import { AddTestCaseParams } from '../types';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { ProblemService } from './problem.service';
+import { DeleteResult, QueryRunner, Repository } from 'typeorm';
+import { Problem } from '../entities';
+import { AuthorProblemDto, CreateTestCasesDto, TestCaseDto } from '../dto';
+import { TestCaseType } from '../enums';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TestCase } from '../entities/test-case.entity';
 
 @Injectable()
 export class TestCaseService {
-  constructor(private readonly storageService: StorageService) {}
+  private logger = new Logger(TestCaseService.name);
+  constructor(
+    @InjectRepository(TestCase) private testCaseRepo: Repository<TestCase>,
+    @Inject(forwardRef(() => ProblemService))
+    private readonly problemService: ProblemService
+  ) {}
 
-  async saveAuthorTestCases({ problemSlug, input, output }: AddTestCaseParams) {
-    await Promise.all([
-      this.storageService.putObject(
-        `problems/${problemSlug}/author-testcases/input.txt`,
-        input
-      ),
-      this.storageService.putObject(
-        `problems/${problemSlug}/author-testcases/output.txt`,
-        output
-      ),
-    ]);
+  async createTestCase(
+    queryRunner: QueryRunner,
+    problem: Problem,
+    type: TestCaseType,
+    { input, output }: TestCaseDto
+  ) {
+    const newTestCase = this.testCaseRepo.create({
+      input,
+      output,
+      type,
+      problem,
+    });
+    return await queryRunner.manager.save(newTestCase);
   }
 
-  async getAuthorTestCases(
-    problemSlug: string
-  ): Promise<{ input: string; output: string }> {
-    const [input, output] = await Promise.all([
-      this.storageService.getObject(`problems/${problemSlug}/author-testcases/input.txt`),
-      this.storageService.getObject(
-        `problems/${problemSlug}/author-testcases/output.txt`
-      ),
-    ]);
-
-    return { input, output };
+  async getExampleTestCases(problemId: number): Promise<TestCase[]> {
+    const testCases = await this.testCaseRepo
+      .createQueryBuilder('testcase')
+      .leftJoinAndSelect('testcase.problem', 'problem')
+      .select(['testcase'])
+      .where('problem.id =:problemId', { problemId })
+      .andWhere('testcase.type = :type', { type: TestCaseType.EXAMPLE })
+      .getMany();
+    if (testCases.length == 0) {
+      throw new NotFoundException(`No TestCases Found`);
+    }
+    return testCases;
   }
 
-  async savePlatformTestCases({ problemSlug, input, output }: AddTestCaseParams) {
-    await Promise.all([
-      this.storageService.putObject(
-        `problems/${problemSlug}/platform-testcases/input.txt`,
-        input
-      ),
-      this.storageService.putObject(
-        `problems/${problemSlug}/platform-testcases/output.txt`,
-        output
-      ),
-    ]);
+  async getActualTestCases(problemId: number): Promise<TestCase[]> {
+    const testCases = await this.testCaseRepo
+      .createQueryBuilder('testcase')
+      .leftJoinAndSelect('testcase.problem', 'problem')
+      .select(['testcase'])
+      .where('problem.id =:problemId', { problemId })
+      .andWhere('testcase.type = :type', { type: TestCaseType.ACTUAL })
+      .getMany();
+    if (testCases.length == 0) {
+      throw new NotFoundException(`No TestCases Found`);
+    }
+    return testCases;
   }
 
-  async getPlatformTestCases(
-    problemSlug: string
-  ): Promise<{ input: string; output: string }> {
-    const [input, output] = await Promise.all([
-      this.storageService.getObject(
-        `problems/${problemSlug}/platform-testcases/input.txt`
-      ),
-      this.storageService.getObject(
-        `problems/${problemSlug}/platform-testcases/output.txt`
-      ),
-    ]);
+  async getTestCase(id: number) {
+    const testCase = await this.testCaseRepo.findOne({
+      where: { id },
+    });
 
-    return { input, output };
+    if (!testCase) {
+      throw new NotFoundException(`No TestCase Found`);
+    }
+    return testCase;
+  }
+
+  async deleteTestCase(queryRunner: QueryRunner, id: number): Promise<DeleteResult> {
+    return queryRunner.manager.delete(TestCase, id);
+  }
+
+  async addTestCases(
+    problemId: number,
+    { testCases }: CreateTestCasesDto
+  ): Promise<AuthorProblemDto> {
+    const problem = await this.problemService.getProblemByID(problemId);
+
+    const queryRunner = this.testCaseRepo.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      testCases.map(
+        async (testCase: TestCaseDto) =>
+          await this.createTestCase(queryRunner, problem, TestCaseType.ACTUAL, testCase)
+      );
+      problem.hasPlatformTestCases = true;
+
+      await queryRunner.manager.save(problem);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
+      this.logger.log('Error while adding actual testcases', error);
+      throw new InternalServerErrorException();
+    }
+
+    await queryRunner.release();
+    return this.problemService.getProblemByID(problem.id);
   }
 }

@@ -11,7 +11,7 @@ import {
 import { ProblemDifficulty } from '../enums';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { AddTestCasesDto } from './add-testcases.dto';
+import { TestCaseDto } from './create-testcases.dto';
 
 export class CreateProblemDto {
   @ApiProperty()
@@ -40,8 +40,9 @@ export class CreateProblemDto {
   @IsNumber(undefined, { each: true })
   tagIds?: number[];
 
-  @ApiProperty({ type: AddTestCasesDto })
-  @ValidateNested()
-  @Type(() => AddTestCasesDto)
-  testCases: AddTestCasesDto;
+  @ApiProperty({ type: [TestCaseDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TestCaseDto)
+  testCases: TestCaseDto[];
 }

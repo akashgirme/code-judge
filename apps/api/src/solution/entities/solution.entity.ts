@@ -26,7 +26,8 @@ export class Solution {
 
   @ApiProperty({
     type: 'enum',
-    enum: Languages,
+    enum: () => Languages,
+    enumName: 'Languages',
   })
   @Column('enum', { enum: Languages })
   language: Languages;
@@ -41,11 +42,9 @@ export class Solution {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
 }

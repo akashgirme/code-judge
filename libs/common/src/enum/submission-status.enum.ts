@@ -1,5 +1,4 @@
-export enum StatusMessage {
-  NULL = 'Null',
+export enum SubmissionStatus {
   ACCEPTED = 'Accepted',
   WRONG_ANSWER = 'Wrong Answer',
   REJECTED = 'Rejected',

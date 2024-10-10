@@ -15,7 +15,7 @@ import { StorageModule } from '../object-store/storage.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { SolutionModule } from '../solution/solution.module';
 import { APP_GUARD } from '@nestjs/core';
-import { ExecutionModule } from '../execution/execution.module';
+import { QueueModule } from '../queue/queue.module';
 
 @Module({
   imports: [
@@ -35,6 +35,7 @@ import { ExecutionModule } from '../execution/execution.module';
         limit: 10,
       },
     ]),
+    QueueModule,
     AbilityModule,
     AuthModule,
     UserModule,
@@ -42,7 +43,6 @@ import { ExecutionModule } from '../execution/execution.module';
     StorageModule,
     SubmissionModule,
     SolutionModule,
-    ExecutionModule,
   ],
   controllers: [AppController],
   providers: [

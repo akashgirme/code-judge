@@ -5,19 +5,26 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { SubmissionService } from '../services/submission.service';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../auth/decorators';
 import { User } from '../../user/entities';
-import { CreateSubmissionDto, SubmissionDto } from '../dto';
+import {
+  CreateSubmissionDto,
+  CreateSubmissionResponseDto,
+  RunStatusResponseDto,
+  SubmitStatusResponseDto,
+} from '../dto';
 import { Submission } from '../entities';
 import { AuthGuard } from '@nestjs/passport';
 import { AbilityGuard } from '../../ability/ability.guard';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { Action } from '../../ability/ability.factory';
 import { Throttle } from '@nestjs/throttler';
+import { plainToClass, plainToInstance } from 'class-transformer';
 
 const RATE_LIMIT_TIME_IN_MILISECONDS = 30 * 1000; // 30s
 
@@ -26,36 +33,66 @@ const RATE_LIMIT_TIME_IN_MILISECONDS = 30 * 1000; // 30s
 export class SubmissionController {
   constructor(private readonly submissionService: SubmissionService) {}
 
-  @Post('/')
-  @Throttle({ default: { limit: 3, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
+  @Post('/submit')
+  @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
   @UseGuards(AuthGuard(), AbilityGuard)
-  @ApiCreatedResponse({ type: Submission })
+  @ApiCreatedResponse({ type: CreateSubmissionResponseDto })
   async createSubmission(
     @CurrentUser() user: User,
     @Body() body: CreateSubmissionDto
-  ): Promise<Submission> {
+  ): Promise<CreateSubmissionResponseDto> {
     return this.submissionService.createSubmission(user, body);
+  }
+
+  @Post('/run')
+  @Throttle({ default: { limit: 5, ttl: RATE_LIMIT_TIME_IN_MILISECONDS } })
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @ApiCreatedResponse({ type: CreateSubmissionResponseDto })
+  async createRun(
+    @CurrentUser() user: User,
+    @Body() body: CreateSubmissionDto
+  ): Promise<CreateSubmissionResponseDto> {
+    return this.submissionService.createRun(user, body);
+  }
+
+  @Get('/status/run')
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @ApiOkResponse({ type: RunStatusResponseDto })
+  async getRunStatus(@Query('id') id: string): Promise<RunStatusResponseDto> {
+    return this.submissionService.getRunStatus(id);
+  }
+
+  @Get('/status/submit')
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @ApiOkResponse({ type: SubmitStatusResponseDto })
+  async getSubmitStatus(@Query('id') id: string): Promise<SubmitStatusResponseDto> {
+    return this.submissionService.getSubmitStatus(id);
   }
 
   @Get('/user/:problemId')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: [Submission] })
-  getSubmissionsByUserAndProblem(
+  async getSubmissionsByUserAndProblem(
     @CurrentUser() user: User,
     @Param('problemId', ParseIntPipe) problemId: number
   ): Promise<Submission[]> {
-    return this.submissionService.getSubmissionsByProblemAndUser(user, problemId);
+    const submissions = await this.submissionService.getSubmissionsByProblem(
+      user,
+      problemId
+    );
+
+    return plainToInstance(Submission, submissions);
   }
 
   @Get('/:submissionId')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
-  @ApiOkResponse({ type: SubmissionDto })
+  @ApiOkResponse({ type: SubmitStatusResponseDto })
   getSubmissionById(
     @CurrentUser() user: User,
     @Param('submissionId', ParseIntPipe) submissionId: number
-  ): Promise<SubmissionDto> {
+  ): Promise<SubmitStatusResponseDto> {
     return this.submissionService.getSubmission(user, submissionId);
   }
 }

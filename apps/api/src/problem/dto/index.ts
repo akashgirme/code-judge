@@ -8,5 +8,7 @@ export { UpdateProblemDto } from './update-problem.dto';
 export { ProblemFilterDto } from './problem-filter.dto';
 export { AdminProblemDto } from './problem-admin.dto';
 export { ChangeProblemStatusDto } from './change-problem-status.dto';
-export { AddTestCasesDto } from './add-testcases.dto';
+export { CreateTestCasesDto } from './create-testcases.dto';
 export { SuccessMessageDto } from './success-message.dto';
+export { TestCaseDto } from './create-testcases.dto';
+export { AuthorProblemDto } from './author-problem.dto';

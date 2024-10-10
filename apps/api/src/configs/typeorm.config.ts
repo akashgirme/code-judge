@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
-import { Problem, Tag } from '../problem/entities';
+import { Problem, Tag, TestCase } from '../problem/entities';
 import { User } from '../user/entities';
 import { Submission } from '../submission/entities';
 import { Solution } from '../solution/entities';
@@ -10,8 +10,8 @@ const db_url = process.env.DB_URL;
 const commonTypeOrmConfig: DataSourceOptions = {
   logging: true,
   type: 'postgres',
-  entities: [User, Problem, Tag, Solution, Submission],
-  synchronize: true,
+  entities: [User, Problem, Tag, TestCase, Solution, Submission],
+  synchronize: false,
   logNotifications: true,
   ssl: true,
 };

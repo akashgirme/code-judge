@@ -3,9 +3,9 @@ import { Solution } from '../entities';
 import { PaginationResultDto } from '../../common/dto';
 
 export class AllSolutionsDto {
-  @ApiProperty({ type: [Solution] })
+  @ApiProperty({ type: () => [Solution] })
   solutions: Solution[];
 
-  @ApiProperty({ type: PaginationResultDto })
+  @ApiProperty({ type: () => PaginationResultDto })
   paginationMeta: PaginationResultDto;
 }

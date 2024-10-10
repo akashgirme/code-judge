@@ -38,7 +38,7 @@ export class SolutionController {
   }
 
   @Get('/')
-  @ApiOkResponse({ type: String })
+  @ApiOkResponse({ type: () => AllSolutionsDto })
   @ApiQuery({ type: () => SolutionQueryDto })
   getAllSolutions(@Query() query: SolutionQueryValidatorDto): Promise<AllSolutionsDto> {
     return this.solutionService.getAllSolutions(query);

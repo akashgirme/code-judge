@@ -1,11 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Problem } from '../entities';
-import { AddTestCasesDto } from './add-testcases.dto';
+import { TestCaseDto } from './create-testcases.dto';
+import { TestCase } from '../entities/test-case.entity';
+import { Exclude } from 'class-transformer';
 
 export class ProblemDto extends Problem {
-  @ApiProperty({ type: String })
+  @Exclude()
+  hasPlatformTestCases: boolean;
+
+  @Exclude()
+  remark: string;
+
+  @ApiProperty()
   description: string;
 
-  @ApiProperty({ type: AddTestCasesDto })
-  testCases: AddTestCasesDto;
+  @ApiProperty({ type: [TestCase] })
+  exampleTestCases: TestCase[];
+
+  @Exclude()
+  actualTestCases: TestCase[];
 }
