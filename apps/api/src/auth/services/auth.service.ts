@@ -275,21 +275,24 @@ export class AuthService {
 
       const user = await this.usersService.findAccountById(id);
 
-      const retrievedRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
+      const hashRefreshToken = await this.cacheservice.retrieveRefreshTokenFromCache(
         user.id
       );
-      const decrypedRefreshToken = decrypt(retrievedRefreshToken);
 
-      if (!user || decrypedRefreshToken !== refreshToken) {
+      const match = await bcrypt.compare(refreshToken, hashRefreshToken);
+      // const decrypedRefreshToken = decrypt(retrievedRefreshToken);
+
+      if (!user || !match) {
         throw new UnauthorizedException('Invalid Token');
       }
 
       const { refreshToken: newRefreshToken } =
         await this.tokenService.generateRefreshToken(user);
 
-      this.tokenService.setRefreshTokenCookie(newRefreshToken, res);
       await this.cacheservice.storeRefreshTokenInCache(newRefreshToken, user.id);
       await this.cacheservice.setUserCache(user);
+
+      this.tokenService.setRefreshTokenCookie(newRefreshToken, res);
 
       const { accessToken } = await this.tokenService.generateAccessToken(user);
 
@@ -370,12 +373,13 @@ export class AuthService {
     const { accessToken } = await this.tokenService.generateAccessToken(user);
     const { refreshToken } = await this.tokenService.generateRefreshToken(user);
 
-    const encryptedRefreshToken = encrypt(refreshToken);
-    await this.cacheservice.storeRefreshTokenInCache(encryptedRefreshToken, user.id);
-
-    this.tokenService.setRefreshTokenCookie(refreshToken, res);
+    // const encryptedRefreshToken = encrypt(refreshToken);
+    const hashedRefreshToken = await hashToken(refreshToken);
+    await this.cacheservice.storeRefreshTokenInCache(hashedRefreshToken, user.id);
 
     await this.cacheservice.setUserCache(user);
+
+    this.tokenService.setRefreshTokenCookie(refreshToken, res);
 
     const safeUser = instanceToPlain(user);
 

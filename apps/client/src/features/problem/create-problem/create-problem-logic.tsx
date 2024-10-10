@@ -66,6 +66,7 @@ export const CreateProblemLogic: React.FC<CreateProblemLogicProps> = ({
   }, [watch, clearStoredValue, setStoredValue]);
 
   const handleSubmit: SubmitHandler<CreateProblemModel> = async (data) => {
+    console.log('Handle submit form logic comp');
     await onSubmit(data);
     clearStoredValue();
   };

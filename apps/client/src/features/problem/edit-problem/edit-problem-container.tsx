@@ -7,6 +7,8 @@ import {
   CreateProblemLogic,
   CreateProblemModel,
 } from '../create-problem/create-problem-logic';
+import { toast } from 'sonner';
+import { Check } from 'lucide-react';
 
 export const EditProblemContainer = () => {
   const navigate = useNavigate();
@@ -27,7 +29,14 @@ export const EditProblemContainer = () => {
         tagIds: data.tags.map((topic) => topic.value),
       },
     }).unwrap();
-    navigate(`/admin/problems/${id}/add-testcases`);
+    toast.success(
+      <div className="flex items-center">
+        <Check className="mr-4" /> Problem updated successfully
+      </div>
+    );
+    setTimeout(() => {
+      navigate(`/admin/problems/${id}/add-testcases`);
+    }, 2000);
   };
 
   const defaultValues: CreateProblemModel = {

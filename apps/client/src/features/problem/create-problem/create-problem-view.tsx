@@ -24,9 +24,19 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
     fixedCacheKey: 'createProblem',
   });
   const {
-    formState: { isValid },
+    formState: { isValid, submitCount, errors },
     handleSubmit,
+    getValues,
   } = form;
+
+  const printFormData = () => {
+    const currentData = getValues();
+    console.log('Current Form Data:', currentData);
+    console.log('Submit count', submitCount);
+    console.log(isValid);
+    console.log(errors);
+  };
+
   const { problemId } = useParams();
 
   return (
@@ -60,6 +70,7 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
                 type="submit"
                 isLoading={isLoading}
                 className="md:w-72 mx-auto"
+                onClick={printFormData}
               >
                 Submit
               </Button>
