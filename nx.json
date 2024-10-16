@@ -74,7 +74,8 @@
         "apps/api-e2e/**/*",
         "apps/code-execution-engine-e2e/**/*",
         "apps/execution-engine/worker-e2e/**/*",
-        "apps/execution-engine/server-e2e/**/*"
+        "apps/execution-engine/server-e2e/**/*",
+        "apps/worker-e2e/**/*"
       ]
     },
     {

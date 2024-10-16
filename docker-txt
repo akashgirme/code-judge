@@ -1,0 +1,56 @@
+# Use a specific base image if available or keep Ubuntu
+FROM ubuntu:20.04
+
+# Avoid prompts from apt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gcc \
+    g++ \
+    make \
+    git \
+    pkg-config \
+    libsystemd-dev \
+    sudo && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get update \
+    && apt-get install -y nodejs \
+    && npm install -g nx
+
+RUN set -xe && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends locales && \
+    rm -rf /var/lib/apt/lists/* && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+RUN set -xe && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends git libcap-dev && \
+    rm -rf /var/lib/apt/lists/* && \
+    git clone https://github.com/judge0/isolate.git /tmp/isolate && \
+    cd /tmp/isolate && \
+    git checkout ad39cc4d0fbb577fb545910095c9da5ef8fc9a1a && \
+    make -j$(nproc) install && \
+    rm -rf /tmp/*
+ENV BOX_ROOT /var/local/lib/isolate
+
+# Create a non-privileged user
+RUN useradd -u 1000 -m -r codejudge && \
+    echo "codejudge ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers
+
+
+WORKDIR /app
+
+# Change ownership of the working directory
+RUN chown codejudge:codejudge /app
+
+USER codejudge
+
+CMD ["sudo", "npx", "nx", "serve", "worker"]
