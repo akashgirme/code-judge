@@ -1,0 +1,23 @@
+{
+  "name": "worker",
+  "version": "1.0.0",
+  "description": "cee-worker",
+  "main": "main.ts",
+  "scripts": {
+    "test": "npx nx test worker"
+  },
+  "keywords": [
+    "worker"
+  ],
+  "author": "Akash Girme",
+  "license": "ISC",
+  "dependencies": {
+    "bullmq": "^5.12.12",
+    "dotenv": "^16.4.5",
+    "ioredis": "^5.4.1",
+    "pino": "^9.3.2",
+    "redis": "^4.7.0",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.8.0"
+  }
+}

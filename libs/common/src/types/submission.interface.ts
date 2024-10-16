@@ -31,3 +31,33 @@ export interface SubmissionObject {
   memory?: number;
   error?: string;
 }
+
+export interface SubmissionRequest {
+  id: string;
+  type: SubmissionType;
+  userId: number;
+  problemId: number;
+  sourceCode: string;
+  language: Languages;
+  createdAt: Date;
+  testCases: TestCases[];
+  state: SubmissionState;
+}
+
+export interface SubmissionResult {
+  type: SubmissionType;
+  userId: number;
+  problemId: number;
+  sourceCode: string;
+  language: Languages;
+  createdAt: Date;
+  testCases: TestCases[];
+  state: SubmissionState;
+  status: SubmissionStatus;
+  result: TestCasesResult[];
+  passed?: number;
+  total?: number;
+  time?: number;
+  memory?: number;
+  error?: string;
+}
