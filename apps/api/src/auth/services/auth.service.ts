@@ -39,6 +39,7 @@ import {
   generateUsername,
   hashPassword,
 } from '../utility';
+import { hashToken } from '../utility/hash-token';
 
 @Injectable()
 export class AuthService {
