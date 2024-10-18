@@ -36,7 +36,7 @@ export const headerMjml = `
       <mj-section padding='16px 0px 0px 0px'>
         <mj-column>
           <mj-text align="center">
-            <p class="bold helvetica">Online Coding Judge</p>
+            <p class="bold helvetica">Code Judge</p>
           </mj-text>
         </mj-column>
       </mj-section>
