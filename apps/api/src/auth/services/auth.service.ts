@@ -107,6 +107,7 @@ export class AuthService {
       'AUTH_UI_URL'
     )}/sign-in-with-token?token=${validationToken}`;
 
+    //TODO: Send Welcome Mail (add task in message queue)
     return { redirectUrl };
   }
 
@@ -136,6 +137,7 @@ export class AuthService {
 
     const { otp } = await this.otpService.createOtp(user);
 
+    //TODO: Queue sendMail job instead of awaiting here
     await this.mailService.sendMail({
       to: email,
       subject: 'Verify your email for Code-Judge',
@@ -201,6 +203,8 @@ export class AuthService {
     await this.usersService.setVerifyTrue(userId);
 
     await this.authenticateUser(user, res);
+
+    //TODO: Send Welcome email
   }
 
   async signIn({ email, password }: SignInUserDto, res: Response) {

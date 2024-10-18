@@ -4,14 +4,13 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { StorageService } from '../../object-store/storage.service';
 import { User } from '../../user/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from '../entities';
 import { Repository } from 'typeorm';
-import { ProblemService, TestCaseService } from '../../problem/services';
+import { ProblemService } from '../../problem/services';
 import {
   CreateSubmissionDto,
   CreateSubmissionResponseDto,
@@ -24,8 +23,9 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { SubmissionObject, SubmissionState } from '@code-judge/common';
+import { SubmissionRequest, SubmissionResult, SubmissionState } from '@code-judge/common';
 import { SubmissionType } from 'libs/common/src/enum/submission-type.enum';
+import { stdin } from 'process';
 
 @Injectable()
 export class SubmissionService {
@@ -48,14 +48,15 @@ export class SubmissionService {
     const submissionDateTime = new Date();
 
     /**
-     * For Submission use actual test cases
+     * For Submission `actual test cases` are used
      */
     const testCases = problem.actualTestCases.map(({ input, output }) => ({
       input,
       output,
     }));
 
-    const submissionObj: SubmissionObject = {
+    const submissionObj: SubmissionRequest = {
+      id: submissionKey,
       type: SubmissionType.SUBMIT,
       userId: user.id,
       problemId: problem.id,
@@ -93,14 +94,15 @@ export class SubmissionService {
     const submissionDateTime = new Date();
 
     /**
-     * For Submission use example test cases
+     * For Run `example test cases` are used
      */
     const testCases = problem.exampleTestCases.map(({ input, output }) => ({
       input,
       output,
     }));
 
-    const submissionObj: SubmissionObject = {
+    const submissionObj: SubmissionRequest = {
+      id: submissionKey,
       type: SubmissionType.RUN,
       userId: user.id,
       problemId: problem.id,
@@ -129,7 +131,7 @@ export class SubmissionService {
   }
 
   async createDBEntry(submissionKey: string) {
-    const submissionResult: SubmissionObject = await this.cacheManager.get(
+    const submissionResult: SubmissionResult = await this.cacheManager.get(
       `submission:${submissionKey}`
     );
     /**
@@ -151,7 +153,7 @@ export class SubmissionService {
 
     await Promise.all([
       this.storageService.putObject(sourceCodePath, submissionResult.sourceCode),
-      this.storageService.putObject(stderrPath, submissionResult.error ?? ''),
+      this.storageService.putObject(stderrPath, submissionResult.stderr ?? ''),
     ]);
 
     const submissionObj = this.submissionRepo.create({
@@ -161,8 +163,8 @@ export class SubmissionService {
       problem: { id: submissionResult.problemId },
       status: submissionResult.status,
       stderrPath: stderrPath,
-      testCasesPassed: submissionResult.passed,
-      totalTestCases: submissionResult.total,
+      testCasesPassed: submissionResult.passedTestCases,
+      totalTestCases: submissionResult.totalTestCases,
       createdAt: submissionResult.createdAt,
     });
 
@@ -172,26 +174,33 @@ export class SubmissionService {
   }
 
   async getRunStatus(id: string): Promise<RunStatusResponseDto> {
-    const submissionResult: SubmissionObject = await this.cacheManager.get(
+    const submissionResult: SubmissionResult = await this.cacheManager.get(
       `submission-${id}`
     );
 
-    const { sourceCode, language, state, result, passed, total, error } =
-      submissionResult;
+    const {
+      sourceCode,
+      language,
+      state,
+      result,
+      passedTestCases,
+      totalTestCases,
+      stderr,
+    } = submissionResult;
 
     return {
       sourceCode,
       language,
       state,
       result,
-      passed,
-      total,
-      error,
+      passed: passedTestCases,
+      total: totalTestCases,
+      error: stderr,
     };
   }
 
   async getSubmitStatus(id: string): Promise<SubmitStatusResponseDto> {
-    const submissionResult: SubmissionObject = await this.cacheManager.get(
+    const submissionResult: SubmissionResult = await this.cacheManager.get(
       `submission-${id}`
     );
 
@@ -200,10 +209,10 @@ export class SubmissionService {
       language,
       state,
       status,
-      passed,
-      total,
+      passedTestCases,
+      totalTestCases,
       createdAt,
-      error,
+      stderr,
       memory,
       time,
     } = submissionResult;
@@ -213,9 +222,9 @@ export class SubmissionService {
       language,
       state,
       status,
-      passed,
-      total,
-      error,
+      passed: passedTestCases,
+      total: totalTestCases,
+      error: stderr,
       memory,
       time,
       createdAt,
