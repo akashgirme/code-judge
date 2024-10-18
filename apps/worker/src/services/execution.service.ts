@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { getLanguageConfig, logger } from '../utils';
+import { getLanguageConfig } from '../utils';
 import { SubmissionService } from './submission.service';
 import { SubmissionRequest, SubmissionResult, SubmissionState } from '@code-judge/common';
 import { IsolateJob } from './isolate-job.service';

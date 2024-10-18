@@ -54,4 +54,4 @@ db/*
 db
 
 #Helm Chart values.yml file
-helm/code-judge/values.yaml
+k8s/helm/values.yaml

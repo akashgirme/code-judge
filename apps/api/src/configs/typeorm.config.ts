@@ -13,7 +13,7 @@ const commonTypeOrmConfig: DataSourceOptions = {
   entities: [User, Problem, Tag, TestCase, Solution, Submission],
   synchronize: false,
   logNotifications: true,
-  ssl: true,
+  ssl: false,
 };
 
 export const getTypeOrmConfig = async (
@@ -21,12 +21,12 @@ export const getTypeOrmConfig = async (
 ): Promise<DataSourceOptions> => {
   return {
     ...commonTypeOrmConfig,
-    extra: {
-      ssl: {
-        rejectUnauthorized: false,
-        ca: fs.readFileSync('./db-ca.crt').toString(),
-      },
-    },
+    // extra: {
+    //   ssl: {
+    //     rejectUnauthorized: false,
+    //     ca: fs.readFileSync('./db-ca.crt').toString(),
+    //   },
+    // },
     url: configService.get<string>('DB_URL'),
   };
 };

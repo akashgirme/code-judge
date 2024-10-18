@@ -1,0 +1,5 @@
+- In all applications export `env` variables from single config file instead of reading in respective module/package.
+- Separate package.json for each application currently api & client using common package.json from root
+  causing higher docker image size for api.
+- common tsconfig + prettier package/lib
+- common taiwind package/lib 

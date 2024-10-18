@@ -1,0 +1,41 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile.api.dev
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local 
+    environment:
+      - NODE_ENV=development
+    restart: always
+
+  client:
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile.client.dev
+    volumes:
+      - .:/app
+    ports:
+      - "4200:4200"
+    env_file:
+      - .env.local 
+    environment:
+      - NODE_ENV=development
+    restart: always
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker/Dockerfile.worker.dev
+    volumes:
+      - .:/app
+    env_file:
+      - .env.local 
+    environment:
+      - NODE_ENV=development
+    privileged: true
+    restart: always
