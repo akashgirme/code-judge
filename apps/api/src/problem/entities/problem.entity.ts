@@ -34,7 +34,7 @@ export class Problem {
     enumName: 'ProblemDifficulty',
   })
   @Column('enum', {
-    enum: () => ProblemDifficulty,
+    enum: ProblemDifficulty,
   })
   difficulty: ProblemDifficulty;
 
@@ -52,9 +52,8 @@ export class Problem {
     enum: ProblemStatus,
     enumName: 'ProblemStatus',
   })
-  @Column({
-    type: 'enum',
-    enum: () => ProblemStatus,
+  @Column('enum', {
+    enum: ProblemStatus,
     default: ProblemStatus.UNPUBLISHED,
   })
   status: ProblemStatus;

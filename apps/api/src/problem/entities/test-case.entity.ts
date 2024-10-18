@@ -23,9 +23,8 @@ export class TestCase {
     enum: TestCaseType,
     enumName: 'TestCaseType',
   })
-  @Column({
-    type: 'enum',
-    enum: () => TestCaseType,
+  @Column('enum', {
+    enum: TestCaseType,
   })
   type: TestCaseType;
 

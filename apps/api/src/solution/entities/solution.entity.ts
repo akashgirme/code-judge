@@ -25,8 +25,7 @@ export class Solution {
   path: string;
 
   @ApiProperty({
-    type: 'enum',
-    enum: () => Languages,
+    enum: Languages,
     enumName: 'Languages',
   })
   @Column('enum', { enum: Languages })

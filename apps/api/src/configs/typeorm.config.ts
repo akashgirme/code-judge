@@ -6,7 +6,7 @@ import { User } from '../user/entities';
 import { Submission } from '../submission/entities';
 import { Solution } from '../solution/entities';
 
-const db_url = process.env.DB_URL;
+const DB_URL = process.env.DB_URL;
 const commonTypeOrmConfig: DataSourceOptions = {
   logging: true,
   type: 'postgres',
@@ -24,7 +24,7 @@ export const getTypeOrmConfig = async (
     extra: {
       ssl: {
         rejectUnauthorized: false,
-        ca: fs.readFileSync('./db-ssl-certificate.crt').toString(),
+        ca: fs.readFileSync('./db-ca.crt').toString(),
       },
     },
     url: configService.get<string>('DB_URL'),
@@ -34,14 +34,13 @@ export const getTypeOrmConfig = async (
 //TODO: Issue with migration generation > unable to locate @code-judge/common lib
 const datasource = new DataSource({
   ...commonTypeOrmConfig,
-  // url: process.env.DB_URL,
   extra: {
     ssl: {
       rejectUnauthorized: false,
-      ca: fs.readFileSync('./db-ssl-certificate.crt').toString(),
+      ca: fs.readFileSync('./db-ca.crt').toString(),
     },
   },
-  url: db_url,
+  url: DB_URL,
   migrations: ['db/migrations/*{.ts,.js}'],
 });
 
