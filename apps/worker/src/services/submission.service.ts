@@ -1,15 +1,11 @@
 import { injectable } from 'tsyringe';
 import { redisClient } from '../config/redis-connection.config';
-import { SubmissionRequest } from '@code-judge/common';
 import { Submission } from '../types';
 
 @injectable()
 export class SubmissionService {
-  // private getSubmission()
-  // private updateSubmission()
-
-  async getSubmission(key: string): Promise<SubmissionRequest> {
-    let submission: SubmissionRequest;
+  async getSubmission(key: string): Promise<Submission> {
+    let submission: Submission;
     try {
       const value = await redisClient.get(`submission:${key}`);
       submission = JSON.parse(value);

@@ -14,24 +14,6 @@ export interface TestCasesResult {
   expectedOutput: string;
 }
 
-export interface SubmissionObject {
-  type: SubmissionType;
-  userId: number;
-  problemId: number;
-  sourceCode: string;
-  language: Languages;
-  createdAt?: Date;
-  testCases?: TestCases[];
-  state: SubmissionState;
-  status?: SubmissionStatus;
-  result?: TestCasesResult[];
-  passed?: number;
-  total?: number;
-  time?: number;
-  memory?: number;
-  error?: string;
-}
-
 export interface SubmissionRequest {
   id: string;
   type: SubmissionType;
@@ -55,9 +37,9 @@ export interface SubmissionResult {
   state: SubmissionState;
   status: SubmissionStatus;
   result: TestCasesResult[];
-  passed?: number;
-  total?: number;
+  passedTestCases?: number;
+  totalTestCases?: number;
   time?: number;
   memory?: number;
-  error?: string;
+  stderr?: string;
 }

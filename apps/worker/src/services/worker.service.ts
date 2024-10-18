@@ -1,18 +1,12 @@
 import { injectable, singleton } from 'tsyringe';
-import * as dotenv from 'dotenv';
-import { Worker, Job, Queue } from 'bullmq';
-import { logger } from '../utils';
+import { Worker, Job } from 'bullmq';
 import { ExecutionService } from './execution.service';
 import { Config, redisConnection } from '../config';
-
-dotenv.config();
 
 @injectable()
 @singleton()
 export class WorkerService {
   private worker: Worker;
-  private resultQueue: Queue;
-
   constructor(private readonly executionService: ExecutionService) {
     this.initializeWorker();
   }
@@ -22,12 +16,12 @@ export class WorkerService {
       Config.JobQueueName,
       async (job: Job) => {
         try {
-          logger.info(
+          console.info(
             `Processing job id: ${job.id}, name: ${job.name}, submissionId: ${job.data}`
           );
           await this.executionService.processSubmission(job.data);
         } catch (error) {
-          logger.error(
+          console.error(
             `Error occurred while executing job with id: ${job.id}, submissionId: ${job.data}`
           );
           throw error;

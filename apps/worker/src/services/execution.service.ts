@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { getLanguageConfig, logger } from '../utils';
 import { SubmissionService } from './submission.service';
-import { SubmissionRequest, SubmissionState } from '@code-judge/common';
+import { SubmissionRequest, SubmissionResult, SubmissionState } from '@code-judge/common';
 import { IsolateJob } from './isolate-job.service';
 import { Submission } from '../types';
 
@@ -12,7 +12,7 @@ export class ExecutionService {
     private readonly isolateJob: IsolateJob
   ) {}
 
-  async processSubmission(id: string): Promise<any> {
+  async processSubmission(id: string): Promise<void> {
     let submissionReq: SubmissionRequest;
 
     submissionReq = await this.submissionService.getSubmission(id);
@@ -25,15 +25,5 @@ export class ExecutionService {
     };
 
     await this.isolateJob.perform(submission);
-
-    const submissionResult = await this.submissionService.getSubmission(submission.id);
-
-    return submissionResult;
   }
 }
-
-/**
- * Properly comment the isolateJob
- * Build SubmissionResult
- * Proper Docker image
- */

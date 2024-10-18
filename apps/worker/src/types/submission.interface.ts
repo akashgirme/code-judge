@@ -25,4 +25,6 @@ export interface Submission {
   stderr?: string;
   status?: SubmissionStatus;
   result?: Result[];
+  passedTestCases?: number;
+  totalTestCases?: number;
 }
