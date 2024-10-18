@@ -14,20 +14,32 @@ export interface TestCasesResult {
   expectedOutput: string;
 }
 
-export interface SubmissionObject {
+export interface SubmissionRequest {
+  id: string;
   type: SubmissionType;
   userId: number;
   problemId: number;
   sourceCode: string;
   language: Languages;
-  createdAt?: Date;
-  testCases?: TestCases[];
+  createdAt: Date;
+  testCases: TestCases[];
   state: SubmissionState;
-  status?: SubmissionStatus;
-  result?: TestCasesResult[];
-  passed?: number;
-  total?: number;
+}
+
+export interface SubmissionResult {
+  type: SubmissionType;
+  userId: number;
+  problemId: number;
+  sourceCode: string;
+  language: Languages;
+  createdAt: Date;
+  testCases: TestCases[];
+  state: SubmissionState;
+  status: SubmissionStatus;
+  result: TestCasesResult[];
+  passedTestCases?: number;
+  totalTestCases?: number;
   time?: number;
   memory?: number;
-  error?: string;
+  stderr?: string;
 }

@@ -1,0 +1,45 @@
+FROM judge0/buildpack-deps:buster-2019-12-28
+
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install dependencies
+RUN apt-get update && apt-get install -y \
+    sudo && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get update \
+    && apt-get install -y nodejs \
+    && npm install -g nx \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -xe && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends locales && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+RUN set -xe && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends git libcap-dev && \
+    git clone https://github.com/judge0/isolate.git /tmp/isolate && \
+    cd /tmp/isolate && \
+    git checkout ad39cc4d0fbb577fb545910095c9da5ef8fc9a1a && \
+    make -j$(nproc) install
+ENV BOX_ROOT /var/local/lib/isolate
+
+# Create a non-privileged user
+RUN useradd -u 1000 -m -r codejudge && \
+    echo "codejudge ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers
+
+
+WORKDIR /app
+
+# Change ownership of the working directory
+RUN chown codejudge:codejudge /app
+
+USER codejudge
+
+CMD ["sudo", "npx", "nx", "serve", "worker"]

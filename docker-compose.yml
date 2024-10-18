@@ -1,0 +1,11 @@
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=development
+    command: npx nx serve worker
+    privileged: true
