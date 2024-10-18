@@ -4,7 +4,6 @@ metadata:
   name: '{{ .Release.Name }}-api-config'
   namespace: {{ .Values.api.namespace | default "default" }}
 data:
-  CODE_EXECUTION_REQUEST_URL: "http://{{ .Release.Name }}-server:3333/api/submissions"
   {{- range $key, $value := .Values.api.configMap }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
