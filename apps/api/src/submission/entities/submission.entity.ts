@@ -21,6 +21,7 @@ export class Submission {
 
   @ApiProperty({
     enum: Languages,
+    enumName: 'Languages',
   })
   @Column('enum', { enum: Languages })
   language: Languages;
@@ -29,7 +30,7 @@ export class Submission {
     enum: SubmissionStatus,
     enumName: 'SubmissionStatus',
   })
-  @Column('enum', { enum: () => SubmissionStatus })
+  @Column('enum', { enum: SubmissionStatus })
   status: SubmissionStatus;
 
   @ApiProperty()
