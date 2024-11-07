@@ -55,3 +55,9 @@ db
 
 #Helm Chart values.yml file
 k8s/helm/values.yaml
+
+# Next.js
+.next
+out
+
+storybook-static

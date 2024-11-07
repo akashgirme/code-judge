@@ -9,7 +9,7 @@ class SolutionQuery {
   @IsNumber()
   problemId: number;
 
-  @ApiProperty({ type: 'enum', enum: () => Languages, enumName: 'SupportedLanguages' })
+  @ApiProperty({ type: 'enum', enum: () => Languages, enumName: 'Languages' })
   @IsEnum(Languages)
   language: Languages;
 }

@@ -29,7 +29,7 @@ export class SolutionController {
   constructor(private readonly solutionService: SolutionService) {}
 
   @Post('/')
-  @ApiOkResponse({ type: () => SolutionDto })
+  @ApiOkResponse({ type: SolutionDto })
   createSolution(
     @CurrentUser() user: User,
     @Body() body: CreateSolutionDto
@@ -38,14 +38,14 @@ export class SolutionController {
   }
 
   @Get('/')
-  @ApiOkResponse({ type: () => AllSolutionsDto })
-  @ApiQuery({ type: () => SolutionQueryDto })
+  @ApiOkResponse({ type: AllSolutionsDto })
+  @ApiQuery({ type: SolutionQueryDto })
   getAllSolutions(@Query() query: SolutionQueryValidatorDto): Promise<AllSolutionsDto> {
     return this.solutionService.getAllSolutions(query);
   }
 
   @Get('/:solutionId')
-  @ApiOkResponse({ type: () => SolutionDto })
+  @ApiOkResponse({ type: SolutionDto })
   getSolutionById(
     @Param('solutionId', ParseIntPipe) solutionId: number
   ): Promise<SolutionDto> {

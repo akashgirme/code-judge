@@ -146,9 +146,9 @@ export class AuthService {
     });
 
     return {
-      message: `You have been successfully registered! Please check your email ${email} for a otp`,
-      email,
       userId: user.id,
+      email,
+      message: `You have been successfully registered! Please check your email ${email} for a otp`,
     };
   }
 
