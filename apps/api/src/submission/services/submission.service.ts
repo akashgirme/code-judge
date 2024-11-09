@@ -15,9 +15,9 @@ import {
   CreateSubmissionDto,
   CreateSubmissionResponseDto,
   RunStatusResponseDto,
+  SubmissionResponse,
   SubmitStatusResponseDto,
 } from '../dto';
-import { plainToClass } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
@@ -25,7 +25,6 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { SubmissionRequest, SubmissionResult, SubmissionState } from '@code-judge/common';
 import { SubmissionType } from 'libs/common/src/enum/submission-type.enum';
-import { stdin } from 'process';
 
 @Injectable()
 export class SubmissionService {
@@ -178,6 +177,8 @@ export class SubmissionService {
       `submission-${id}`
     );
 
+    console.log(`SubmissionResult: `, submissionResult);
+
     const {
       sourceCode,
       language,
@@ -245,10 +246,7 @@ export class SubmissionService {
     return submissions;
   }
 
-  async getSubmission(
-    user: User,
-    submissionId: number
-  ): Promise<SubmitStatusResponseDto> {
+  async getSubmission(user: User, submissionId: number): Promise<SubmissionResponse> {
     const submission = await this.submissionRepo
       .createQueryBuilder('submission')
       .leftJoinAndSelect('submission.user', 'user')
@@ -264,6 +262,6 @@ export class SubmissionService {
     const sourceCode = await this.storageService.getObject(submission.sourceCodePath);
     const error = await this.storageService.getObject(submission.stderrPath);
 
-    return plainToClass(SubmitStatusResponseDto, { ...submission, sourceCode, error });
+    return { ...submission, sourceCode, error };
   }
 }

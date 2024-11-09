@@ -7,10 +7,11 @@ import { useGetProblemQuery, useUpdateProblemMutation } from '@code-judge/api-ho
 
 export const EditProblemContainer = () => {
   const router = useRouter();
-  const { problemId } = useParams();
-  const probId = parseInt(Array.isArray(problemId) ? problemId[0] : problemId, 10);
-  // const probId = parseInt(problemId);
-  const { data, isSuccess } = useGetProblemQuery({ problemId: probId });
+  // const { problemId } = useParams();
+  // const probId = parseInt(Array.isArray(problemId) ? problemId[0] : problemId, 10);
+  const { problemId: id } = useParams();
+  const problemId = Number(id);
+  const { data, isSuccess } = useGetProblemQuery({ problemId });
 
   const [updatePost] = useUpdateProblemMutation({
     fixedCacheKey: 'createPost',
@@ -19,7 +20,7 @@ export const EditProblemContainer = () => {
   const handleSubmit = async (data: CreateProblemModel) => {
     console.log(data);
     const { id } = await updatePost({
-      problemId: probId,
+      problemId,
       updateProblemDto: {
         ...data,
         tagIds: data.tags.map((tag) => parseInt(tag.value)),
@@ -32,11 +33,12 @@ export const EditProblemContainer = () => {
   const defaultValues: CreateProblemModel = {
     title: data?.title || '',
     description: data?.description || '',
-    remark: data?.remark || '',
+    internalNotes: data?.internalNotes || '',
     difficulty: data?.difficulty || 'easy',
     tags: data?.tags.map((tag) => ({ value: `${tag.id}`, label: tag.name })) || [],
     status: data?.status || 'unpublished',
-    testCases: data?.exampleTestCases || [{ input: '', output: '' }],
+    exampleTestCases: data?.exampleTestCases || [{ input: '', output: '' }],
+    actualTestCases: data?.exampleTestCases || [{ input: '', output: '' }],
   };
 
   if (!isSuccess) return null;

@@ -6,8 +6,8 @@ interface TitleSectionProps {
 
 export const TitleSection = ({ title = '' }: TitleSectionProps) => {
   return (
-    <div className="flex flex-col gap-y-6">
-      <Typography fontFamily={'helvetica'} fontSize={'h1'} fontWeight={'bold'}>
+    <div className="flex gap-y-6">
+      <Typography fontFamily={'helvetica'} fontSize={'body-l'} fontWeight={'medium'}>
         {title}
       </Typography>
       {/* <Typography fontFamily={'helvetica'} fontSize={'body-l'} fontWeight={'regular'}>

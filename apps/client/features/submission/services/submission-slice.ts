@@ -1,27 +1,57 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SubmissionDto } from '@code-judge/api-hooks';
+import {
+  Language,
+  RunStatusResponseDto,
+  SubmitStatusResponseDto,
+} from '@code-judge/api-hooks';
 
 export interface SubmissionState {
-  submission: SubmissionDto | null;
+  submitResponse: SubmitStatusResponseDto | null;
+  runResponse: RunStatusResponseDto | null;
+  sourceCode: string | null;
+  language: Language;
 }
 
 const initialState: SubmissionState = {
-  submission: null,
+  submitResponse: null,
+  runResponse: null,
+  sourceCode: null,
+  language: 'c',
 };
 
 export const submissionSlice = createSlice({
   name: 'submission',
   initialState,
   reducers: {
-    setSubmission: (state, action: PayloadAction<SubmissionDto>) => {
-      state.submission = action.payload;
+    setSourceCode: (state, action: PayloadAction<string>) => {
+      console.log('From reducer:', action.payload);
+      state.sourceCode = action.payload;
     },
-    removeSubmission: (state) => {
-      state.submission = null;
+    setLanguage: (state, action: PayloadAction<Language>) => {
+      state.language = action.payload;
+    },
+    setSubmitResponse: (state, action: PayloadAction<SubmitStatusResponseDto>) => {
+      state.submitResponse = action.payload;
+    },
+    removeSubmitResponse: (state) => {
+      state.submitResponse = null;
+    },
+    setRunResponse: (state, action: PayloadAction<RunStatusResponseDto>) => {
+      state.runResponse = action.payload;
+    },
+    removeRunResponse: (state) => {
+      state.runResponse = null;
     },
   },
 });
 
-export const { setSubmission, removeSubmission } = submissionSlice.actions;
+export const {
+  setSourceCode,
+  setLanguage,
+  setSubmitResponse,
+  removeSubmitResponse,
+  setRunResponse,
+  removeRunResponse,
+} = submissionSlice.actions;
 
 export const submissionReducer = submissionSlice.reducer;

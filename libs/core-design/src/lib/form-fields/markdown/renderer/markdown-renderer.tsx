@@ -34,14 +34,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
   };
 
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="prose dark:prose-invert max-w-none">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-            {content}
-          </ReactMarkdown>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="prose dark:prose-invert max-w-none p-4">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 };

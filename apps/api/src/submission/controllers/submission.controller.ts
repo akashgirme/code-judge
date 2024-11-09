@@ -16,6 +16,7 @@ import {
   CreateSubmissionDto,
   CreateSubmissionResponseDto,
   RunStatusResponseDto,
+  SubmissionResponse,
   SubmitStatusResponseDto,
 } from '../dto';
 import { Submission } from '../entities';
@@ -57,6 +58,7 @@ export class SubmissionController {
 
   @Get('/status/run')
   @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: RunStatusResponseDto })
   async getRunStatus(@Query('id') id: string): Promise<RunStatusResponseDto> {
     return this.submissionService.getRunStatus(id);
@@ -64,35 +66,37 @@ export class SubmissionController {
 
   @Get('/status/submit')
   @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: SubmitStatusResponseDto })
   async getSubmitStatus(@Query('id') id: string): Promise<SubmitStatusResponseDto> {
     return this.submissionService.getSubmitStatus(id);
   }
 
-  @Get('/user/:problemId')
+  @Get('/')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
-  @ApiOkResponse({ type: [Submission] })
-  async getSubmissionsByUserAndProblem(
+  @ApiOkResponse({ type: [SubmissionResponse] })
+  async getSubmissions(
     @CurrentUser() user: User,
     @Param('problemId', ParseIntPipe) problemId: number
-  ): Promise<Submission[]> {
+  ): Promise<SubmissionResponse[]> {
     const submissions = await this.submissionService.getSubmissionsByProblem(
       user,
       problemId
     );
 
-    return plainToInstance(Submission, submissions);
+    return plainToInstance(SubmissionResponse, submissions);
   }
 
   @Get('/:submissionId')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
-  @ApiOkResponse({ type: SubmitStatusResponseDto })
-  getSubmissionById(
+  @ApiOkResponse({ type: SubmissionResponse })
+  async getSubmissionById(
     @CurrentUser() user: User,
     @Param('submissionId', ParseIntPipe) submissionId: number
-  ): Promise<SubmitStatusResponseDto> {
-    return this.submissionService.getSubmission(user, submissionId);
+  ): Promise<SubmissionResponse> {
+    const submission = await this.submissionService.getSubmission(user, submissionId);
+    return plainToClass(SubmissionResponse, submission);
   }
 }

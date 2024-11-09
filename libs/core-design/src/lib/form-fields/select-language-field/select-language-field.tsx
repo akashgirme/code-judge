@@ -32,24 +32,18 @@ export const SelectLanguageField = () => {
       name={modelKey}
       control={control}
       render={({ field }) => (
-        <div className="flex flex-col gap-3">
-          <span className="text-sm">{questionConfig.label}</span>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <SelectTrigger>
-              <SelectValue placeholder="Language" />
-            </SelectTrigger>
-            <SelectContent>
-              {data.map((language) => (
-                <SelectItem
-                  key={`Language-${language.value}`}
-                  value={`${language.value}`}
-                >
-                  {language.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Select language" />
+          </SelectTrigger>
+          <SelectContent>
+            {data.map((language) => (
+              <SelectItem key={`Language-${language.value}`} value={`${language.value}`}>
+                {language.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )}
     />
   );

@@ -1,4 +1,4 @@
-import { SanitizedHtmlView } from '../../../components/sanitized-html-view';
+import { MarkdownRenderer } from '@code-judge/core-design';
 
 interface ProblemDetailsProps {
   description: string;
@@ -6,9 +6,8 @@ interface ProblemDetailsProps {
 
 export const ProblemDetails = ({ description }: ProblemDetailsProps) => {
   return (
-    <div className="w-full lg:w-3/4 xl:w-1/2 py-6 max-lg:px-4">
-      //TODO: Here insted SanitizedHtmlView you markdownView components
-      <SanitizedHtmlView content={description} />
+    <div className="w-full flex-1 overflow-auto">
+      <MarkdownRenderer content={description} />
     </div>
   );
 };

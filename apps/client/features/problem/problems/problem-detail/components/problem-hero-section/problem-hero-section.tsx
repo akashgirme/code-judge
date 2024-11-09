@@ -1,32 +1,30 @@
-import { Typography } from '@code-judge/core-design';
-
-import { TitleSection } from './title-section';
+import { Badge, Card, Typography } from '@code-judge/core-design';
 import { ProblemDifficulty } from '@code-judge/api-hooks';
 
 interface ProblemHeroSectionProps {
   title?: string;
   difficulty?: ProblemDifficulty;
-  author?: string;
 }
 
-export const ProblemHeroSection = ({
-  title,
-  difficulty,
-  author,
-}: ProblemHeroSectionProps) => {
+export const ProblemHeroSection = ({ title, difficulty }: ProblemHeroSectionProps) => {
   return (
-    <div className="max-w-screen flex flex-row flex-wrap-reverse sm:flex-col items-center justify-between gap-y-6 lg:gap-y-16 sm:px-4 lg:px-0 pb-6 sm:py-6 lg:py-0">
-      <div className="flex flex-col gap-y-8 lg:w-3/4 xl:w-1/2 w-auto max-lg:items-center max-sm:px-4">
-        <TitleSection title={title} />
-        <div className="flex flex-col w-full" style={{ gap: '10px' }}>
-          <Typography fontFamily={'helvetica'} fontSize={'body-l'} fontWeight={'regular'}>
-            {difficulty}
-          </Typography>
-          <Typography fontFamily={'helvetica'} fontSize={'body-l'} fontWeight={'regular'}>
-            {author}
-          </Typography>
+    <Card className="w-full p-6 rounded-none border-0 border-b">
+      <div className="flex flex-col gap-4">
+        <Typography variant="body1" fontSize={'body-l'} fontWeight={'bold'}>
+          {title}
+        </Typography>
+        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span className="font-medium">Difficulty:</span>
+            <Badge
+              variant="outline"
+              className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
+            >
+              {difficulty}
+            </Badge>
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

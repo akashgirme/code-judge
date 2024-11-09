@@ -6,6 +6,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
+import { AppBar } from '../components';
 
 // export const metadata: Metadata = {
 //   title: {
@@ -38,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <body style={{ height: '-webkit-fill-available' }} className="flex flex-col ">
           <Provider store={store}>
-            <PersistGate persistor={persistor}>
+            <PersistGate persistor={persistor} loading={null}>
               <NextThemesProvider
                 attribute="class"
                 defaultTheme="light"
@@ -46,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 disableTransitionOnChange
               >
                 <main className="flex-1">
-                  {/* <Header /> */}
+                  {/* <AppBar /> */}
                   {children}
                   {/* <Footer /> */}
                   {/* TODO: Customise Sonner Styling */}

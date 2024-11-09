@@ -9,3 +9,4 @@ export * from './problems';
 export * from './problem-tags';
 export * from './markdown';
 export * from './select-language-field';
+export * from './code-editor-field';

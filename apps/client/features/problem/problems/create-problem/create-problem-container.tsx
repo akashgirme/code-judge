@@ -27,12 +27,13 @@ export const CreateProblemContainer = () => {
 
   const defaultValues: CreateProblemModel = {
     title: '',
-    remark: '',
+    internalNotes: '',
     tags: [],
     description: '',
     difficulty: 'easy',
     status: 'unpublished',
-    testCases: [{ input: '', output: '' }],
+    exampleTestCases: [{ input: '', output: '' }],
+    actualTestCases: [{ input: '', output: '' }],
   };
 
   return <CreateProblemLogic defaultValues={defaultValues} onSubmit={handleSubmit} />;

@@ -27,7 +27,7 @@ export const PolicyDisclaimer = () => {
         >
           Privacy Policy
         </TextLinkButton>{' '}
-        of SkillStreet.
+        of CodeJudge.
       </Typography>
     </div>
   );

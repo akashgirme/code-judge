@@ -53,16 +53,18 @@ export const defineAbilityForUser = (userRole: UserRole) => {
   switch (userRole) {
     case 'super_admin':
       can(Action.Manage, Subject.All);
-    case 'problem_admin':
+    case 'problem_moderator':
       can(Action.Manage, Subject.Problem);
       can(Action.Manage, Subject.Tag);
       can(Action.Manage, Subject.Submission);
-    case 'user':
+    case 'problem_writer':
       can(Action.Create, Subject.Problem);
       can(Action.UpdateOwn, Subject.Problem);
-      can(Action.Read, Subject.Tag);
       can(Action.ReadOwn, Subject.Problem);
+      can(Action.Read, Subject.Tag);
+    case 'user':
       can(Action.Create, Subject.Submission);
+      can(Action.ReadOwn, Subject.Submission);
   }
 
   return build();

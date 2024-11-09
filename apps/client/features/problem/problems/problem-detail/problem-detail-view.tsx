@@ -1,20 +1,23 @@
 'use client';
 import { ProblemDto } from '@code-judge/api-hooks';
 import { ProblemDetails, ProblemHeroSection } from './components';
+import { Loading } from 'apps/client/components';
 
 interface ProblemDetailViewProps {
-  data: ProblemDto;
+  problem: ProblemDto;
+  isLoading: boolean;
 }
 
-export const ProblemDetailView = ({ data }: ProblemDetailViewProps) => {
+export const ProblemDetailView = ({ problem, isLoading }: ProblemDetailViewProps) => {
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
-    <div className="flex flex-col w-full items-center lg:gap-y-16 bg-surface-container">
-      <ProblemHeroSection
-        title={data.title}
-        difficulty={data.difficulty}
-        author={data.author.username}
-      />
-      <ProblemDetails description={data.description} />
+    <div className="flex flex-col w-full h-full items-left">
+      <ProblemHeroSection title={problem.title} difficulty={problem.difficulty} />
+      <div className="flex-1 overflow-auto">
+        <ProblemDetails description={problem.description} />
+      </div>
     </div>
   );
 };

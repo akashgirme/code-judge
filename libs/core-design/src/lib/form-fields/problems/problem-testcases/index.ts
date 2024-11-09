@@ -1,2 +1,2 @@
-export { ProblemTestCasesField } from './problem-testcases-field';
-export { problemTestCasesValidations } from './problem-testcases-config';
+export * from './actual';
+export * from './example';

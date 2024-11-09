@@ -4,15 +4,15 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateProblemView } from './create-problem-view';
 import {
+  problemActualTestCasesValidations,
   problemDescriptionValidations,
   problemDifficultyValidations,
-  problemRemarksValidations,
+  problemExampleTestCasesValidations,
+  problemInternalNotesValidations,
   problemStatusValidations,
   problemTagsValidations,
-  problemTestCasesValidations,
   problemTitleValidations,
 } from '@code-judge/core-design';
-import { toast } from 'sonner';
 import { useLocalStorage } from 'apps/client/features/hooks/use-local-storage';
 import { useCallback, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -21,11 +21,12 @@ import { debounce } from 'apps/client/utils';
 const CreateProblemSchema = z.object({
   ...problemTitleValidations,
   ...problemDifficultyValidations,
-  ...problemRemarksValidations,
+  ...problemInternalNotesValidations,
   ...problemDescriptionValidations,
   ...problemTagsValidations,
   ...problemStatusValidations,
-  ...problemTestCasesValidations,
+  ...problemExampleTestCasesValidations,
+  ...problemActualTestCasesValidations,
 });
 
 export type CreateProblemModel = z.infer<typeof CreateProblemSchema>;

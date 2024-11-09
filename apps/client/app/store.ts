@@ -15,13 +15,15 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { createBlacklistFilter } from 'redux-persist-transform-filter';
 import { ability, defineAbilityForUser } from '../features/auth/ability/ability-factory';
 import storage from 'redux-persist/lib/storage';
-import { submissionReducer } from '../features/submission/services/submission-slice';
 import { setupListeners } from '@reduxjs/toolkit/query';
+import { submissionReducer } from '../features/submission';
+import { problemReducer } from '../features/problem/services';
 
 const rootReducer = combineReducers({
   [api.reducerPath]: api.reducer,
   auth: authReducer,
   submission: submissionReducer,
+  problem: problemReducer,
 });
 
 const accessTokenBlackListFilter = createBlacklistFilter('auth', ['accessToken']);
@@ -48,13 +50,13 @@ export const store = configureStore({
 setupListeners(store.dispatch);
 
 export type RootState = ReturnType<typeof rootReducer>;
-
 export type AppDispatch = typeof store.dispatch;
 
+// Custom typesafe hooks for useDispatch and useSelector
 export const useAppDispatch: () => AppDispatch = useDispatch;
-
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
+//persist redux store in localStorage to use across sessions.
 export const persistor = persistStore(store);
 
 let lastUserRole: UserRole;

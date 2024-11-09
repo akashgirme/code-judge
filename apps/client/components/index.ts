@@ -6,7 +6,6 @@ export { LogoWithName } from './logo-with-name';
 export { BackButton } from './back-button';
 export { Logo } from './logo';
 export { Loading } from './loading';
-
 export { AppBar } from './app-bar';
 export { MarkdownView } from './markdown-view';
 export { Hero } from './hero';

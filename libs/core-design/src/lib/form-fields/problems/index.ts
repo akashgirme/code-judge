@@ -1,4 +1,4 @@
-export * from './problem-remarks';
+export * from './problem-internal-notes';
 export * from './problem-title';
 export * from './problem-tags';
 export * from './problem-description';

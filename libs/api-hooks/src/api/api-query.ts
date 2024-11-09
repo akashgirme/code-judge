@@ -32,11 +32,8 @@ const injectedRtkApi = api.injectEndpoints({
         params: { id: queryArg.id },
       }),
     }),
-    getSubmissionsByUserAndProblem: build.query<
-      GetSubmissionsByUserAndProblemApiResponse,
-      GetSubmissionsByUserAndProblemApiArg
-    >({
-      query: (queryArg) => ({ url: `/api/submissions/user/${queryArg.problemId}` }),
+    getSubmissions: build.query<GetSubmissionsApiResponse, GetSubmissionsApiArg>({
+      query: (queryArg) => ({ url: `/api/submissions` }),
     }),
     getSubmissionById: build.query<GetSubmissionByIdApiResponse, GetSubmissionByIdApiArg>(
       {
@@ -65,9 +62,6 @@ const injectedRtkApi = api.injectEndpoints({
         },
       }),
     }),
-    getProblem: build.query<GetProblemApiResponse, GetProblemApiArg>({
-      query: (queryArg) => ({ url: `/api/problems/${queryArg.problemId}` }),
-    }),
     updateProblem: build.mutation<UpdateProblemApiResponse, UpdateProblemApiArg>({
       query: (queryArg) => ({
         url: `/api/problems/${queryArg.problemId}`,
@@ -75,11 +69,8 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.updateProblemDto,
       }),
     }),
-    getProblemForAuthor: build.query<
-      GetProblemForAuthorApiResponse,
-      GetProblemForAuthorApiArg
-    >({
-      query: (queryArg) => ({ url: `/api/problems/author/${queryArg.problemId}` }),
+    getProblem: build.query<GetProblemApiResponse, GetProblemApiArg>({
+      query: (queryArg) => ({ url: `/api/problems/${queryArg.problemId}` }),
     }),
     getProblemsForAdmin: build.query<
       GetProblemsForAdminApiResponse,
@@ -104,26 +95,6 @@ const injectedRtkApi = api.injectEndpoints({
       GetProblemForAdminApiArg
     >({
       query: (queryArg) => ({ url: `/api/problems/admin/${queryArg.problemId}` }),
-    }),
-    changeProblemStatus: build.mutation<
-      ChangeProblemStatusApiResponse,
-      ChangeProblemStatusApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/problems/admin/${queryArg.problemId}/change-status`,
-        method: 'PUT',
-        body: queryArg.changeProblemStatusDto,
-      }),
-    }),
-    addTestCasesToProblem: build.mutation<
-      AddTestCasesToProblemApiResponse,
-      AddTestCasesToProblemApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/problems/admin/${queryArg.problemId}/add-testcases`,
-        method: 'POST',
-        body: queryArg.createTestCasesDto,
-      }),
     }),
     createTag: build.mutation<CreateTagApiResponse, CreateTagApiArg>({
       query: (queryArg) => ({
@@ -312,15 +283,15 @@ export type GetSubmitStatusApiResponse = /** status 200  */ SubmitStatusResponse
 export type GetSubmitStatusApiArg = {
   id: string;
 };
-export type GetSubmissionsByUserAndProblemApiResponse = /** status 200  */ Submission[];
-export type GetSubmissionsByUserAndProblemApiArg = {
+export type GetSubmissionsApiResponse = /** status 200  */ SubmissionResponse[];
+export type GetSubmissionsApiArg = {
   problemId: number;
 };
-export type GetSubmissionByIdApiResponse = /** status 200  */ SubmitStatusResponseDto;
+export type GetSubmissionByIdApiResponse = /** status 200  */ SubmissionResponse;
 export type GetSubmissionByIdApiArg = {
   submissionId: number;
 };
-export type CreateProblemApiResponse = /** status 201  */ AuthorProblemDto;
+export type CreateProblemApiResponse = /** status 201  */ AdminProblemDto;
 export type CreateProblemApiArg = {
   createProblemDto: CreateProblemDto;
 };
@@ -335,17 +306,13 @@ export type GetProblemsApiArg = {
   status?: ProblemStatus;
   tagIds?: number[];
 };
-export type GetProblemApiResponse = /** status 200  */ ProblemDto;
-export type GetProblemApiArg = {
-  problemId: number;
-};
-export type UpdateProblemApiResponse = /** status 200  */ AuthorProblemDto;
+export type UpdateProblemApiResponse = /** status 200  */ AdminProblemDto;
 export type UpdateProblemApiArg = {
   problemId: number;
   updateProblemDto: UpdateProblemDto;
 };
-export type GetProblemForAuthorApiResponse = /** status 200  */ AuthorProblemDto;
-export type GetProblemForAuthorApiArg = {
+export type GetProblemApiResponse = /** status 200  */ ProblemDto;
+export type GetProblemApiArg = {
   problemId: number;
 };
 export type GetProblemsForAdminApiResponse = /** status 200  */ AllProblemsDto;
@@ -362,16 +329,6 @@ export type GetProblemsForAdminApiArg = {
 export type GetProblemForAdminApiResponse = /** status 200  */ AdminProblemDto;
 export type GetProblemForAdminApiArg = {
   problemId: number;
-};
-export type ChangeProblemStatusApiResponse = /** status 200  */ AuthorProblemDto;
-export type ChangeProblemStatusApiArg = {
-  problemId: number;
-  changeProblemStatusDto: ChangeProblemStatusDto;
-};
-export type AddTestCasesToProblemApiResponse = /** status 200  */ AdminProblemDto;
-export type AddTestCasesToProblemApiArg = {
-  problemId: number;
-  createTestCasesDto: CreateTestCasesDto;
 };
 export type CreateTagApiResponse = /** status 201  */ Tag;
 export type CreateTagApiArg = {
@@ -518,7 +475,7 @@ export type SubmitStatusResponseDto = {
   time: number;
   createdAt: string;
 };
-export type Submission = {
+export type SubmissionResponse = {
   id: number;
   language: Languages;
   status: SubmissionStatus;
@@ -527,6 +484,8 @@ export type Submission = {
   time: number;
   memory: number;
   createdAt: string;
+  sourceCode: string;
+  error: string;
 };
 export type ProblemDifficulty = 'easy' | 'medium' | 'hard';
 export type ProblemStatus = 'unpublished' | 'approved' | 'rejected';
@@ -534,7 +493,7 @@ export type Tag = {
   id: number;
   name: string;
 };
-export type UserRole = 'user' | 'problem_admin' | 'super_admin';
+export type UserRole = 'user' | 'problem_writer' | 'problem_moderator' | 'super_admin';
 export type User = {
   id: number;
   username: string;
@@ -545,43 +504,38 @@ export type User = {
   hasOnboarded: boolean;
   role: UserRole;
 };
-export type TestCaseType = 'example' | 'actual';
-export type TestCase = {
-  id: number;
-  type: TestCaseType;
+export type TestCaseDto = {
   input: string;
   output: string;
 };
-export type AuthorProblemDto = {
+export type AdminProblemDto = {
   id: number;
   title: string;
   difficulty: ProblemDifficulty;
   status: ProblemStatus;
-  hasPlatformTestCases: boolean;
-  remark: string;
+  internalNotes: string;
   tags: Tag[];
   author: User;
   description: string;
-  exampleTestCases: TestCase[];
-};
-export type TestCaseDto = {
-  input: string;
-  output: string;
+  exampleTestCases: TestCaseDto[];
+  actualTestCases: TestCaseDto[];
 };
 export type CreateProblemDto = {
   title: string;
   difficulty: ProblemDifficulty;
   description: string;
+  internalNotes?: string;
   tagIds?: number[];
-  testCases: TestCaseDto[];
+  status?: ProblemStatus;
+  exampleTestCases: TestCaseDto[];
+  actualTestCases: TestCaseDto[];
 };
 export type Problem = {
   id: number;
   title: string;
   difficulty: ProblemDifficulty;
   status: ProblemStatus;
-  hasPlatformTestCases: boolean;
-  remark: string;
+  internalNotes: string;
   tags: Tag[];
   author: User;
 };
@@ -599,44 +553,33 @@ export type AllProblemsDto = {
   paginationMeta: PaginationResultDto;
 };
 export type SortOrder = 'ASC' | 'DESC';
+export type UpdateProblemDto = {
+  title: string;
+  difficulty: ProblemDifficulty;
+  description: string;
+  internalNotes?: string;
+  tagIds?: number[];
+  status?: ProblemStatus;
+  exampleTestCases: TestCaseDto[];
+  actualTestCases: TestCaseDto[];
+};
+export type TestCaseType = 'example' | 'actual';
+export type TestCase = {
+  id: number;
+  type: TestCaseType;
+  input: string;
+  output: string;
+};
 export type ProblemDto = {
   id: number;
   title: string;
   difficulty: ProblemDifficulty;
   status: ProblemStatus;
-  hasPlatformTestCases: boolean;
-  remark: string;
+  internalNotes: string;
   tags: Tag[];
   author: User;
   description: string;
   exampleTestCases: TestCase[];
-};
-export type UpdateProblemDto = {
-  title: string;
-  difficulty: ProblemDifficulty;
-  description: string;
-  tagIds?: number[];
-  testCases: TestCaseDto[];
-};
-export type AdminProblemDto = {
-  id: number;
-  title: string;
-  difficulty: ProblemDifficulty;
-  status: ProblemStatus;
-  hasPlatformTestCases: boolean;
-  remark: string;
-  tags: Tag[];
-  author: User;
-  description: string;
-  exampleTestCases: TestCaseDto[];
-  actualTestCases: TestCaseDto[];
-};
-export type ChangeProblemStatusDto = {
-  status: ProblemStatus;
-  remark: string;
-};
-export type CreateTestCasesDto = {
-  testCases: TestCaseDto[];
 };
 export type CreateTagDto = {
   tagName: string;
@@ -735,17 +678,14 @@ export const {
   useCreateRunMutation,
   useGetRunStatusQuery,
   useGetSubmitStatusQuery,
-  useGetSubmissionsByUserAndProblemQuery,
+  useGetSubmissionsQuery,
   useGetSubmissionByIdQuery,
   useCreateProblemMutation,
   useGetProblemsQuery,
-  useGetProblemQuery,
   useUpdateProblemMutation,
-  useGetProblemForAuthorQuery,
+  useGetProblemQuery,
   useGetProblemsForAdminQuery,
   useGetProblemForAdminQuery,
-  useChangeProblemStatusMutation,
-  useAddTestCasesToProblemMutation,
   useCreateTagMutation,
   useGetAllTagsQuery,
   useGetTagQuery,

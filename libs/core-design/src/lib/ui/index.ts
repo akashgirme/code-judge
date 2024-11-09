@@ -18,3 +18,4 @@ export * from './option-wrapper';
 export * from './data-table';
 export * from './pills-container';
 export * from './label';
+export * from './resizable';

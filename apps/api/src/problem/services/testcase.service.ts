@@ -2,14 +2,13 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ProblemService } from './problem.service';
 import { DeleteResult, QueryRunner, Repository } from 'typeorm';
 import { Problem } from '../entities';
-import { AuthorProblemDto, CreateTestCasesDto, TestCaseDto } from '../dto';
+import { TestCaseDto } from '../dto';
 import { TestCaseType } from '../enums';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TestCase } from '../entities/test-case.entity';
@@ -79,36 +78,5 @@ export class TestCaseService {
 
   async deleteTestCase(queryRunner: QueryRunner, id: number): Promise<DeleteResult> {
     return queryRunner.manager.delete(TestCase, id);
-  }
-
-  async addTestCases(
-    problemId: number,
-    { testCases }: CreateTestCasesDto
-  ): Promise<AuthorProblemDto> {
-    const problem = await this.problemService.getProblemByID(problemId);
-
-    const queryRunner = this.testCaseRepo.manager.connection.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      testCases.map(
-        async (testCase: TestCaseDto) =>
-          await this.createTestCase(queryRunner, problem, TestCaseType.ACTUAL, testCase)
-      );
-      problem.hasPlatformTestCases = true;
-
-      await queryRunner.manager.save(problem);
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      if (queryRunner.isTransactionActive) {
-        await queryRunner.rollbackTransaction();
-      }
-      this.logger.log('Error while adding actual testcases', error);
-      throw new InternalServerErrorException();
-    }
-
-    await queryRunner.release();
-    return this.problemService.getProblemByID(problem.id);
   }
 }

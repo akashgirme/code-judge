@@ -7,12 +7,13 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  ProblemActualTestCasesField,
   ProblemDescriptionField,
   ProblemDifficultyField,
-  ProblemRemarksField,
+  ProblemExampleTestCasesField,
+  ProblemInternalNotesField,
   ProblemStatusField,
   ProblemTagsField,
-  ProblemTestCasesField,
   ProblemTitleField,
 } from '@code-judge/core-design';
 import { useCreateProblemMutation } from '@code-judge/api-hooks';
@@ -60,9 +61,15 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
                 </Can>
               </div>
               <ProblemDescriptionField />
-              <ProblemRemarksField />
-              <ProblemTestCasesField />
-              <Button type="submit" isLoading={isLoading} className="md:w-72 mx-auto">
+              <ProblemExampleTestCasesField />
+              <ProblemActualTestCasesField />
+              <ProblemInternalNotesField />
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isLoading}
+                className="md:w-72 mx-auto"
+              >
                 Submit
               </Button>
             </div>
