@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@code-judge/core-design';
 import { Logo } from '../logo';
 import { useRouter } from 'next/navigation';

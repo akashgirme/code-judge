@@ -441,6 +441,14 @@ export type CreateSubmissionDto = {
 };
 export type Language = 'c' | 'cpp' | 'java' | 'js' | 'go';
 export type SubmissionState = 'Pending' | 'Started' | 'Running' | 'Success' | 'Error';
+export type SubmissionStatus =
+  | 'Accepted'
+  | 'Wrong Answer'
+  | 'Compile error'
+  | 'Runtime error'
+  | 'Time limit exceeded'
+  | 'Memory limit exceeded'
+  | 'Internal Server Error';
 export type ResultDto = {
   input: string;
   output: string;
@@ -451,18 +459,11 @@ export type RunStatusResponseDto = {
   language: Language;
   state: SubmissionState;
   error: string;
+  status: SubmissionStatus;
   result: ResultDto[];
   passed: number;
   total: number;
 };
-export type SubmissionStatus =
-  | 'Accepted'
-  | 'Wrong Answer'
-  | 'Compile error'
-  | 'Runtime error'
-  | 'Time limit exceeded'
-  | 'Memory limit exceeded'
-  | 'Internal Server Error';
 export type SubmitStatusResponseDto = {
   sourceCode: string;
   language: Language;

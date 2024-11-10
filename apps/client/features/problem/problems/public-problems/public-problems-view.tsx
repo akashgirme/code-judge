@@ -17,6 +17,7 @@ export const PublicProblemsView = () => {
     order: 'ASC',
   });
 
+  //TODO: Redesign this page like hanckerrank `make exact design from v0.dev` & right now no need of filters add later
   return (
     <div className="grid gap-6">
       {problems?.map((problem) => (

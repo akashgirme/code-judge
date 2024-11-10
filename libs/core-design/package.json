@@ -8,9 +8,5 @@
       "import": "./index.mjs",
       "require": "./index.js"
     }
-  },
-  "dependencies": {
-    "@radix-ui/react-label": "^2.1.0",
-    "react-resizable-panels": "^2.1.6"
   }
 }

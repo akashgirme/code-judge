@@ -174,15 +174,14 @@ export class SubmissionService {
 
   async getRunStatus(id: string): Promise<RunStatusResponseDto> {
     const submissionResult: SubmissionResult = await this.cacheManager.get(
-      `submission-${id}`
+      `submission:${id}`
     );
-
-    console.log(`SubmissionResult: `, submissionResult);
 
     const {
       sourceCode,
       language,
       state,
+      status,
       result,
       passedTestCases,
       totalTestCases,
@@ -192,6 +191,7 @@ export class SubmissionService {
     return {
       sourceCode,
       language,
+      status,
       state,
       result,
       passed: passedTestCases,
@@ -202,7 +202,7 @@ export class SubmissionService {
 
   async getSubmitStatus(id: string): Promise<SubmitStatusResponseDto> {
     const submissionResult: SubmissionResult = await this.cacheManager.get(
-      `submission-${id}`
+      `submission:${id}`
     );
 
     const {

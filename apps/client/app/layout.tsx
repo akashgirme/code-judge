@@ -47,6 +47,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 disableTransitionOnChange
               >
                 <main className="flex-1">
+                  //TODO: use AppBar and reduce is height currently it 64px maybe 52px is
+                  better
                   {/* <AppBar /> */}
                   {children}
                   {/* <Footer /> */}

@@ -270,6 +270,7 @@ export class AuthService {
     await this.authenticateUser(user, res);
   }
 
+  // TODO: This is not stable often times get 'Invalid Token' error
   async refreshSession(refreshToken: string, res: Response) {
     try {
       if (!refreshToken) {

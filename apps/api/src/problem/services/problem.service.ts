@@ -185,20 +185,24 @@ export class ProblemService {
       );
 
       // Delete all existing example test cases
-      await Promise.all(
-        existingExampleTestCases.map(
-          async (testcase) =>
-            await this.testCaseService.deleteTestCase(queryRunner, testcase.id)
-        )
-      );
+      if (existingExampleTestCases.length != 0) {
+        await Promise.all(
+          existingExampleTestCases.map(
+            async (testcase) =>
+              await this.testCaseService.deleteTestCase(queryRunner, testcase.id)
+          )
+        );
+      }
 
       // Delete all existing actual test cases
-      await Promise.all(
-        existingActualTestCases.map(
-          async (testcase) =>
-            await this.testCaseService.deleteTestCase(queryRunner, testcase.id)
-        )
-      );
+      if (existingActualTestCases.length != 0) {
+        await Promise.all(
+          existingActualTestCases.map(
+            async (testcase) =>
+              await this.testCaseService.deleteTestCase(queryRunner, testcase.id)
+          )
+        );
+      }
 
       // Add new edited example test cases
       await Promise.all(

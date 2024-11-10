@@ -3,15 +3,16 @@ import {
   CreateProblemLogic,
   CreateProblemModel,
 } from '../create-problem/create-problem-logic';
-import { useGetProblemQuery, useUpdateProblemMutation } from '@code-judge/api-hooks';
+import {
+  useGetProblemForAdminQuery,
+  useUpdateProblemMutation,
+} from '@code-judge/api-hooks';
 
 export const EditProblemContainer = () => {
   const router = useRouter();
-  // const { problemId } = useParams();
-  // const probId = parseInt(Array.isArray(problemId) ? problemId[0] : problemId, 10);
   const { problemId: id } = useParams();
   const problemId = Number(id);
-  const { data, isSuccess } = useGetProblemQuery({ problemId });
+  const { data, isSuccess } = useGetProblemForAdminQuery({ problemId });
 
   const [updatePost] = useUpdateProblemMutation({
     fixedCacheKey: 'createPost',
@@ -38,7 +39,7 @@ export const EditProblemContainer = () => {
     tags: data?.tags.map((tag) => ({ value: `${tag.id}`, label: tag.name })) || [],
     status: data?.status || 'unpublished',
     exampleTestCases: data?.exampleTestCases || [{ input: '', output: '' }],
-    actualTestCases: data?.exampleTestCases || [{ input: '', output: '' }],
+    actualTestCases: data?.actualTestCases || [{ input: '', output: '' }],
   };
 
   if (!isSuccess) return null;

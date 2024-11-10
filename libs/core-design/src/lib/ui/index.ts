@@ -19,3 +19,4 @@ export * from './data-table';
 export * from './pills-container';
 export * from './label';
 export * from './resizable';
+export * from './scroll-area';

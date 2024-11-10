@@ -21,15 +21,18 @@ import { useSearchParams } from 'apps/client/features/hooks';
 import { Can } from 'apps/client/features/auth/ability/Can';
 import { Action, Subject } from 'apps/client/features/auth/ability/ability-factory';
 
+//TODO: Error in backend while fetching the data 'bad Request' (validation Errors)
 export const AllProblemsView = () => {
   const [searchParams, setSearchParams, removeSearchParams] = useSearchParams();
 
   // TODO: Form should auto-fill values from url , during refresh for Tags Field
   // * Currently not working because in URL , we receive only tagId ,and not tagName
   const filterObj: GetProblemsForAdminApiArg = {
-    pageIndex: Number(searchParams.get('pageIndex')) || 0,
+    // pageIndex: Number(searchParams.get('pageIndex')) || 0,
     // pageSize: Number(searchParams.get('pageSize')) || 10,
+    pageIndex: 0,
     pageSize: 1000,
+    order: 'ASC',
     title: searchParams.get('title') ?? undefined,
     status: (searchParams.get('status') as ProblemStatus) ?? undefined,
     // tagIds: searchParams.get('tagIds')?.split(',') ?? [],
@@ -68,8 +71,6 @@ export const AllProblemsView = () => {
           <TableHead>Author</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Tags</TableHead>
-          {/* <TableHead>Difficulty</TableHead> */}
-          <TableHead>Has TestCases</TableHead>
           <TableHead>Actions</TableHead>
         </TableHeader>
         <TableBody>
@@ -91,9 +92,6 @@ export const AllProblemsView = () => {
               </TableCell>
               <TableCell>
                 <Badge>{problem.difficulty}</Badge>
-              </TableCell>
-              <TableCell>
-                <Badge>{problem.hasPlatformTestCases}</Badge>
               </TableCell>
               <TableCell className="grid gap-3 grid-flow-col">
                 <Can I={Action.UpdateOwn} a={Subject.Problem}>

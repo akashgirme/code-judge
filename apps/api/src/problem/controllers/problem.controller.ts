@@ -49,6 +49,7 @@ export class ProblemController {
     return plainToClass(AdminProblemDto, problem);
   }
 
+  //TODO: Transform is not working gets actual testcases in response
   @Put('/:problemId')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.UpdateOwn, subject: Problem })
@@ -69,6 +70,7 @@ export class ProblemController {
     return this.problemService.getProblemsForPublic(query);
   }
 
+  //TODO: ProblemDto transform not working gets actual testcases in response
   @Get('/:problemId')
   @ApiOkResponse({ type: ProblemDto })
   async getProblem(
@@ -80,7 +82,7 @@ export class ProblemController {
 
   @Get('/admin')
   @ApiOkResponse({ type: AllProblemsDto })
-  @ApiQuery({ type: ProblemsQueryDto })
+  @ApiQuery({ type: () => ProblemsQueryDto })
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Problem })
   getProblemsForAdmin(

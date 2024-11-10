@@ -7,7 +7,7 @@ import { handleError } from 'apps/client/utils';
 import { useParams } from 'next/navigation';
 import { setSubmitResponse } from '../../services';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@code-judge/core-design';
 
 export const SubmitCode = () => {
@@ -31,31 +31,28 @@ export const SubmitCode = () => {
     }
   );
 
-  useEffect(() => {
-    const pollWithBackoff = async (id: string, retries: number) => {
-      if (retries === 0) {
-        setSubmissionId(null);
-        return;
-      }
+  const pollWithBackoff = async (retries: number) => {
+    if (retries === 0) {
+      setSubmissionId(null);
+      return;
+    }
 
-      const { data } = await refetch();
-      if (data) {
-        dispatch(setSubmitResponse(data));
-      } else {
-        setTimeout(() => pollWithBackoff(id, retries - 1), 1000);
-        return;
-      }
+    const { data } = await refetch();
 
-      if (data.state === 'Success') {
-        setSubmissionId(null);
-        return;
-      }
+    if (data) {
+      dispatch(setSubmitResponse(data));
+    }
 
-      if (submissionId && pollRetries > 0) {
-        setTimeout(() => pollWithBackoff(submissionId, pollRetries), 1000);
-      }
-    };
-  }, [submissionId, pollRetries, refetch, dispatch]);
+    if (data?.state === 'Success') {
+      setSubmissionId(null);
+      return;
+    }
+
+    if (submissionId && retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return pollWithBackoff(retries - 1);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -68,17 +65,19 @@ export const SubmitCode = () => {
       }).unwrap();
 
       setSubmissionId(id);
-      setPollRetries(7);
+      // Wait 1 sec before fetching first status
+      setTimeout(() => pollWithBackoff(7), 1000);
     } catch (error) {
       handleError(error as Error);
     }
   };
 
   return (
+    //TODO: isActive={}  only when there is Code in editor
     <Button
       onClick={handleSubmit}
       variant="primary"
-      // isActive={isValid}
+      // isActive={Boolean(sourceCode)}
       isLoading={isLoading}
     >
       {isLoading ? 'Pending...' : 'Submit'}

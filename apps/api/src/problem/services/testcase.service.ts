@@ -45,9 +45,6 @@ export class TestCaseService {
       .where('problem.id =:problemId', { problemId })
       .andWhere('testcase.type = :type', { type: TestCaseType.EXAMPLE })
       .getMany();
-    if (testCases.length == 0) {
-      throw new NotFoundException(`No TestCases Found`);
-    }
     return testCases;
   }
 
@@ -59,9 +56,6 @@ export class TestCaseService {
       .where('problem.id =:problemId', { problemId })
       .andWhere('testcase.type = :type', { type: TestCaseType.ACTUAL })
       .getMany();
-    if (testCases.length == 0) {
-      throw new NotFoundException(`No TestCases Found`);
-    }
     return testCases;
   }
 

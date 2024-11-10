@@ -15,6 +15,7 @@ import {
   ProblemStatusField,
   ProblemTagsField,
   ProblemTitleField,
+  Typography,
 } from '@code-judge/core-design';
 import { useCreateProblemMutation } from '@code-judge/api-hooks';
 import { useParams } from 'next/navigation';
@@ -61,7 +62,9 @@ export const CreateProblemView: React.FC<CreateProblemViewProps> = ({
                 </Can>
               </div>
               <ProblemDescriptionField />
+              <Typography variant="caption">Sample Test Cases</Typography>
               <ProblemExampleTestCasesField />
+              <Typography variant="caption">Actual Test Cases</Typography>
               <ProblemActualTestCasesField />
               <ProblemInternalNotesField />
               <Button

@@ -7,5 +7,5 @@ export const questionConfig = {
 export const modelKey = 'internalNotes';
 
 export const problemInternalNotesValidations = {
-  [modelKey]: z.string().min(1, { message: 'Remark is required' }).optional(),
+  [modelKey]: z.string().optional(),
 };

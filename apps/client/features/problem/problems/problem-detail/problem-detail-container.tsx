@@ -7,7 +7,7 @@ import { Loading } from 'apps/client/components';
 export const ProblemDetailContainer = () => {
   const { problemId: id } = useParams();
   const problemId = Number(id);
-  const { data: problem, isFetching, isLoading } = useGetProblemQuery({ problemId });
+  const { data: problem, isLoading } = useGetProblemQuery({ problemId });
 
   //TODO: handle better this case `problem not found or any error`
   if (!problem) {
