@@ -1,4 +1,4 @@
-import { Chip } from '@skill-street-ui/core-design';
+import { Chip } from '@code-judge/core-design';
 import React from 'react';
 
 export const VersionInfo = () => {

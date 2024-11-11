@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 import { SortOrder } from '../types';
 
 export class SortingDto {
@@ -9,7 +9,7 @@ export class SortingDto {
     example: 'ASC or DESC',
     required: false,
   })
+  @IsOptional()
   @IsEnum(SortOrder)
-  @IsNotEmpty()
   order?: SortOrder;
 }

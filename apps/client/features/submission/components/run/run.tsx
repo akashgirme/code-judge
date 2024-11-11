@@ -4,18 +4,20 @@ import { handleError } from 'apps/client/utils';
 import { useParams } from 'next/navigation';
 import { setRunResponse } from '../../services';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
-import { useCallback, useEffect, useState } from 'react';
-import { Alert, Button, Toaster } from '@code-judge/core-design';
+import { useState } from 'react';
+import { Button } from '@code-judge/core-design';
 
 export const RunCode = () => {
   const [runId, setRunId] = useState<string | null>(null);
-  const [showAlert, setShowAlert] = useState(false);
 
   const { problemId: pid } = useParams();
   const problemId = Number(pid);
 
   const dispatch = useAppDispatch();
   const { sourceCode, language } = useAppSelector((state) => state.submission);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  const isButtonActive = isAuthenticated && Boolean(sourceCode);
 
   const [submit, { isLoading }] = useCreateRunMutation({
     fixedCacheKey: 'run',
@@ -55,17 +57,11 @@ export const RunCode = () => {
   };
 
   const handleSubmit = async () => {
-    if (!sourceCode) {
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000); // Hide alert after 3 seconds
-      return;
-    }
-
     try {
       const { id } = await submit({
         createSubmissionDto: {
           problemId,
-          sourceCode,
+          sourceCode: sourceCode ?? '',
           language,
         },
       }).unwrap();
@@ -78,14 +74,13 @@ export const RunCode = () => {
   };
 
   return (
-    //TODO: isActive={} only when there is Code in editor
     <Button
       onClick={handleSubmit}
       variant="primary-outline"
-      // isActive={Boolean(sourceCode)}
+      isActive={isButtonActive}
       isLoading={isLoading}
     >
-      {isLoading ? 'Pending...' : 'Run Code'}
+      {isLoading ? 'Running...' : 'Run Code'}
     </Button>
   );
 };

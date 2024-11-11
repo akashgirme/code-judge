@@ -1,11 +1,7 @@
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { EditProfileModel } from './edit-profile-logic';
-import {
-  Button,
-  FirstNameField,
-  LastNameField,
-} from '@skill-street-ui/core-design';
-import { useEditProfileMutation } from '@skill-street-ui/auth-client';
+import { Button, FirstNameField, LastNameField } from '@code-judge/core-design';
+import { useEditProfileMutation } from '@code-judge/api-hooks';
 import { ProfileTopbar } from '../components';
 import { ProfileImg } from './components';
 
@@ -14,16 +10,12 @@ interface EditProfileViewProps {
   onSubmit: (data: EditProfileModel) => void;
 }
 
-export const EditProfileView: React.FC<EditProfileViewProps> = ({
-  form,
-  onSubmit,
-}) => {
+export const EditProfileView: React.FC<EditProfileViewProps> = ({ form, onSubmit }) => {
   const [_editProfile, { isLoading }] = useEditProfileMutation({
     fixedCacheKey: 'editProfile',
   });
 
   const { isDirty, isValid } = form.formState;
-  const cldImgURL = form.watch('uploadedImage.publicId');
   return (
     <FormProvider {...form}>
       <form
@@ -32,7 +24,7 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({
       >
         <ProfileTopbar backURL="/profile" />
         <div className="flex flex-col lg:flex-row  gap-y-6 gap-x-12 px-4 ">
-          <ProfileImg cldImgURL={cldImgURL} />
+          <ProfileImg />
           <div className="w-full flex-1 flex flex-col gap-y-3">
             <FirstNameField />
             <LastNameField />

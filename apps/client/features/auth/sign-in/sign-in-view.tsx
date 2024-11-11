@@ -27,7 +27,7 @@ export const SignInView = () => {
           title="Hello there!"
           description={
             <>
-              I&apos;m CodeJudge, your buddy to help you master problem solving. <br />
+              I&apos;m CodeJudge, Here to help you master problem solving. <br />
               Let&apos;s continue to challenge after you Login.
             </>
           }

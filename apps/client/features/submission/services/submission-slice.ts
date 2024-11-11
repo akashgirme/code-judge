@@ -2,10 +2,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   Language,
   RunStatusResponseDto,
+  SubmissionResponse,
   SubmitStatusResponseDto,
 } from '@code-judge/api-hooks';
 
 export interface SubmissionState {
+  submission: SubmissionResponse | null;
+  submissionId: number | null;
   submitResponse: SubmitStatusResponseDto | null;
   runResponse: RunStatusResponseDto | null;
   sourceCode: string | null;
@@ -13,6 +16,8 @@ export interface SubmissionState {
 }
 
 const initialState: SubmissionState = {
+  submission: null,
+  submissionId: null,
   submitResponse: null,
   runResponse: null,
   sourceCode: null,
@@ -24,7 +29,6 @@ export const submissionSlice = createSlice({
   initialState,
   reducers: {
     setSourceCode: (state, action: PayloadAction<string>) => {
-      console.log('From reducer:', action.payload);
       state.sourceCode = action.payload;
     },
     setLanguage: (state, action: PayloadAction<Language>) => {
@@ -42,6 +46,18 @@ export const submissionSlice = createSlice({
     removeRunResponse: (state) => {
       state.runResponse = null;
     },
+    setSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
+      state.submission = action.payload;
+    },
+    removeSubmission: (state) => {
+      state.submission = null;
+    },
+    setsubmissionId: (state, action: PayloadAction<number>) => {
+      state.submissionId = action.payload;
+    },
+    removeSubmissionId: (state) => {
+      state.submission = null;
+    },
   },
 });
 
@@ -52,6 +68,10 @@ export const {
   removeSubmitResponse,
   setRunResponse,
   removeRunResponse,
+  setSubmission,
+  removeSubmission,
+  setsubmissionId,
+  removeSubmissionId,
 } = submissionSlice.actions;
 
 export const submissionReducer = submissionSlice.reducer;

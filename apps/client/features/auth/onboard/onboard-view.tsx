@@ -7,7 +7,6 @@ import {
   FirstNameField,
   LastNameField,
 } from '@code-judge/core-design';
-import { PasswordErrors } from '../components';
 import { useOnboardMutation } from '@code-judge/api-hooks';
 import { PageHeader } from 'apps/client/components';
 import { useState } from 'react';

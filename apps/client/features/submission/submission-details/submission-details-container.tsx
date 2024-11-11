@@ -1,11 +1,9 @@
 import React from 'react';
 import { SubmissionDetailsView } from './submissions-details-view';
-import { SubmissionDto } from '@code-judge/api-hooks';
-import { useAppDispatch } from '../../../app/store';
-import { removeSubmission } from '../services/submission-slice';
+import { SubmissionResponse } from '@code-judge/api-hooks';
 
 interface SubmissionDetailsContainerProps {
-  submission: SubmissionDto;
+  submission: SubmissionResponse;
   handleOnBack: () => void;
 }
 

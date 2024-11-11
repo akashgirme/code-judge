@@ -18,6 +18,7 @@ import { AbilityGuard } from '../../ability/ability.guard';
 import { CheckAbilities } from '../../ability/ability.decorator';
 import { Action } from '../../ability/ability.factory';
 import { PaginationDto } from '../../common/dto';
+import { instanceToPlain } from 'class-transformer';
 
 @ApiTags('users')
 @Controller('users')
@@ -28,7 +29,8 @@ export class UserController {
   @ApiOkResponse({ type: User })
   @UseGuards(AuthGuard())
   whoAmI(@CurrentUser() user: User) {
-    return { user };
+    const safeUser = instanceToPlain(user);
+    return safeUser;
   }
 
   @Put('/onboard')

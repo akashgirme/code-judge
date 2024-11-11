@@ -3,17 +3,20 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams } from 'react-router-dom';
-import { FC, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useLocalStorage } from 'apps/client/features/hooks';
 import { debounce } from 'apps/client/utils';
-import { selectLanguageValidations } from '@code-judge/core-design';
+import {
+  codeEditorValidations,
+  selectLanguageValidations,
+} from '@code-judge/core-design';
 import { CodeEditorPanelView } from './code-editor-panel-view';
-import { useAppDispatch } from 'apps/client/app/store';
+import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
 import { setLanguage, setSourceCode } from '../services';
 
 const CodeEditorPanelSchema = z.object({
   ...selectLanguageValidations,
-  sourceCode: z.string(),
+  ...codeEditorValidations,
 });
 
 export type CodeEditorPanelModel = z.infer<typeof CodeEditorPanelSchema>;
@@ -40,8 +43,6 @@ export const CodeEditorPanelLogic: React.FC<CodeEditorPanelLogicProps> = ({
   });
 
   const watch = form.watch;
-
-  console.log('watch: ', watch('language'), watch('sourceCode'));
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetStoredValue = useCallback(

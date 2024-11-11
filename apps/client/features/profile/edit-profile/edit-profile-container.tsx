@@ -1,10 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { EditProfileLogic, EditProfileModel } from './edit-profile-logic';
-import {
-  useEditProfileMutation,
-  useWhoAmIQuery,
-} from '@skill-street-ui/auth-client';
-import { handleError } from 'apps/home/utils';
+import { useEditProfileMutation, useWhoAmIQuery } from '@code-judge/api-hooks';
+import { handleError } from 'apps/client/utils';
 import { useAuth } from '../../auth';
 
 export const EditProfileContainer = () => {
@@ -23,27 +20,20 @@ export const EditProfileContainer = () => {
     })
       .unwrap()
       .then((updatedProfile) => {
-        updateUser(updatedProfile.user);
+        updateUser(updatedProfile);
         router.push('/profile');
       })
       .catch(handleError);
   };
 
   const defaultValues: EditProfileModel = {
-    firstName: data?.user.firstName ?? '',
-    lastName: data?.user.lastName ?? '',
-    uploadedImage: {
-      publicId: data?.user.profileImagePublicId ?? '',
-      version: 0,
-      signature: '',
-    },
+    firstName: data?.firstName ?? '',
+    lastName: data?.lastName ?? '',
   };
 
   if (!isSuccess) {
     return null;
   }
 
-  return (
-    <EditProfileLogic defaultValues={defaultValues} onSubmit={handleSubmit} />
-  );
+  return <EditProfileLogic defaultValues={defaultValues} onSubmit={handleSubmit} />;
 };

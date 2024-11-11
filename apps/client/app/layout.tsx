@@ -14,7 +14,8 @@ import { AppBar } from '../components';
 //     template: `%s | Judge.Codes`,
 //   },
 // };
-// TODO: Layout should be Server Component in order to use `export metadata`...
+
+//Layout should be Server Component in order to use `export metadata`...
 
 const robotoFont = Roboto_Flex({
   subsets: ['latin'],
@@ -39,20 +40,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <body style={{ height: '-webkit-fill-available' }} className="flex flex-col ">
           <Provider store={store}>
-            <PersistGate persistor={persistor} loading={null}>
+            <PersistGate persistor={persistor}>
               <NextThemesProvider
                 attribute="class"
                 defaultTheme="light"
-                // enableSystem
+                enableSystem
                 disableTransitionOnChange
               >
                 <main className="flex-1">
-                  //TODO: use AppBar and reduce is height currently it 64px maybe 52px is
-                  better
-                  {/* <AppBar /> */}
+                  <AppBar />
                   {children}
-                  {/* <Footer /> */}
-                  {/* TODO: Customise Sonner Styling */}
                 </main>
                 <Toaster />
               </NextThemesProvider>

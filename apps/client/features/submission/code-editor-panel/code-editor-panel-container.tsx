@@ -3,7 +3,7 @@ import { CodeEditorPanelLogic, CodeEditorPanelModel } from './code-editor-panel-
 
 export const CodeEditorPanelContainer = () => {
   const defaultValues: CodeEditorPanelModel = {
-    sourceCode: '// Write your code here',
+    sourceCode: '',
     language: 'cpp',
   };
   return <CodeEditorPanelLogic defaultValues={defaultValues} />;

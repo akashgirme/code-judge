@@ -1,5 +1,5 @@
-import { Button } from '@skill-street-ui/core-design';
-import { useAuth } from 'apps/home/features/auth';
+import { Button } from '@code-judge/core-design';
+import { useAuth } from 'apps/client/features/auth';
 import React from 'react';
 
 export const Logout = () => {

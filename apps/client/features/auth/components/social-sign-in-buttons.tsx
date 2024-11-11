@@ -1,3 +1,4 @@
+'use client';
 import { Button, Icon } from '@code-judge/core-design';
 import { useRouter } from 'next/navigation';
 import { GoogleIcon } from '@code-judge/core-design';
@@ -16,7 +17,6 @@ export const SocialSignInButtons = () => {
   return (
     <div className="grid gap-4">
       <Button variant="google-btn" onClick={onGoogleSignInClick}>
-        {/* TODO: Remove this Icon component */}
         <Icon className="h-5 w-5 " icon={GoogleIcon} />
         Continue with Google
       </Button>

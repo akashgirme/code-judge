@@ -23,7 +23,7 @@ export const useAuth = () => {
   ) => {
     dispatch(setCredentials(signedInUser));
     if (shouldAutoNavigate) {
-      router.push(!signedInUser.user.hasOnboarded ? '/auth/onboard' : '/problems');
+      router.push(!signedInUser.user.hasOnboarded ? '/auth/onboard' : '/home');
     }
   };
 

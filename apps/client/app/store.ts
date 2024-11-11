@@ -1,3 +1,4 @@
+'use client';
 import {
   FLUSH,
   REHYDRATE,
@@ -14,10 +15,30 @@ import { authReducer, apiQuery as api, UserRole } from '@code-judge/api-hooks';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { createBlacklistFilter } from 'redux-persist-transform-filter';
 import { ability, defineAbilityForUser } from '../features/auth/ability/ability-factory';
-import storage from 'redux-persist/lib/storage';
+// import storage from 'redux-persist/lib/storage';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { submissionReducer } from '../features/submission';
 import { problemReducer } from '../features/problem/services';
+import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
+
+const createNoopStorage = () => {
+  return {
+    getItem(_key: any) {
+      return Promise.resolve(null);
+    },
+    setItem(_key: any, value: any) {
+      return Promise.resolve(value);
+    },
+    removeItem(_key: any) {
+      return Promise.resolve();
+    },
+  };
+};
+
+const storage =
+  typeof window !== 'undefined' ? createWebStorage('local') : createNoopStorage();
+
+// export default storage;
 
 const rootReducer = combineReducers({
   [api.reducerPath]: api.reducer,

@@ -10,6 +10,7 @@ interface CodeEditorProps {
   height?: string;
 }
 
+//TODO: Issue with useController instead use `useFormContext`
 export const CodeEditorField: React.FC<CodeEditorProps> = ({
   language,
   defaultLanguage = 'c',
@@ -35,7 +36,7 @@ export const CodeEditorField: React.FC<CodeEditorProps> = ({
       height={height}
       defaultLanguage={defaultLanguage}
       language={getLanguageFullName(language)}
-      value={value || ''}
+      value={value}
       onChange={onChange}
     />
   );

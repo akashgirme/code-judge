@@ -3,6 +3,7 @@ import { ProblemDetailView } from './problem-detail-view';
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { Loading } from 'apps/client/components';
+import { Typography } from '@code-judge/core-design';
 
 export const ProblemDetailContainer = () => {
   const { problemId: id } = useParams();
@@ -11,8 +12,9 @@ export const ProblemDetailContainer = () => {
 
   //TODO: handle better this case `problem not found or any error`
   if (!problem) {
-    return;
+    return <Typography variant="h2">Problem Not Found!</Typography>;
   }
+
   return (
     <Suspense fallback={<Loading />}>
       <ProblemDetailView problem={problem} isLoading={isLoading} />

@@ -14,7 +14,7 @@ export const useOnboard = () => {
           ...data,
         },
       }).unwrap();
-      router.push('/problems');
+      router.push('/home');
     } catch (error) {
       handleError(error as Error);
     }

@@ -1,10 +1,7 @@
 'use client';
-import {
-  Action,
-  Subject,
-} from 'apps/home/features/auth/ability/ability-factory';
-import { withAbility } from 'apps/home/features/auth/hooks';
-import { AllUsersView } from 'apps/home/features/profile';
+import { Action, Subject } from 'apps/client/features/auth/ability/ability-factory';
+import { withAbility } from 'apps/client/features/auth/hooks';
+import { AllUsersView } from 'apps/client/features/profile';
 
 const AllUsersPage = () => {
   return <AllUsersView />;

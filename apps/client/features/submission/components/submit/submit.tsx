@@ -12,13 +12,13 @@ import { Button } from '@code-judge/core-design';
 
 export const SubmitCode = () => {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
-  const [pollRetries, setPollRetries] = useState<number>(0);
 
   const { problemId: pid } = useParams();
   const problemId = Number(pid);
 
   const dispatch = useAppDispatch();
   const { sourceCode, language } = useAppSelector((state) => state.submission);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   const [submit, { isLoading }] = useCreateSubmissionMutation({
     fixedCacheKey: 'submit',
@@ -73,13 +73,7 @@ export const SubmitCode = () => {
   };
 
   return (
-    //TODO: isActive={}  only when there is Code in editor
-    <Button
-      onClick={handleSubmit}
-      variant="primary"
-      // isActive={Boolean(sourceCode)}
-      isLoading={isLoading}
-    >
+    <Button onClick={handleSubmit} variant="primary" isActive isLoading={isLoading}>
       {isLoading ? 'Pending...' : 'Submit'}
     </Button>
   );

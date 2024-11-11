@@ -1,156 +1,121 @@
 import {
   Badge,
-  Button,
-  Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Typography,
 } from '@code-judge/core-design';
-import {
-  Submission,
-  useGetSubmissionByIdQuery,
-  useGetSubmissionsByUserAndProblemQuery,
-} from '@code-judge/api-hooks';
-import { useParams } from 'react-router-dom';
-import { SubmissionDetailsContainer } from '../submission-details';
-import { useAppDispatch, useAppSelector } from '../../../app/store';
-import { removeSubmission, setSubmission } from '../services/submission-slice';
-import { useEffect, useState } from 'react';
-import { CheckIcon, CircleX, Clock3, MemoryStick } from 'lucide-react';
+import { CheckCircle, Clock, FileCheck, MemoryStick, XCircle } from 'lucide-react';
+import { SubmissionResponse } from '@code-judge/api-hooks';
+import React from 'react';
+import { useAppDispatch } from 'apps/client/app/store';
+import { setsubmissionId } from '../services';
 
-function getIcon(statusMessage: string) {
-  switch (statusMessage) {
-    case 'Accepted':
-      return <CheckIcon className="h-4 w-4" />;
-    default:
-      return <CircleX className="h-4 w-4" />;
-  }
+interface AllSubmissionsViewProps {
+  data?: SubmissionResponse[];
+  isFetching: Boolean;
 }
 
-//TODO: Offload this all logic to container, it should not be in view
-export const AllSubmissionsView = () => {
-  const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
-  const [trigger, setTrigger] = useState(false);
-
-  const { problemId: pid } = useParams();
-  const problemId = Number(pid);
-
+export const AllSubmissionsView: React.FC<AllSubmissionsViewProps> = ({
+  data,
+  isFetching,
+}) => {
   const dispatch = useAppDispatch();
-  const { submission } = useAppSelector((state) => state.submission);
-
-  const {
-    data: allSubmissions,
-    isFetching,
-    isLoading,
-    refetch,
-  } = useGetSubmissionsByUserAndProblemQuery({
-    problemId,
-  });
-
-  const { data: submissionDetails, isLoading: getSubmissionIsLoading } =
-    useGetSubmissionByIdQuery(
-      { submissionId: selectedSubmissionId ?? 0 },
-      { skip: selectedSubmissionId === null }
-    );
-
-  if (submissionDetails && selectedSubmissionId !== null) {
-    dispatch(setSubmission(submissionDetails));
-    setSelectedSubmissionId(null);
-  }
-
-  const handleGetSubmission = (id: number) => {
-    setSelectedSubmissionId(id);
+  const handleSubmissionClick = (id: number) => {
+    dispatch(setsubmissionId(id));
   };
 
-  const handleOnBack = () => {
-    dispatch(removeSubmission());
-    setTrigger((prev) => !prev);
+  const getStatusIcon = (status: any) => {
+    return status === 'Accepted' ? (
+      <CheckCircle className="h-5 w-5 text-green-500" />
+    ) : (
+      <XCircle className="h-5 w-5 text-red-500" />
+    );
   };
 
-  useEffect(() => {
-    refetch(); // refetch the submissions when `trigger` changes
-  }, [trigger, refetch]); // Refetch is called whenever trigger changes
-
-  if (isFetching || isLoading || getSubmissionIsLoading) {
-    return (
-      <Card>
-        <CardContent>Loading...</CardContent>
-      </Card>
-    );
-  }
-
-  if (submission) {
-    return (
-      <SubmissionDetailsContainer submission={submission} handleOnBack={handleOnBack} />
-    );
-  }
+  const getStatusColor = (status: any) => {
+    return status === 'Accepted' ? 'text-green-500' : 'text-red-500';
+  };
 
   return (
-    <div className="grid gap-4 pt-4 h-full">
-      <Table>
-        <TableHeader>
-          <TableHead>Status</TableHead>
-          <TableHead>Language</TableHead>
-          <TableHead>Runtime</TableHead>
-          <TableHead>Memory</TableHead>
-        </TableHeader>
-        <TableBody>
-          {allSubmissions?.map((submission: Submission) => (
-            <TableRow key={submission.id}>
-              <TableCell className="text-left pl-0">
-                <Button
-                  type="submit"
-                  variant="link"
-                  className="flex flex-col items-start"
-                  onClick={() => handleGetSubmission(submission.id)}
-                >
-                  <Typography
-                    variant="h3"
-                    style={{
-                      color: submission.status === 'Accepted' ? 'green' : 'red',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {getIcon(submission.status)}
-                    {submission.status}
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Date(submission.createdAt).toLocaleDateString('en-GB')}
-                  </Typography>
-                </Button>
-              </TableCell>
-              <TableCell>
-                <Badge>{submission.language}</Badge>
-              </TableCell>
-              <TableCell>
-                <Clock3 />
-                {submission.status === 'Accepted' ? (
-                  <Typography variant="caption">{`${
-                    submission.time * 1000
-                  } ms`}</Typography>
-                ) : (
-                  'N/A'
-                )}
-              </TableCell>
-              <TableCell>
-                <MemoryStick />
-                {submission.status === 'Accepted' ? (
-                  <Typography variant="caption">{`${(submission.memory / 1024).toFixed(
-                    1
-                  )} MB`}</Typography>
-                ) : (
-                  'N/A'
-                )}
-              </TableCell>
+    <div className="container py-6">
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[200px] font-semibold">Status</TableHead>
+              <TableHead className="font-semibold">Language</TableHead>
+              <TableHead className="font-semibold">Runtime</TableHead>
+              <TableHead className="font-semibold">Memory</TableHead>
+              <TableHead className="font-semibold">Test Cases</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {isFetching ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : data?.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No submissions found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data?.map((submission: SubmissionResponse) => (
+                <TableRow
+                  key={submission.id}
+                  onClick={() => handleSubmissionClick(submission.id)}
+                >
+                  <TableCell className="font-medium">
+                    <div className="flex items-center space-x-2">
+                      {getStatusIcon(submission.status)}
+                      <span
+                        className={`font-semibold ${getStatusColor(submission.status)}`}
+                      >
+                        {submission.status}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{submission.language}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        {submission.status === 'Accepted'
+                          ? `${submission.time * 1000} ms`
+                          : 'N/A'}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <MemoryStick className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        {submission.status === 'Accepted'
+                          ? `${(submission.memory / 1024).toFixed(1)} MB`
+                          : 'N/A'}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <FileCheck className="h-4 w-4 text-muted-foreground" />
+                      <span>{`${submission.testCasesPassed}/${submission.totalTestCases}`}</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

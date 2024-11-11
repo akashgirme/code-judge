@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { Controller, FormProvider, UseFormReturn } from 'react-hook-form';
 import { CodeEditorField, SelectLanguageField } from '@code-judge/core-design';
 import { CodeEditorPanelModel } from './code-editor-panel-logic';
@@ -9,6 +10,7 @@ interface CodeEditorPanelViewProps {
 
 export const CodeEditorPanelView: React.FC<CodeEditorPanelViewProps> = ({ form }) => {
   const { control } = form;
+
   return (
     <FormProvider {...form}>
       <form className="w-full h-full">
@@ -20,21 +22,25 @@ export const CodeEditorPanelView: React.FC<CodeEditorPanelViewProps> = ({ form }
               render={({ field: { onChange, value } }) => <SelectLanguageField />}
             />
           </div>
-          <div>
-            <Controller
-              name="sourceCode"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <CodeEditorField
-                  language={value || 'c'} // Pass current language
-                  defaultLanguage="c"
-                  height="75vh"
-                />
-              )}
-            />
+          <div className="relative">
+            <div>
+              <Controller
+                name="sourceCode"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <CodeEditorField
+                    language={value || 'c'}
+                    defaultLanguage="c"
+                    height="75vh"
+                  />
+                )}
+              />
+            </div>
           </div>
         </div>
       </form>
     </FormProvider>
   );
 };
+
+export default CodeEditorPanelView;

@@ -41,7 +41,6 @@ export const SignInWithPasswordView: React.FC<SignInWithPasswordViewProps> = ({
                   <LoginPasswordField />
                 </div>
                 <div className="space-y-3 flex flex-col ">
-                  {/* TODO: Can Create seperate Form Button component */}
                   <Button
                     isActive={isValid}
                     variant="primary"

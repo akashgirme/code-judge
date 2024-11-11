@@ -1,14 +1,13 @@
 import {
   Badge,
+  Button,
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@code-judge/core-design';
-import { useGetProblemsQuery } from '@code-judge/api-hooks';
+import { ProblemDifficulty, useGetProblemsQuery } from '@code-judge/api-hooks';
 import Link from 'next/link';
-import { TagBadges } from '../../components/tag-badges';
 
 export const PublicProblemsView = () => {
   const { data: { problems = [] } = {} } = useGetProblemsQuery({
@@ -17,23 +16,52 @@ export const PublicProblemsView = () => {
     order: 'ASC',
   });
 
-  //TODO: Redesign this page like hanckerrank `make exact design from v0.dev` & right now no need of filters add later
+  const getDifficultyColor = (difficulty: ProblemDifficulty) => {
+    const colors = {
+      easy: 'bg-green-500/10 text-green-500 hover:bg-green-500/20',
+      medium: 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20',
+      hard: 'bg-orange-500/10 text-orange-500 hover:bg-red-500/20',
+    };
+    return colors[difficulty] || 'bg-primary/10 text-primary hover:bg-primary/20';
+  };
+
   return (
-    <div className="grid gap-6">
-      {problems?.map((problem) => (
-        <Link key={`problem-${problem.id}`} href={`/problems/${problem.id}`}>
-          <Card className="" key={problem.id}>
-            <CardHeader>
-              <CardTitle>{problem.title}</CardTitle>
-              <CardDescription className="flex gap-3">
-                <TagBadges tags={problem.tags} />
-                <Badge>{problem.difficulty}</Badge>
-              </CardDescription>
+    <div className="container py-6">
+      <div className="mx-auto max-w-4xl space-y-4">
+        {problems?.map((problem) => (
+          <Card key={problem.id} className="group transition-all hover:shadow-md ">
+            <CardHeader className="flex flex-row items-center justify-between h-28 space-y-0 py-6 px-6">
+              <div className="space-y-1">
+                <CardTitle className="text-xl">
+                  <Link
+                    href={`/problems/${problem.id}`}
+                    className="hover:text-primary transition-colors"
+                  >
+                    {problem.title}
+                  </Link>
+                </CardTitle>
+                <CardDescription className="flex flex-wrap items-center gap-2">
+                  {problem.tags?.map((tag) => (
+                    <Badge key={tag.id} variant="outline" className="text-s">
+                      {tag.name}
+                    </Badge>
+                  ))}
+                  <Badge className={`text-s ${getDifficultyColor(problem.difficulty)}`}>
+                    {problem.difficulty}
+                  </Badge>
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-4">
+                <Link href={`/problems/${problem.id}`}>
+                  <Button variant="secondary-outline" className="whitespace-nowrap">
+                    Solve Challenge
+                  </Button>
+                </Link>
+              </div>
             </CardHeader>
-            <CardContent>{''}</CardContent>
           </Card>
-        </Link>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
