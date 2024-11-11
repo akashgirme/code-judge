@@ -88,7 +88,7 @@ export function Hero() {
                 </div>
                 <div className="relative mt-8">
                   <div className="rounded-lg border bg-card p-4 shadow-lg">
-                    <pre className="text-sm text-primary">
+                    <pre className="text-sm text-primary-active">
                       <code>{`function solve(input) {
   // Your code here
   return solution;

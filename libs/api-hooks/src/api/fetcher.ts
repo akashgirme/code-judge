@@ -22,8 +22,8 @@ type FetcherResponse<T> =
   | { data: undefined; error: true | string; success: false };
 
 //TODO: use env variable
-// const baseUrl = import.meta.env.VITE_API_SERVER_URL;
-const baseUrl = 'http://localhost:3000';
+const baseUrl = process.env['NEXT_PUBLIC_API_SERVICE_URL'];
+// const baseUrl = 'http://localhost:3000';
 
 export const fetcher = async <ApiArg, ApiResponse>({
   endpoint,

@@ -32,7 +32,10 @@ export const SignUpView: React.FC<SignUpViewProps> = ({ form, onSubmit }) => {
     <>
       <div>
         <FormProvider {...form}>
-          <PageHeader title="Welcome" description="Sign up to access the Chat Bot" />
+          <PageHeader
+            title="Welcome! Join us."
+            description="Sign up to access the Code Judge"
+          />
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="grid py-6 space-y-7 ">

@@ -30,7 +30,7 @@ export const RunCode = () => {
     }
   );
 
-  const pollWithBackoff = async (retries: number) => {
+  const pollWithBackoff = async (retries: number): Promise<void> => {
     if (retries === 0) {
       setRunId(null);
       return;

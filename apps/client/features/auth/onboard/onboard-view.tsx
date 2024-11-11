@@ -34,7 +34,6 @@ export const OnboardView: React.FC<OnboardViewProps> = ({ form, onSubmit }) => {
           title="Onboard"
           description={'Create a 8 character password to secure your Account.'}
           hideBackButton
-          hideLogo
         />
 
         <CardContent>

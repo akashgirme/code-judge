@@ -1,4 +1,4 @@
-import { API, useGetProblemQuery } from '@code-judge/api-hooks';
+import { useGetProblemQuery } from '@code-judge/api-hooks';
 import { ProblemDetailView } from './problem-detail-view';
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';

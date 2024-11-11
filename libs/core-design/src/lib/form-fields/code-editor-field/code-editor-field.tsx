@@ -7,14 +7,16 @@ import { modelKey } from './code-editor-config';
 interface CodeEditorProps {
   language: string;
   defaultLanguage: Languages;
-  height?: string;
+  height: string;
+  theme: 'vs-dark' | 'light';
 }
 
 //TODO: Issue with useController instead use `useFormContext`
 export const CodeEditorField: React.FC<CodeEditorProps> = ({
   language,
   defaultLanguage = 'c',
-  height = '78vh',
+  height,
+  theme,
 }) => {
   const {
     field: { value, onChange },
@@ -36,6 +38,7 @@ export const CodeEditorField: React.FC<CodeEditorProps> = ({
       height={height}
       defaultLanguage={defaultLanguage}
       language={getLanguageFullName(language)}
+      theme={theme}
       value={value}
       onChange={onChange}
     />

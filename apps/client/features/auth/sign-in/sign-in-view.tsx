@@ -24,7 +24,7 @@ export const SignInView = () => {
     <>
       <div className="max-md:pt-16">
         <PageHeader
-          title="Hello there!"
+          title="Welcome Back!"
           description={
             <>
               I&apos;m CodeJudge, Here to help you master problem solving. <br />

@@ -38,7 +38,6 @@ export const SignInWithOtpView: React.FC<SignInWithOtpViewProps> = ({
         <PageHeader
           title="Verify"
           description="We've sent an 6-digit OTP to you email, please enter."
-          hideLogo={true}
           prevRoute="/auth/request-sign-in-otp"
         />
         <CardContent>

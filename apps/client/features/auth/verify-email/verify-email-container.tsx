@@ -28,7 +28,7 @@ export const VerifyEmailContainer = () => {
     })
       .unwrap()
       .then((responseData) => {
-        handleLogin(responseData, true, true);
+        handleLogin(responseData, true);
       })
       .catch(handleError);
   };

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { SignedInUserResponseDto, User } from '../api/api-query';
 
 export interface AuthState {
@@ -13,7 +13,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
 };
 
-export const authSlice = createSlice({
+export const authSlice: Slice<AuthState> = createSlice({
   name: 'auth',
   initialState,
   reducers: {

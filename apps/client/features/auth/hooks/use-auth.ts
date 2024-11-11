@@ -29,7 +29,7 @@ export const useAuth = () => {
 
   const handleLogout = async () => {
     await onLogout().unwrap();
-    dispatch(logout());
+    dispatch(logout({}));
     router.push('/auth/sign-in');
   };
 

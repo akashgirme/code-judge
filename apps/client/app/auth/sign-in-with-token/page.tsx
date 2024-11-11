@@ -1,5 +1,5 @@
 'use client';
-import { SignInWithTokenContainer } from 'apps/home/features/auth';
+import { SignInWithTokenContainer } from 'apps/client/features/auth';
 
 const SignInWithTokenPage = () => {
   return <SignInWithTokenContainer />;

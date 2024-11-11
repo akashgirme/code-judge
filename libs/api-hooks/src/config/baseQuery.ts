@@ -1,14 +1,12 @@
 import { BaseQueryApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { AuthState, logout, setCredentials } from '../auth/authSlice';
+import { authReducer, AuthState, logout, setCredentials } from '../auth/authSlice';
 import { RefreshedSessionDto } from '../api/api-query';
 import { paramsSerializer } from './param-serializer';
 
 type RootAuthState = { auth: AuthState };
 
 const baseQuery = fetchBaseQuery({
-  //TODO: Read from `env `
-  baseUrl: 'http://localhost:3000',
-  // baseUrl: import.meta.env.VITE_API_SERVER_URL,
+  baseUrl: process.env['NEXT_PUBLIC_API_SERVICE_URL'],
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     const accessToken = (getState() as RootAuthState).auth.accessToken;
@@ -67,8 +65,8 @@ const refreshAccessToken = async (api: BaseQueryApi, extraOptions: object) => {
     api.dispatch(setCredentials({ user, accessToken }));
     return accessToken;
   } else {
-    api.dispatch(logout());
-    // window.location.href = '/auth/sign-in';
+    api.dispatch(logout({}));
+    window.location.href = '/auth/sign-in';
     return null;
   }
 };

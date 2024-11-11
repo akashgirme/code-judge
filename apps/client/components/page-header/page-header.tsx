@@ -5,7 +5,6 @@ import {
   Typography,
 } from '@code-judge/core-design';
 import { BackButton } from '../back-button';
-import { Logo } from '../logo';
 import { ReactNode } from 'react';
 import { HeaderData } from 'apps/client/constant';
 
@@ -13,7 +12,6 @@ interface PageHeaderProps {
   title?: string | ReactNode;
   description?: string | ReactNode;
   hideBackButton?: boolean;
-  hideLogo?: boolean;
   SkipButton?: ReactNode;
   prevRoute?: string;
 }
@@ -21,7 +19,6 @@ export const PageHeader = ({
   title = HeaderData.title,
   description = HeaderData.description,
   hideBackButton = false,
-  hideLogo = false,
   SkipButton,
   prevRoute,
 }: PageHeaderProps) => {
@@ -35,7 +32,6 @@ export const PageHeader = ({
       )}
       <div className="flex flex-col items-start py-6 ">
         <CardHeader className="flex flex-col items-center w-full p-0 gap-4 ">
-          {!hideLogo && <Logo />}
           <div className="flex flex-col items-center gap-2 w-full">
             <CardTitle>
               <Typography

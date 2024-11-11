@@ -1,7 +1,6 @@
 'use client';
 import { useAppSelector } from 'apps/client/app/store';
 import { Button, Typography } from '@code-judge/core-design';
-import { useAuth } from 'apps/client/features/auth';
 import { Action, Can, Subject } from 'apps/client/features/auth';
 import { handleComingSoonAlert } from 'apps/client/utils/coming-soon-alert';
 import Link from 'next/link';

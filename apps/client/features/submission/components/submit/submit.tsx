@@ -31,7 +31,7 @@ export const SubmitCode = () => {
     }
   );
 
-  const pollWithBackoff = async (retries: number) => {
+  const pollWithBackoff = async (retries: number): Promise<void> => {
     if (retries === 0) {
       setSubmissionId(null);
       return;
