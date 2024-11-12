@@ -2,16 +2,23 @@ node_modules
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+
 .git
 .gitignore
 .github
+
 .nx
 .vscode
 .env*
 .env.local
 .dockerignore
+
 Dockerfile.*
 *.md
 .cache
+
 dist
 temp
+
+# Next.js
+.next

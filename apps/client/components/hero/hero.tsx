@@ -2,16 +2,23 @@
 import { Code2, Trophy, Users } from 'lucide-react';
 import { Button } from '@code-judge/core-design';
 import { useRouter } from 'next/navigation';
+import { useAppSelector } from 'apps/client/app/store';
 
 export function Hero() {
   const router = useRouter();
+
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   const handleViewProblemOnClick = () => {
     router.push('/problems');
   };
 
   const handleStartNowOnClick = () => {
-    router.push('/auth/sign-in');
+    if (isAuthenticated) {
+      router.push('/problems');
+    } else {
+      router.push('/auth/sign-in');
+    }
   };
 
   return (
@@ -26,7 +33,7 @@ export function Hero() {
               <div className="space-y-6">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
                   Master Your Code.
-                  <span className="text-primary block">Shape Your Future.</span>
+                  <span className="text-primary-active block">Shape Your Future.</span>
                 </h1>
                 <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
                   Join CodeJudge to enhance your programming skills, compete in
@@ -59,7 +66,7 @@ export function Hero() {
               <div className="relative space-y-4 p-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center space-x-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
-                    <Code2 className="h-6 w-6 text-primary" />
+                    <Code2 className="h-6 w-6 text-primary-active" />
                     <div>
                       <h3 className="font-semibold">Practice</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -68,7 +75,7 @@ export function Hero() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
-                    <Trophy className="h-6 w-6 text-primary" />
+                    <Trophy className="h-6 w-6 text-primary-active" />
                     <div>
                       <h3 className="font-semibold">Compete</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -78,7 +85,7 @@ export function Hero() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
-                  <Users className="h-6 w-6 text-primary" />
+                  <Users className="h-6 w-6 text-primary-active" />
                   <div>
                     <h3 className="font-semibold">Community</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">

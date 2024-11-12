@@ -1,6 +1,6 @@
 'use client';
 import { Controller, useFormContext } from 'react-hook-form';
-import { modelKey, questionConfig } from './select-language-config';
+import { modelKey } from './select-language-config';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui';
 
 export const SelectLanguageField = () => {

@@ -19,6 +19,8 @@ spec:
         - name: worker
           image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}"
           imagePullPolicy: {{ .Values.worker.image.imagePullPolicy}}
+          securityContext:
+            privileged: true
           envFrom:
             - configMapRef:
                 name: '{{ .Release.Name }}-worker-config'

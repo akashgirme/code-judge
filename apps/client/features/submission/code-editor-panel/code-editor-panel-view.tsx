@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Controller, FormProvider, UseFormReturn } from 'react-hook-form';
+import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { CodeEditorField, SelectLanguageField } from '@code-judge/core-design';
 import { CodeEditorPanelModel } from './code-editor-panel-logic';
 import { useTheme } from 'next-themes';
@@ -10,7 +10,7 @@ interface CodeEditorPanelViewProps {
 }
 
 export const CodeEditorPanelView: React.FC<CodeEditorPanelViewProps> = ({ form }) => {
-  const { control } = form;
+  const { watch } = form;
 
   const { theme } = useTheme();
   const editorTheme = theme === 'dark' ? 'vs-dark' : 'light';
@@ -20,25 +20,15 @@ export const CodeEditorPanelView: React.FC<CodeEditorPanelViewProps> = ({ form }
       <form className="w-full h-full">
         <div>
           <div className="border-b p-4 flex items-center justify-between">
-            <Controller
-              name="language"
-              control={control}
-              render={({ field: { onChange, value } }) => <SelectLanguageField />}
-            />
+            <SelectLanguageField />
           </div>
           <div className="relative">
             <div>
-              <Controller
-                name="sourceCode"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <CodeEditorField
-                    language={value || 'c'}
-                    defaultLanguage="c"
-                    height="70vh"
-                    theme={editorTheme}
-                  />
-                )}
+              <CodeEditorField
+                language={watch('language') || 'c'}
+                defaultLanguage="c"
+                height="70vh"
+                theme={editorTheme}
               />
             </div>
           </div>

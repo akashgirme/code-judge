@@ -7,11 +7,11 @@ export const SocialSignInButtons = () => {
   const router = useRouter();
 
   const onGoogleSignInClick = () => {
-    router.push(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/auth/google`);
+    router.push(`${process.env.NEXT_PUBLIC_API_SERVICE_URL}/api/auth/google`);
   };
 
   const onAppleSignInClick = () => {
-    router.push(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/auth/apple`);
+    router.push(`${process.env.NEXT_PUBLIC_API_SERVICE_URL}/api/auth/apple`);
   };
 
   return (

@@ -1,28 +1,25 @@
 import React from 'react';
-import { useController } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { Editor } from '@monaco-editor/react';
-import { Languages } from '@code-judge/api-hooks';
+import { Language, Languages } from '@code-judge/api-hooks';
 import { modelKey } from './code-editor-config';
 
 interface CodeEditorProps {
-  language: string;
+  language: Language;
   defaultLanguage: Languages;
   height: string;
   theme: 'vs-dark' | 'light';
 }
 
-//TODO: Issue with useController instead use `useFormContext`
 export const CodeEditorField: React.FC<CodeEditorProps> = ({
   language,
   defaultLanguage = 'c',
   height,
   theme,
 }) => {
-  const {
-    field: { value, onChange },
-  } = useController({ name: modelKey });
+  const { control } = useFormContext();
 
-  const getLanguageFullName = (language: string): string => {
+  const getLanguageFullName = (language: Language): string => {
     const languageMap: { [key: string]: string } = {
       c: 'c',
       cpp: 'cpp',
@@ -34,13 +31,19 @@ export const CodeEditorField: React.FC<CodeEditorProps> = ({
   };
 
   return (
-    <Editor
-      height={height}
-      defaultLanguage={defaultLanguage}
-      language={getLanguageFullName(language)}
-      theme={theme}
-      value={value}
-      onChange={onChange}
-    />
+    <Controller
+      name={modelKey}
+      control={control}
+      render={({ field }) => (
+        <Editor
+          height={height}
+          defaultLanguage={defaultLanguage}
+          language={getLanguageFullName(language)}
+          theme={theme}
+          value={field.value}
+          onChange={field.onChange}
+        />
+      )}
+    ></Controller>
   );
 };

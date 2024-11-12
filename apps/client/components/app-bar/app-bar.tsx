@@ -65,12 +65,12 @@ export function AppBar() {
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/auth/sign-in">
-                <Button variant="ghost" isActive>
+                <Button variant="ghost" size={'sm'} className="text-xs" isActive>
                   Log in
                 </Button>
               </Link>
               <Link href="/auth/sign-up">
-                <Button variant="primary" isActive>
+                <Button variant="primary" size={'sm'} className="text-xs" isActive>
                   Sign up
                 </Button>
               </Link>
