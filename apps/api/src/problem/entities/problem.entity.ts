@@ -59,14 +59,8 @@ export class Problem {
   status: ProblemStatus;
 
   @ApiProperty()
-  @Column({
-    default: false,
-  })
-  hasPlatformTestCases: boolean;
-
-  @ApiProperty()
-  @Column('text', { nullable: true })
-  remark: string;
+  @Column('text', { nullable: true, default: '' })
+  internalNotes: string;
 
   @ApiProperty({ type: [Tag] })
   @ManyToMany(() => Tag, (tag) => tag.problems)

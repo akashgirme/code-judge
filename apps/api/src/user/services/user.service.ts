@@ -146,17 +146,20 @@ export class UserService {
   async getAllUsers({ pageIndex = 0, pageSize = 10 }: PaginationDto) {
     const [users, totalItems] = await this.repo
       .createQueryBuilder('user')
-      .where('user.hasOnboarded = :hasOnboarded', {
-        hasOnboarded: true,
-      })
       .select([
         'user.id',
+        'user.username',
         'user.firstName',
         'user.lastName',
+        'user.email',
+        'user.hasOnboarded',
         'user.role',
         'user.createdAt',
         'user.updatedAt',
       ])
+      .where('user.isEmailVerified = :isEmailVerified', {
+        isEmailVerified: true,
+      })
       .orderBy('user.updatedAt', 'DESC')
       .skip(pageIndex * pageSize)
       .take(pageSize)

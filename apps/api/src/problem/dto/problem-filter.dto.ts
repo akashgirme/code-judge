@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsOptional,
   IsInt,
+  Min,
 } from 'class-validator';
 import { ProblemDifficulty, ProblemStatus } from '../enums';
 import { Transform } from 'class-transformer';
@@ -44,10 +45,11 @@ export class ProblemFilterDto {
   status?: ProblemStatus;
 
   @ApiProperty({ required: false, type: [Number] })
-  @IsArray()
   @IsOptional()
+  @IsArray()
   @ArrayUnique({ message: 'Tags array must contain unique TagIds' })
   @Transform(({ value }) => value.map((val) => parseInt(val)), { toClassOnly: true })
   @IsInt({ each: true })
+  @Min(1, { each: true, message: 'Each tagId must be positive' })
   tagIds?: number[];
 }

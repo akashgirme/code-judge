@@ -20,7 +20,7 @@ spec:
           image: "{{ .Values.client.image.repository }}:{{ .Values.client.image.tag }}"
           imagePullPolicy: {{ .Values.client.image.imagePullPolicy}}
           ports:
-            - containerPort: 4200
+            - containerPort: 3000
           envFrom:
             - configMapRef:
                 name: '{{ .Release.Name }}-client-config'

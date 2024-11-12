@@ -146,9 +146,9 @@ export class AuthService {
     });
 
     return {
-      message: `You have been successfully registered! Please check your email ${email} for a otp`,
-      email,
       userId: user.id,
+      email,
+      message: `You have been successfully registered! Please check your email ${email} for a otp`,
     };
   }
 
@@ -270,6 +270,7 @@ export class AuthService {
     await this.authenticateUser(user, res);
   }
 
+  // TODO: This is not stable often times get 'Invalid Token' error
   async refreshSession(refreshToken: string, res: Response) {
     try {
       if (!refreshToken) {
@@ -285,7 +286,6 @@ export class AuthService {
       );
 
       const match = await bcrypt.compare(refreshToken, hashRefreshToken);
-      // const decrypedRefreshToken = decrypt(retrievedRefreshToken);
 
       if (!user || !match) {
         throw new UnauthorizedException('Invalid Token');
@@ -295,7 +295,6 @@ export class AuthService {
         await this.tokenService.generateRefreshToken(user);
 
       await this.cacheservice.storeRefreshTokenInCache(newRefreshToken, user.id);
-      await this.cacheservice.setUserCache(user);
 
       this.tokenService.setRefreshTokenCookie(newRefreshToken, res);
 
@@ -378,11 +377,8 @@ export class AuthService {
     const { accessToken } = await this.tokenService.generateAccessToken(user);
     const { refreshToken } = await this.tokenService.generateRefreshToken(user);
 
-    // const encryptedRefreshToken = encrypt(refreshToken);
     const hashedRefreshToken = await hashToken(refreshToken);
     await this.cacheservice.storeRefreshTokenInCache(hashedRefreshToken, user.id);
-
-    await this.cacheservice.setUserCache(user);
 
     this.tokenService.setRefreshTokenCookie(refreshToken, res);
 

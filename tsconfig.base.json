@@ -15,8 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@code-judge/api-client": ["libs/api-client/src/index.ts"],
+      "@code-judge/api-hooks": ["libs/api-hooks/src/index.ts"],
       "@code-judge/common": ["libs/common/src/index.ts"],
+      "@code-judge/core-design": ["libs/core-design/src/index.ts"],
       "@code-judge/ui": ["libs/ui/index.ts"]
     }
   },

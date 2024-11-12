@@ -1,26 +1,37 @@
 FROM node:20-alpine AS build
 
-WORKDIR /usr/src/monorepo
+WORKDIR /app
 
-COPY package*.json ./
+# Copy Everything from root to workdir
 COPY . .
 
-RUN npm install
+RUN npm install -g pnpm
+
+RUN pnpm install
 
 RUN npx nx reset
 
-ARG VITE_API_SERVER_URL
-ENV VITE_API_SERVER_URL=${VITE_API_SERVER_URL}
+ARG NEXT_PUBLIC_API_SERVICE_URL
+ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
 
 RUN npx nx build client
 
-FROM node:20-alpine AS production
+FROM node:20-alpine
 
-WORKDIR /usr/src/monorepo
+WORKDIR /app
 
-COPY --from=build /usr/src/monorepo/dist ./dist
+COPY --from=build /app .
 
-RUN npm install -g serve
+RUN npm install -g pnpm
 
-CMD [ "serve","-s", "dist/apps/client", "-l", "4200", "--cors" ]
+RUN pnpm install --prod
+
+# Builds optimize next.js build
+RUN pnpm i sharp
+
+WORKDIR /app/dist/apps/client
+
+EXPOSE 3000
+
+CMD [ "pnpm", "run", "start" ]
 

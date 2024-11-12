@@ -17,6 +17,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get update \
     && apt-get install -y nodejs \
     && npm install -g nx \
+    && npm install -g pnpm \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -46,7 +47,9 @@ WORKDIR /app
 # Change ownership of the working directory
 RUN chown codejudge:codejudge /app
 
-RUN npm install
+RUN npm install -g pnpm
+
+RUN pnpm install
 
 WORKDIR /app
 

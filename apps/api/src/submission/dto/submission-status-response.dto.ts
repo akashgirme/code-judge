@@ -31,26 +31,33 @@ class StatusDto {
   state: SubmissionState;
 
   @ApiProperty()
-  error: string;
+  error?: string;
 }
 
 export class RunStatusResponseDto extends StatusDto {
+  @ApiProperty({
+    type: 'enum',
+    enum: SubmissionStatus,
+    enumName: 'SubmissionStatus',
+  })
+  status: SubmissionStatus;
+
   @ApiProperty({ type: [ResultDto] })
-  result: ResultDto[];
+  result?: ResultDto[];
 
   @ApiProperty()
-  passed: number;
+  passed?: number;
 
   @ApiProperty()
-  total: number;
+  total?: number;
 }
 
 export class SubmitStatusResponseDto extends StatusDto {
   @ApiProperty()
-  passed: number;
+  passed?: number;
 
   @ApiProperty()
-  total: number;
+  total?: number;
 
   @ApiProperty({
     type: 'enum',
@@ -60,10 +67,10 @@ export class SubmitStatusResponseDto extends StatusDto {
   status: SubmissionStatus;
 
   @ApiProperty()
-  memory: number;
+  memory?: number;
 
   @ApiProperty()
-  time: number;
+  time?: number;
 
   @ApiProperty({ type: Date })
   createdAt: Date;

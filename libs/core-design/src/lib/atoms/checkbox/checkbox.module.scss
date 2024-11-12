@@ -1,0 +1,43 @@
+.checkboxContainer {
+  label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  input {
+    display: none;
+
+    &:hover ~ div {
+      border-color: #ffb500;
+    }
+    &:checked ~ div {
+      background: #ffb500;
+      border-color: #ffb500;
+
+      &:after {
+        transform: scale(1);
+      }
+    }
+
+    & ~ div {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid #cccccc;
+      border-radius: 3px;
+      display: flex;
+      justify-content: center;
+      margin-right: 10px;
+      flex-shrink: 0;
+      transition: background 150ms, border-color 150ms;
+
+      &:after {
+        content: '\2714';
+        color: white;
+        position: relative;
+        bottom: 3px;
+        transform: scale(0);
+        transition: transform 150ms;
+      }
+    }
+  }
+}

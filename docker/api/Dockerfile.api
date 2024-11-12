@@ -1,11 +1,13 @@
 FROM node:20-alpine AS build
 
-WORKDIR /usr/src/monorepo
+WORKDIR /app
 
-COPY package*.json ./
+# Copy Everything from root to workdir
 COPY . .
 
-RUN npm install
+RUN npm install -g pnpm
+
+RUN pnpm install
 
 RUN npx nx reset
 
@@ -16,14 +18,16 @@ FROM node:20-alpine AS production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /usr/src/monorepo
+WORKDIR /app
 
 COPY package*.json ./
-COPY db-ssl-certificate.crt ./
+COPY db-ca.crt ./
 
-RUN npm install --omit=dev
+RUN npm install -g pnpm
 
-COPY --from=build /usr/src/monorepo/dist ./dist
+RUN pnpm install --omit=dev
+
+COPY --from=build /app/dist ./dist
 
 CMD [ "node", "dist/apps/api/main" ]
 
