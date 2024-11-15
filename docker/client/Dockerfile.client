@@ -10,10 +10,10 @@ RUN pnpm install
 
 COPY . .
 
-RUN npx nx reset
-
 ARG NEXT_PUBLIC_API_SERVICE_URL
 ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
+
+RUN npx nx reset
 
 RUN npx nx build client
 
@@ -22,26 +22,18 @@ FROM node:20-alpine
 WORKDIR /app
 
 RUN npm install -g pnpm
-RUN npm install -g nx
 
-COPY --from=build /app/dist/apps/client/package.json ./
+COPY --from=build app/dist ./dist
 
-RUN pnpm install --prod
-
-COPY --from=build app/dist/apps/client ./
-COPY --from=build app/dist/libs ./libs
-COPY nx.json ./
-
-WORKDIR /app/dist/apps/client
+WORKDIR /app/dist/apps/client/
 
 RUN pnpm install --prod
 
-WORKDIR /app
+RUN pnpm add @next/bundle-analyzer
 
 ARG NEXT_PUBLIC_API_SERVICE_URL
 ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
 
 EXPOSE 3000
 
-CMD [ "pnpm", "--filter", "client", "run", "start" ]
-# CMD [ "pnpm", "run","start" ]
+CMD [ "pnpm","run","start" ]

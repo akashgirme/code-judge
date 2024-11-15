@@ -12,6 +12,7 @@ export class WorkerService {
   }
 
   private async initializeWorker() {
+    console.log('submission queue name.....', Config.JobQueueName);
     this.worker = new Worker(
       Config.JobQueueName,
       async (job: Job) => {

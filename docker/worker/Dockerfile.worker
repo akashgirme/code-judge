@@ -15,6 +15,7 @@ RUN npx nx reset
 RUN npx nx build worker
 
 FROM ubuntu:latest AS prod
+# FROM judge0/buildpack-deps:buster-2019-12-28
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -68,9 +69,9 @@ COPY --from=build app/dist/apps/worker/package.json app/dist/apps/worker/pnpm*.y
 
 RUN pnpm install --prod
 
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist/ ./dist
 
 USER codejudge
 
-CMD [ "node", "dist/apps/worker/main" ]
+CMD [ "sh", "-c", "sudo -E node dist/apps/worker/main" ]
 

@@ -15,10 +15,10 @@ export const config = {
 };
 
 export default function middleware(request: NextRequest) {
-  console.log('middleware running...');
+  console.log('AUth middleware running...');
   const refreshToken = request.cookies.get('refreshToken');
   if (refreshToken) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/home', request.url));
   }
   return NextResponse.next();
 }
