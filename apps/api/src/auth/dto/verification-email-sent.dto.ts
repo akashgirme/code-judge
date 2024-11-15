@@ -1,3 +1,12 @@
-import { SuccessMessageDto } from './success-message.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class VerificationEmailSentDto extends SuccessMessageDto {}
+export class VerificationEmailSentDto {
+  @ApiProperty()
+  userId: number;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  message: string;
+}

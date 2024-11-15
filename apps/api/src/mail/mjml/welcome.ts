@@ -4,8 +4,8 @@ export const welcomeMjml = `
           <mj-text>
             <p class='lead'>
               Hello {{firstName}} 👋 <br /> <br />
-              Welcome to example.com! <br/>
-              Embark on Your Coding Journey with ProblemSolver Pro! 💻 <br/><br/>
+              Welcome to Code-Judge <br/>
+              Embark on Your Coding Journey with us! 💻 <br/><br/>
               Dive into a world of algorithmic challenges, competitive programming, and continuous learning. <br/>
               From easy warm-ups to brain-bending puzzles, we've got problems for every skill level. <br/><br/>
             </p>

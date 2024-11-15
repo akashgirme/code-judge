@@ -1,0 +1,3 @@
+- In all applications export `env` variables from single config file instead of reading in respective module/package.
+- common tsconfig + prettier package/lib
+- common taiwind package/lib 

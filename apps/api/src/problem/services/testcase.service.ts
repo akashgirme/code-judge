@@ -1,29 +1,76 @@
-import { Injectable } from '@nestjs/common';
-import { StorageService } from '../../object-store/storage.service';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { ProblemService } from './problem.service';
+import { DeleteResult, QueryRunner, Repository } from 'typeorm';
+import { Problem } from '../entities';
+import { TestCaseDto } from '../dto';
+import { TestCaseType } from '../enums';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TestCase } from '../entities/test-case.entity';
 
 @Injectable()
 export class TestCaseService {
-  constructor(private readonly storageService: StorageService) {}
+  private logger = new Logger(TestCaseService.name);
+  constructor(
+    @InjectRepository(TestCase) private testCaseRepo: Repository<TestCase>,
+    @Inject(forwardRef(() => ProblemService))
+    private readonly problemService: ProblemService
+  ) {}
 
-  async saveTestCases(problemSlug: string, input: string, output: string) {
-    await Promise.all([
-      this.storageService.putObject(`problems/${problemSlug}/testcases/input.txt`, input),
-      this.storageService.putObject(
-        `problems/${problemSlug}/testcases/output.txt`,
-        output
-      ),
-    ]);
+  async createTestCase(
+    queryRunner: QueryRunner,
+    problem: Problem,
+    type: TestCaseType,
+    { input, output }: TestCaseDto
+  ) {
+    const newTestCase = this.testCaseRepo.create({
+      input,
+      output,
+      type,
+      problem,
+    });
+    return await queryRunner.manager.save(newTestCase);
   }
 
-  async getTestCases(problemSlug: string): Promise<{ input: string; output: string }> {
-    const input = await this.storageService.getObject(
-      `problems/${problemSlug}/testcases/input.txt`
-    );
+  async getExampleTestCases(problemId: number): Promise<TestCase[]> {
+    const testCases = await this.testCaseRepo
+      .createQueryBuilder('testcase')
+      .leftJoinAndSelect('testcase.problem', 'problem')
+      .select(['testcase'])
+      .where('problem.id =:problemId', { problemId })
+      .andWhere('testcase.type = :type', { type: TestCaseType.EXAMPLE })
+      .getMany();
+    return testCases;
+  }
 
-    const output = await this.storageService.getObject(
-      `problems/${problemSlug}/testcases/output.txt`
-    );
+  async getActualTestCases(problemId: number): Promise<TestCase[]> {
+    const testCases = await this.testCaseRepo
+      .createQueryBuilder('testcase')
+      .leftJoinAndSelect('testcase.problem', 'problem')
+      .select(['testcase'])
+      .where('problem.id =:problemId', { problemId })
+      .andWhere('testcase.type = :type', { type: TestCaseType.ACTUAL })
+      .getMany();
+    return testCases;
+  }
 
-    return { input, output };
+  async getTestCase(id: number) {
+    const testCase = await this.testCaseRepo.findOne({
+      where: { id },
+    });
+
+    if (!testCase) {
+      throw new NotFoundException(`No TestCase Found`);
+    }
+    return testCase;
+  }
+
+  async deleteTestCase(queryRunner: QueryRunner, id: number): Promise<DeleteResult> {
+    return queryRunner.manager.delete(TestCase, id);
   }
 }

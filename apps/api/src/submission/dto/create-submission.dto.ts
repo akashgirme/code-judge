@@ -3,19 +3,19 @@ import { IsString, IsNotEmpty, IsEnum, IsNumber } from 'class-validator';
 import { Languages } from '@code-judge/common';
 
 export class CreateSubmissionDto {
-  @ApiProperty({ type: Number })
+  @ApiProperty()
   @IsNumber()
   problemId: number;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  code: string;
+  sourceCode: string;
 
   @ApiProperty({
-    type: 'enum',
     enum: Languages,
-    enumName: 'SupportedLanguages',
+    enumName: 'Languages',
+    description: 'The Supported languages.',
   })
   @IsEnum(Languages)
   language: Languages;

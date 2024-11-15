@@ -17,7 +17,9 @@ export class TokenService {
       httpOnly: true,
       maxAge: SEVEN_DAYS_IN_MILISECONDS,
       secure: this.configService.get('NODE_ENV') !== 'development',
-      domain: this.configService.get('COOKIES_DOMAIN'),
+      domain: this.configService.get('COOKIES_DOMAIN') || 'localhost',
+      sameSite: 'lax',
+      priority: 'high',
     });
   };
 

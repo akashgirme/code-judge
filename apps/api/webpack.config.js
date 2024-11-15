@@ -14,6 +14,7 @@ module.exports = {
       assets: ['./src/assets'],
       optimization: 'all',
       outputHashing: process.env['NODE_ENV'] === 'production',
+      generatePackageJson: true,
     }),
   ],
 };

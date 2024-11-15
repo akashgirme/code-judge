@@ -1,15 +1,8 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Problem } from '../../problem/entities';
 import { User } from '../../user/entities';
-import { SubmissionState } from '../enums';
-import { Languages, StatusMessage } from '@code-judge/common';
+import { Languages, SubmissionStatus } from '@code-judge/common';
 import { Exclude } from 'class-transformer';
 
 @Entity()
@@ -18,70 +11,53 @@ export class Submission {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ApiHideProperty()
   @Column('varchar')
   @Exclude({ toPlainOnly: true })
-  path: string;
+  sourceCodePath: string;
 
-  @ApiHideProperty()
   @Column('varchar', { nullable: true })
   @Exclude({ toPlainOnly: true })
   stderrPath: string;
 
   @ApiProperty({
-    type: 'enum',
     enum: Languages,
+    enumName: 'Languages',
   })
   @Column('enum', { enum: Languages })
   language: Languages;
 
   @ApiProperty({
-    type: 'enum',
-    enum: SubmissionState,
+    enum: SubmissionStatus,
+    enumName: 'SubmissionStatus',
   })
-  @Column('enum', {
-    enum: SubmissionState,
-    default: SubmissionState.PENDING,
-  })
-  state: SubmissionState;
+  @Column('enum', { enum: SubmissionStatus })
+  status: SubmissionStatus;
 
-  @ApiProperty({
-    type: 'enum',
-    enum: StatusMessage,
-  })
   @ApiProperty()
-  @Column('enum', { enum: StatusMessage, default: StatusMessage.NULL })
-  statusMessage: StatusMessage;
-
-  @ApiProperty({ type: Number })
   @Column('int', { nullable: true })
   totalTestCases: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty()
   @Column('int', { nullable: true })
   testCasesPassed: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty()
   @Column('float8', { nullable: true })
   time: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty()
   @Column('int', { nullable: true })
   memory: number;
 
-  @ApiProperty({ type: Boolean })
-  @Column('boolean', { default: false })
-  finished: boolean;
-
-  @ApiProperty({ type: () => Problem })
   @ManyToOne(() => Problem, (problem) => problem.submissions, { eager: true })
+  @Exclude({ toPlainOnly: true })
   problem: Problem;
 
-  @ApiProperty({ type: () => User })
   @ManyToOne(() => User, (user) => user.submissions)
+  @Exclude({ toPlainOnly: true })
   user: User;
 
   @ApiProperty({ type: Date })
-  @CreateDateColumn()
+  @Column('date')
   createdAt: Date;
 }

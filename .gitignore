@@ -38,6 +38,7 @@ testem.log
 .DS_Store
 Thumbs.db
 
+.nx
 .nx/cache
 .nx/workspace-data
 
@@ -54,4 +55,10 @@ db/*
 db
 
 #Helm Chart values.yml file
-helm/code-judge/values.yaml
+k8s/helm/values.yaml
+
+# Next.js
+.next
+out
+
+storybook-static

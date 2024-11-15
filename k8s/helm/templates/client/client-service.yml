@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: '{{ .Release.Name }}-client'
+  namespace: {{ .Values.client.namespace | default "default" }}
+  labels:
+    app: '{{ .Release.Name }}-client'
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.client.service.type }}
+  selector:
+    app: '{{ .Release.Name }}-client'
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.client.service.port | default 80 }}
+      targetPort: 3000

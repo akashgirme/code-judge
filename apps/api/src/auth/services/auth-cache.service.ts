@@ -1,10 +1,8 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { User } from '../../user/entities';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { OtpDetails } from '../types';
 
-const USER_CACHING_TTL_IN_SECONDS = 1 * 60 * 60; // One Hour
 const REFRESH_TOKEN_CACHING_TTL_IN_SECONDS = 7 * 24 * 60 * 60; // 7 days
 const OTP_CACHING_TTL_IN_SECONDS = 10 * 60; // 10 Min.
 
@@ -12,25 +10,6 @@ const OTP_CACHING_TTL_IN_SECONDS = 10 * 60; // 10 Min.
 export class AuthCacheService {
   private logger = new Logger(AuthCacheService.name);
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-
-  async setUserCache(user: User): Promise<void> {
-    try {
-      await this.cacheManager.set(`user:${user.id}`, user, {
-        ttl: USER_CACHING_TTL_IN_SECONDS,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
-    } catch (error) {
-      this.logger.error(`Failed to set user cache: ${error}`);
-    }
-  }
-
-  fetchUserFromCache(userId: number): Promise<User> {
-    return this.cacheManager.get(`user:${userId}`);
-  }
-
-  deleteUserFromCache(userId: number): Promise<void> {
-    return this.cacheManager.del(`user:${userId}`);
-  }
 
   async storeRefreshTokenInCache(refreshToken: string, userId: number): Promise<void> {
     try {

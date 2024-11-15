@@ -1,0 +1,63 @@
+FROM ubuntu:latest
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install essential tools and languages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    sudo \
+    build-essential \
+    openjdk-11-jdk \
+    golang \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install node.js 20 as debian package
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get update \
+    && apt-get install -y nodejs \
+    && npm install -g nx \
+    && npm install -g pnpm \
+    && rm -rf /var/lib/apt/lists/*
+
+
+RUN set -xe && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends locales && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+# Install isolate
+RUN set -xe && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends git libcap-dev && \
+    git clone https://github.com/judge0/isolate.git /tmp/isolate && \
+    cd /tmp/isolate && \
+    git checkout ad39cc4d0fbb577fb545910095c9da5ef8fc9a1a && \
+    make -j$(nproc) install
+ENV BOX_ROOT=/var/local/lib/isolate
+
+# Create a non-privileged user & appends the NOPASSWD config in /etc/sudoers
+RUN useradd -u 1010 -m -r codejudge && \
+    echo "codejudge ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+WORKDIR /app
+
+# Change ownership of the working directory
+RUN chown codejudge:codejudge /app
+
+RUN npm install -g pnpm
+
+RUN pnpm install
+
+WORKDIR /app
+
+RUN npx nx reset
+
+ENV NODE_ENV=${NODE_ENV}
+
+USER codejudge
+
+CMD ["sudo", "npx", "nx", "serve", "worker"]
+

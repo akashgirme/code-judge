@@ -1,26 +1,47 @@
 FROM node:20-alpine AS build
 
-WORKDIR /usr/src/monorepo
+WORKDIR /app
 
-COPY package*.json ./
+RUN npm install -g pnpm
+
+COPY package.json pnpm*.yaml ./
+
+RUN pnpm install
+
 COPY . .
-
-RUN npm install
 
 RUN npx nx reset
 
-ARG VITE_API_SERVER_URL
-ENV VITE_API_SERVER_URL=${VITE_API_SERVER_URL}
+ARG NEXT_PUBLIC_API_SERVICE_URL
+ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
 
 RUN npx nx build client
 
-FROM node:20-alpine AS production
+FROM node:20-alpine
 
-WORKDIR /usr/src/monorepo
+WORKDIR /app
 
-COPY --from=build /usr/src/monorepo/dist ./dist
+RUN npm install -g pnpm
+RUN npm install -g nx
 
-RUN npm install -g serve
+COPY --from=build /app/dist/apps/client/package.json ./
 
-CMD [ "serve","-s", "dist/apps/client", "-l", "4200", "--cors" ]
+RUN pnpm install --prod
 
+COPY --from=build app/dist/apps/client ./
+COPY --from=build app/dist/libs ./libs
+COPY nx.json ./
+
+WORKDIR /app/dist/apps/client
+
+RUN pnpm install --prod
+
+WORKDIR /app
+
+ARG NEXT_PUBLIC_API_SERVICE_URL
+ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
+
+EXPOSE 3000
+
+CMD [ "pnpm", "--filter", "client", "run", "start" ]
+# CMD [ "pnpm", "run","start" ]

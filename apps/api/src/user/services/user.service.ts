@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities';
@@ -27,15 +32,69 @@ export class UserService {
     return this.repo.findOne({ where: { id } });
   }
 
-  async create({ firstName, lastName, email, provider, hasOnborded }: CreateUserDto) {
+  findVerifiedAccountByEmail(email: string): Promise<User | null> {
+    return this.repo.findOne({
+      where: { email, isEmailVerified: true },
+    });
+  }
+
+  findVerifiedAccountById(id: number): Promise<User | null> {
+    return this.repo.findOne({ where: { id, isEmailVerified: true } });
+  }
+
+  findUserByUsername(username: string): Promise<User | null> {
+    return this.repo.findOne({ where: { username, isEmailVerified: true } });
+  }
+
+  async create({
+    firstName,
+    lastName,
+    username,
+    email,
+    password,
+    provider,
+    hasOnborded,
+  }: CreateUserDto) {
     const createdUser = this.repo.create({
       firstName,
       lastName,
+      username,
       email,
+      password,
       provider,
       hasOnboarded: hasOnborded,
     });
     return await this.repo.save(createdUser);
+  }
+
+  findAccountByEmailAndId(id: number, email: string): Promise<User | null> {
+    return this.repo.findOne({ where: { id, email } });
+  }
+
+  async setVerifyTrue(id: number) {
+    const user = await this.findAccountById(id);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    try {
+      user.isEmailVerified = true;
+
+      await this.repo.save(user);
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async updatePassword(id: number, hashedPassword: string) {
+    const user = await this.findVerifiedAccountById(id);
+
+    try {
+      user.password = hashedPassword;
+
+      await this.repo.save(user);
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   async onboard(user: User, { firstName, lastName }: OnboardUserDto) {
@@ -87,17 +146,20 @@ export class UserService {
   async getAllUsers({ pageIndex = 0, pageSize = 10 }: PaginationDto) {
     const [users, totalItems] = await this.repo
       .createQueryBuilder('user')
-      .where('user.hasOnboarded = :hasOnboarded', {
-        hasOnboarded: true,
-      })
       .select([
         'user.id',
+        'user.username',
         'user.firstName',
         'user.lastName',
+        'user.email',
+        'user.hasOnboarded',
         'user.role',
         'user.createdAt',
         'user.updatedAt',
       ])
+      .where('user.isEmailVerified = :isEmailVerified', {
+        isEmailVerified: true,
+      })
       .orderBy('user.updatedAt', 'DESC')
       .skip(pageIndex * pageSize)
       .take(pageSize)

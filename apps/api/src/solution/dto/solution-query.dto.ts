@@ -5,11 +5,11 @@ import { Languages } from '@code-judge/common';
 import { PaginationDto, SortingDto } from '../../common/dto';
 
 class SolutionQuery {
-  @ApiProperty({ type: Number })
+  @ApiProperty()
   @IsNumber()
   problemId: number;
 
-  @ApiProperty({ type: 'enum', enum: Languages, enumName: 'SupportedLanguages' })
+  @ApiProperty({ type: 'enum', enum: () => Languages, enumName: 'Languages' })
   @IsEnum(Languages)
   language: Languages;
 }

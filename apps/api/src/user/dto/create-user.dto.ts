@@ -8,8 +8,14 @@ export class CreateUserDto {
   @IsString()
   lastName?: string;
 
+  @IsString()
+  username: string;
+
   @IsEmail()
   email: string;
+
+  @IsString()
+  password: string;
 
   @IsEnum(AuthProvider)
   provider: AuthProvider;

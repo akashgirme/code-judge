@@ -17,6 +17,7 @@ import { Submission } from '../../submission/entities';
 import { Exclude } from 'class-transformer';
 import { Tag } from './tag.entity';
 import { Solution } from '../../solution/entities';
+import { TestCase } from './test-case.entity';
 
 @Entity()
 export class Problem {
@@ -42,22 +43,24 @@ export class Problem {
   @Exclude({ toPlainOnly: true })
   slug: string;
 
+  @ApiHideProperty()
+  @Column('varchar')
+  @Exclude({ toPlainOnly: true })
+  descriptionPath: string;
+
   @ApiProperty({
     enum: ProblemStatus,
     enumName: 'ProblemStatus',
   })
-  @Column({
-    type: 'enum',
+  @Column('enum', {
     enum: ProblemStatus,
     default: ProblemStatus.UNPUBLISHED,
   })
   status: ProblemStatus;
 
   @ApiProperty()
-  @Column({
-    default: false,
-  })
-  hasTestCases: boolean;
+  @Column('text', { nullable: true, default: '' })
+  internalNotes: string;
 
   @ApiProperty({ type: [Tag] })
   @ManyToMany(() => Tag, (tag) => tag.problems)
@@ -65,10 +68,13 @@ export class Problem {
   tags: Tag[];
 
   @ApiProperty({
-    type: () => User,
+    type: User,
   })
   @ManyToOne(() => User, (user) => user.problems)
   author: User;
+
+  @OneToMany(() => TestCase, (testCase) => testCase.problem)
+  testCase: TestCase[];
 
   @OneToMany(() => Submission, (submission) => submission.problem)
   submissions: Submission[];
@@ -76,17 +82,14 @@ export class Problem {
   @OneToMany(() => Solution, (solution) => solution.problem)
   solutions: Solution[];
 
-  @ApiProperty()
   @CreateDateColumn()
   @Exclude({ toPlainOnly: true })
   createdAt: Date;
 
-  @ApiProperty()
   @UpdateDateColumn()
   @Exclude({ toPlainOnly: true })
   updatedAt: Date;
 
-  @ApiProperty()
   @DeleteDateColumn()
   @Exclude({ toPlainOnly: true })
   deletedAt: Date;

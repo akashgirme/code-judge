@@ -5,16 +5,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from '../../user/services';
 import { JwtPayload } from '../types';
 import { User } from '../../user/entities';
-import { AuthCacheService } from '../services';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   private logger = new Logger(JwtStrategy.name);
-  constructor(
-    private usersService: UserService,
-    private configService: ConfigService,
-    private cacheService: AuthCacheService
-  ) {
+  constructor(private usersService: UserService, private configService: ConfigService) {
     super({
       secretOrKey: configService.get('ACCESS_TOKEN_JWT_SECRET'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -24,15 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: JwtPayload): Promise<User> {
     const { id } = payload;
-
-    let user: User | null = await this.cacheService.fetchUserFromCache(id);
-    if (!user) {
-      this.logger.log('User Cache Miss');
-      user = await this.usersService.findAccountById(id);
-      if (user !== null) {
-        await this.cacheService.setUserCache(user);
-      }
-    }
+    const user = await this.usersService.findAccountById(id);
 
     if (!user) {
       throw new UnauthorizedException();

@@ -19,8 +19,8 @@ export enum Action {
   ReadOwn = 'readOwn',
   UpdateOwn = 'updateOwn',
   Update = 'update',
-  Publish = 'publish',
   Delete = 'delete',
+  Publish = 'publish',
 }
 
 export type Subjects =
@@ -43,15 +43,15 @@ export class AbilityFactory {
       case UserRole.SUPER_ADMIN:
         can(Action.Manage, 'all');
       // eslint-disable-next-line no-fallthrough
-      case UserRole.PROBLEM_ADMIN:
-        can(Action.Read, Problem);
-        can(Action.Create, Problem);
-        can(Action.Update, Problem);
-        can(Action.Read, Tag);
-        can(Action.Update, Tag);
-        can(Action.Create, Tag);
-        can(Action.Manage, Submission);
+      case UserRole.PROBLEM_MODERATOR:
+        can(Action.Manage, Problem);
+        can(Action.Manage, Tag);
       // eslint-disable-next-line no-fallthrough
+      case UserRole.PROBLEM_WRITER:
+        can(Action.Create, Problem);
+        can(Action.UpdateOwn, Problem);
+        can(Action.ReadOwn, Problem);
+        can(Action.Read, Tag);
       case UserRole.USER:
         can(Action.ReadOwn, Submission);
     }

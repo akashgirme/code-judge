@@ -1,4 +1,5 @@
 export { CreateSubmissionDto } from './create-submission.dto';
-export { SubmissionDto } from './submission-response.dto';
-export { AllSubmissionsDto } from './all-submissions.dto';
-export { SubmissionFilterDto } from './submission-filter.dto';
+export { CreateSubmissionResponseDto } from './create-submission-response.dto';
+export { RunStatusResponseDto } from './submission-status-response.dto';
+export { SubmitStatusResponseDto } from './submission-status-response.dto';
+export { SubmissionResponse } from './submission-response.dto';
