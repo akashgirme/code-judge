@@ -1,15 +1,12 @@
+'use client';
 import { useParams } from 'next/navigation';
 import { AllSubmissionsView } from './all-submissions-view';
 import { useGetSubmissionByIdQuery, useGetSubmissionsQuery } from '@code-judge/api-hooks';
 import { SubmissionDetailsContainer } from '../submission-details';
 import { removeSubmission, removeSubmissionId, setSubmission } from '../services';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
-import { Loading } from 'apps/client/components';
-import { useState } from 'react';
 
 export const AllSubmissionsContainer = () => {
-  const [trigger, setTrigger] = useState(false);
-
   const { problemId: id } = useParams();
   const problemId = Number(id);
 

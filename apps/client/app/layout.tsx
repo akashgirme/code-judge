@@ -8,14 +8,13 @@ import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 import { AppBar } from '../components';
 
+//Layout should be Server Component in order to use `export metadata`...
 // export const metadata: Metadata = {
 //   title: {
-//     default: 'Judge.Codes',
-//     template: `%s | Judge.Codes`,
+//     default: 'Code Judge',
+//     template: `%s | Code Judge`,
 //   },
 // };
-
-//Layout should be Server Component in order to use `export metadata`...
 
 const robotoFont = Roboto_Flex({
   subsets: ['latin'],

@@ -1,7 +1,8 @@
-import { Hero } from '../../components';
+'use client';
+import { Hero } from 'apps/client/components';
 
-const Home = () => {
+const HomePage = () => {
   return <Hero />;
 };
 
-export default Home;
+export default HomePage;

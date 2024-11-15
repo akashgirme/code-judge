@@ -18,6 +18,8 @@ Dockerfile.*
 .cache
 
 dist
+/dist
+/node_modules
 temp
 
 # Next.js

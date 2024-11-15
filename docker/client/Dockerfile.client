@@ -2,12 +2,13 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy Everything from root to workdir
-COPY . .
-
 RUN npm install -g pnpm
 
+COPY package.json pnpm*.yaml ./
+
 RUN pnpm install
+
+COPY . .
 
 RUN npx nx reset
 
@@ -20,18 +21,27 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY --from=build /app .
-
 RUN npm install -g pnpm
+# RUN npm install -g nx
+
+COPY --from=build /app/dist/apps/client/package.json ./
 
 RUN pnpm install --prod
 
-# Builds optimize next.js build
-RUN pnpm i sharp
+COPY --from=build app/dist/apps/client ./
+COPY --from=build app/dist/libs ./libs
+COPY nx.json ./
 
-WORKDIR /app/dist/apps/client
+# WORKDIR /app/dist/apps/client
 
-EXPOSE 3000
+# RUN pnpm install --prod
 
-CMD [ "pnpm", "run", "start" ]
+# WORKDIR /app
 
+ARG NEXT_PUBLIC_API_SERVICE_URL
+ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
+
+# EXPOSE 3000
+
+# CMD [ "pnpm", "--filter", "client", "run", "start" ]
+CMD [ "pnpm", "run","start" ]

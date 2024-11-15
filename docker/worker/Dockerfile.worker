@@ -2,12 +2,13 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy Everything from root to workdir
-COPY . .
-
 RUN npm install -g pnpm
 
+COPY package.json pnpm*.yaml ./
+
 RUN pnpm install
+
+COPY . .
 
 RUN npx nx reset
 
@@ -31,10 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get update \
     && apt-get install -y nodejs \
-    && npm install -g nx \
     && npm install -g pnpm \
     && rm -rf /var/lib/apt/lists/*
-
 
 RUN set -xe && \
     apt-get update && \
@@ -62,12 +61,12 @@ WORKDIR /app
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-COPY apps/worker/package*.json ./
-
 # Change ownership of the working directory
 RUN chown codejudge:codejudge /app
 
-RUN pnpm install --omit=dev
+COPY --from=build app/dist/apps/worker/package.json app/dist/apps/worker/pnpm*.yaml ./
+
+RUN pnpm install --prod
 
 COPY --from=build /app/dist ./dist
 
