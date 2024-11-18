@@ -21,7 +21,6 @@ type FetcherResponse<T> =
     }
   | { data: undefined; error: true | string; success: false };
 
-//TODO: use env variable
 const baseUrl = process.env['NEXT_PUBLIC_API_SERVICE_URL'];
 // const baseUrl = 'http://localhost:3000';
 

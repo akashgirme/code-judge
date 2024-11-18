@@ -22,6 +22,4 @@
 *.tmproj
 .vscode/
 
-# Ignore client deployment
-templates/client/
-client/
+

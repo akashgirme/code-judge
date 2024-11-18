@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <NextThemesProvider
                 attribute="class"
                 defaultTheme="light"
-                enableSystem
+                enableSystem={true}
                 disableTransitionOnChange
               >
                 <main className="flex-1">

@@ -9,8 +9,15 @@ import {
   ScrollArea,
   Typography,
 } from '@code-judge/core-design';
-import { ArrowLeft } from 'iconoir-react';
-import { CheckCircle2, Clock, Code2, XCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  Code2,
+  Loader2,
+  X,
+  XCircle,
+} from 'lucide-react';
 
 interface SubmitDetailsViewProps {
   data: SubmitStatusResponseDto;
@@ -44,18 +51,35 @@ export const SubmitDetailsView: React.FC<SubmitDetailsViewProps> = ({
 
   if (data.state !== 'Success') {
     return (
-      <>
-        <Button variant="link" onClick={handleOnBack}>
-          Back
+      <div className="space-y-4 pl-6">
+        <Button
+          variant="ghost"
+          onClick={handleOnBack}
+          className="flex items-center gap-2 p-0 hover:bg-transparent -ml-4"
+        >
+          <X className="h-4 w-4" />
+          <span className="text-sm font-medium">Close</span>
         </Button>
-        <Alert>
-          <Typography className="flex items-center gap-2">{data.state}</Typography>
-          {data.state === 'Pending' && 'Your submission is in the queue...'}
-          {data.state === 'Started' && 'Starting to process your submission...'}
-          {data.state === 'Running' && 'Running your code against test cases...'}
-          {data.state === 'Error' && 'There was an error processing your submission.'}
-        </Alert>
-      </>
+        <div className="text-sm">
+          <div className="flex items-center gap-2">
+            {(data.state === 'Pending' ||
+              data.state === 'Started' ||
+              data.state === 'Running') && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+            {data.state === 'Error' && (
+              <AlertCircle className="h-4 w-4 text-destructive" />
+            )}
+            <span className="font-medium">{data.state}</span>
+          </div>
+          <p className="mt-1 text-muted-foreground">
+            {data.state === 'Pending' && 'Your submission is in the queue...'}
+            {data.state === 'Started' && 'Starting to process your submission...'}
+            {data.state === 'Running' && 'Running your code against test cases...'}
+            {data.state === 'Error' && 'There was an error processing your submission.'}
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -67,8 +91,13 @@ export const SubmitDetailsView: React.FC<SubmitDetailsViewProps> = ({
   ) {
     return (
       <Card>
-        <Button variant="link" onClick={handleOnBack}>
-          Back
+        <Button
+          variant="ghost"
+          onClick={handleOnBack}
+          className="flex items-center gap-2 p-0 hover:bg-transparent -ml-4"
+        >
+          <X className="h-4 w-4" />
+          <span className="text-sm font-medium">Close</span>
         </Button>
         <CardHeader className="border-b">
           <CardTitle className="text-destructive flex items-center gap-2">
@@ -90,9 +119,13 @@ export const SubmitDetailsView: React.FC<SubmitDetailsViewProps> = ({
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" onClick={handleOnBack} className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back
+          <Button
+            variant="ghost"
+            onClick={handleOnBack}
+            className="flex items-center gap-2 p-0 hover:bg-transparent -ml-4"
+          >
+            <X className="h-4 w-4" />
+            <span className="text-sm font-medium">Close</span>
           </Button>
         </div>
       </div>

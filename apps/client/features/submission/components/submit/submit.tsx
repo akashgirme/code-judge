@@ -9,6 +9,7 @@ import { setSubmitResponse } from '../../services';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
 import { useState } from 'react';
 import { Button } from '@code-judge/core-design';
+import { toast } from 'sonner';
 
 export const SubmitCode = () => {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
@@ -18,7 +19,6 @@ export const SubmitCode = () => {
 
   const dispatch = useAppDispatch();
   const { sourceCode, language } = useAppSelector((state) => state.submission);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   const [submit, { isLoading }] = useCreateSubmissionMutation({
     fixedCacheKey: 'submit',
@@ -34,39 +34,51 @@ export const SubmitCode = () => {
   const pollWithBackoff = async (retries: number): Promise<void> => {
     if (retries === 0) {
       setSubmissionId(null);
+      toast.error('Internal server error. Please try again.');
       return;
     }
 
-    const { data } = await refetch();
+    try {
+      const { data } = await refetch();
 
-    if (data) {
-      dispatch(setSubmitResponse(data));
-    }
+      if (data) {
+        dispatch(setSubmitResponse(data));
 
-    if (data?.state === 'Success') {
+        // Check for terminal states
+        if (data?.state === 'Success') {
+          setSubmissionId(null);
+          return;
+        }
+      }
+
+      // Continue polling if we haven't reached a terminal state
+      if (submissionId && retries > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return pollWithBackoff(retries - 1);
+      }
+    } catch (error) {
+      handleError(error as Error);
       setSubmissionId(null);
-      return;
-    }
-
-    if (submissionId && retries > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return pollWithBackoff(retries - 1);
     }
   };
 
   const handleSubmit = async () => {
+    if (!sourceCode || sourceCode == '') {
+      toast.error('Code should not be empty.');
+      return;
+    }
     try {
       const { id } = await submit({
         createSubmissionDto: {
           problemId,
-          sourceCode: sourceCode ?? '',
+          sourceCode,
           language,
         },
       }).unwrap();
 
       setSubmissionId(id);
-      // Wait 1 sec before fetching first status
-      setTimeout(() => pollWithBackoff(7), 1000);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await pollWithBackoff(7);
     } catch (error) {
       handleError(error as Error);
     }

@@ -24,12 +24,13 @@ WORKDIR /app
 
 RUN npm install -g pnpm
 
-COPY --from=build app/dist/apps/api/package.json app/dist/apps/api/pnpm*.yaml ./
+COPY --from=build app/dist/apps/api/package.json ./
+COPY --from=build app/dist/apps/api/pnpm-lock.yaml ./
 COPY db-ca.crt ./
 
 RUN pnpm install --prod
+RUN pnpm add @nestjs/core @nestjs/common
 
 COPY --from=build /app/dist ./dist
 
 CMD [ "node", "dist/apps/api/main" ]
-

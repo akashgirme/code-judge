@@ -129,10 +129,11 @@ export class SubmissionService {
     return { id: submissionKey };
   }
 
-  async createDBEntry(submissionKey: string) {
+  async createDBEntry(submissionKey: string): Promise<Submission> {
     const submissionResult: SubmissionResult = await this.cacheManager.get(
       `submission:${submissionKey}`
     );
+
     /**
      * If type is SubmissionType.RUN then don't need to save submission in database
      * return
@@ -164,12 +165,14 @@ export class SubmissionService {
       stderrPath: stderrPath,
       testCasesPassed: submissionResult.passedTestCases,
       totalTestCases: submissionResult.totalTestCases,
+      time: submissionResult?.time,
+      memory: submissionResult?.memory,
       createdAt: submissionResult.createdAt,
     });
 
-    await this.submissionRepo.save(submissionObj);
+    const submission = await this.submissionRepo.save(submissionObj);
 
-    return;
+    return submission;
   }
 
   async getRunStatus(id: string): Promise<RunStatusResponseDto> {

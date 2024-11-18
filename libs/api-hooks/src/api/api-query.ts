@@ -32,14 +32,14 @@ const injectedRtkApi = api.injectEndpoints({
         params: { id: queryArg.id },
       }),
     }),
-    getSubmissions: build.query<GetSubmissionsApiResponse, GetSubmissionsApiArg>({
-      query: (queryArg) => ({ url: `/api/submissions` }),
-    }),
     getSubmissionById: build.query<GetSubmissionByIdApiResponse, GetSubmissionByIdApiArg>(
       {
         query: (queryArg) => ({ url: `/api/submissions/${queryArg.submissionId}` }),
       }
     ),
+    getSubmissions: build.query<GetSubmissionsApiResponse, GetSubmissionsApiArg>({
+      query: (queryArg) => ({ url: `/api/submissions/${queryArg.problemId}/all` }),
+    }),
     createProblem: build.mutation<CreateProblemApiResponse, CreateProblemApiArg>({
       query: (queryArg) => ({
         url: `/api/problems`,
@@ -283,13 +283,13 @@ export type GetSubmitStatusApiResponse = /** status 200  */ SubmitStatusResponse
 export type GetSubmitStatusApiArg = {
   id: string;
 };
-export type GetSubmissionsApiResponse = /** status 200  */ SubmissionResponse[];
-export type GetSubmissionsApiArg = {
-  problemId: number;
-};
 export type GetSubmissionByIdApiResponse = /** status 200  */ SubmissionResponse;
 export type GetSubmissionByIdApiArg = {
   submissionId: number;
+};
+export type GetSubmissionsApiResponse = /** status 200  */ SubmissionResponse[];
+export type GetSubmissionsApiArg = {
+  problemId: number;
 };
 export type CreateProblemApiResponse = /** status 201  */ AdminProblemDto;
 export type CreateProblemApiArg = {
@@ -679,8 +679,8 @@ export const {
   useCreateRunMutation,
   useGetRunStatusQuery,
   useGetSubmitStatusQuery,
-  useGetSubmissionsQuery,
   useGetSubmissionByIdQuery,
+  useGetSubmissionsQuery,
   useCreateProblemMutation,
   useGetProblemsQuery,
   useUpdateProblemMutation,
