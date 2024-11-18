@@ -3,7 +3,6 @@ import { BullModule } from '@nestjs/bullmq';
 import { getBullMQConfig } from '../configs/redis.config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SubmissionQueueEvents } from './submission-queue.service';
-import { DbWritesService } from './db-writes.service';
 import { SubmissionModule } from '../submission/submission.module';
 
 @Module({
@@ -16,13 +15,10 @@ import { SubmissionModule } from '../submission/submission.module';
     BullModule.registerQueue({
       name: 'submission',
     }),
-    BullModule.registerQueue({
-      name: 'addSubmissionToDB',
-    }),
     forwardRef(() => SubmissionModule),
   ],
   controllers: [],
-  providers: [SubmissionQueueEvents, DbWritesService],
+  providers: [SubmissionQueueEvents],
   exports: [BullModule],
 })
 export class QueueModule {}

@@ -9,7 +9,7 @@ import {
 } from '@code-judge/core-design';
 import { CheckCircle, Clock, FileCheck, MemoryStick, XCircle } from 'lucide-react';
 import { SubmissionResponse } from '@code-judge/api-hooks';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAppDispatch } from 'apps/client/app/store';
 import { setsubmissionId } from '../services';
 
@@ -26,6 +26,14 @@ export const AllSubmissionsView: React.FC<AllSubmissionsViewProps> = ({
   const handleSubmissionClick = (id: number) => {
     dispatch(setsubmissionId(id));
   };
+
+  // Sort submissions by createdAt time
+  const sortedSubmissions = useMemo(() => {
+    if (!data) return [];
+    return [...data].sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [data]);
 
   const getStatusIcon = (status: any) => {
     return status === 'Accepted' ? (
@@ -70,6 +78,8 @@ export const AllSubmissionsView: React.FC<AllSubmissionsViewProps> = ({
                 <TableRow
                   key={submission.id}
                   onClick={() => handleSubmissionClick(submission.id)}
+                  className="cursor-pointer hover:bg-gray-50 transition-colors"
+                  style={{ cursor: 'pointer' }}
                 >
                   <TableCell className="font-medium">
                     <div className="flex items-center space-x-2">
@@ -89,7 +99,7 @@ export const AllSubmissionsView: React.FC<AllSubmissionsViewProps> = ({
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span>
                         {submission.status === 'Accepted'
-                          ? `${submission.time * 1000} ms`
+                          ? `${(submission.time * 1000).toFixed(2)} ms`
                           : 'N/A'}
                       </span>
                     </div>

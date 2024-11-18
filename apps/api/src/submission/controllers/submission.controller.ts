@@ -72,7 +72,19 @@ export class SubmissionController {
     return this.submissionService.getSubmitStatus(id);
   }
 
-  @Get('/')
+  @Get('/:submissionId')
+  @UseGuards(AuthGuard(), AbilityGuard)
+  @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
+  @ApiOkResponse({ type: SubmissionResponse })
+  async getSubmissionById(
+    @CurrentUser() user: User,
+    @Param('submissionId', ParseIntPipe) submissionId: number
+  ): Promise<SubmissionResponse> {
+    const submission = await this.submissionService.getSubmission(user, submissionId);
+    return plainToClass(SubmissionResponse, submission);
+  }
+
+  @Get('/:problemId/all')
   @UseGuards(AuthGuard(), AbilityGuard)
   @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
   @ApiOkResponse({ type: [SubmissionResponse] })
@@ -86,17 +98,5 @@ export class SubmissionController {
     );
 
     return plainToInstance(SubmissionResponse, submissions);
-  }
-
-  @Get('/:submissionId')
-  @UseGuards(AuthGuard(), AbilityGuard)
-  @CheckAbilities({ action: Action.ReadOwn, subject: Submission })
-  @ApiOkResponse({ type: SubmissionResponse })
-  async getSubmissionById(
-    @CurrentUser() user: User,
-    @Param('submissionId', ParseIntPipe) submissionId: number
-  ): Promise<SubmissionResponse> {
-    const submission = await this.submissionService.getSubmission(user, submissionId);
-    return plainToClass(SubmissionResponse, submission);
   }
 }

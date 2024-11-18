@@ -44,16 +44,16 @@ RUN useradd -u 1010 -m -r codejudge && \
 
 WORKDIR /app
 
+# RUN npm install -g pnpm
+
 # Change ownership of the working directory
 RUN chown codejudge:codejudge /app
 
-RUN npm install -g pnpm
-
-RUN pnpm install
-
 WORKDIR /app
 
-RUN npx nx reset
+# RUN pnpm install
+
+# RUN npx nx reset
 
 ENV NODE_ENV=${NODE_ENV}
 

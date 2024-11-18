@@ -44,74 +44,73 @@ export class IsolateJob {
   constructor(private submissionService: SubmissionService) {}
 
   async perform(submission: Submission) {
-    try {
-      this.submission = submission;
-      const time: number[] = [];
-      const memory: number[] = [];
-      const result: Result[] = [];
+    this.submission = submission;
+    const time: number[] = [];
+    const memory: number[] = [];
+    const result: Result[] = [];
 
-      this.submission.state = SubmissionState.RUNNING;
-      this.submissionService.updateSubmission(this.submission);
+    // Update submission state to running as soon as job is received
+    this.submission.state = SubmissionState.RUNNING;
+    this.submissionService.updateSubmission(this.submission);
 
-      this.initializeWorkdir();
+    this.initializeWorkdir();
 
-      if (this.compile() === 'failure') {
-        this.cleanup();
-        console.log(`Submission Object on compilation error:`, this.submission);
-        return;
-      }
-
-      console.log(`Submission Object after compilation:`, this.submission);
-
-      for (let i = 0; i < this.submission.testCases.length; i++) {
-        fs.writeFileSync(this.stdinFile, this.submission.testCases[i].input);
-        fs.writeFileSync(this.expectedOutputFile, this.submission.testCases[i].output);
-
-        this.run();
-
-        this.verify();
-
-        time.push(this.submission.time);
-        memory.push(this.submission.memory);
-        result.push({
-          input: this.submission.testCases[i].input,
-          output: this.submission.stdout,
-          expectedOutput: this.submission.testCases[i].output,
-        });
-      }
-
+    if (this.compile() === 'failure') {
       this.cleanup();
-
-      this.submission.time = parseFloat(
-        (time.reduce((a, b) => a + b, 0) / time.length).toFixed(4)
-      );
-      this.submission.memory = memory.reduce((a, b) => a + b, 0) / memory.length;
-      this.submission.result = result;
-
-      this.submission.totalTestCases = this.submission.testCases.length;
-
-      let passedTestCases: number = 0;
-
-      this.submission.result.map((testCase) => {
-        if (testCase.output === testCase.expectedOutput) passedTestCases++;
-      });
-
-      this.submission.passedTestCases = passedTestCases;
-
+      console.log(`Submission Object on compilation error:`, this.submission);
       this.submission.state = SubmissionState.SUCCESS;
-
-      console.log(`Final submission Object after run & verify: `, this.submission);
-
       await this.submissionService.updateSubmission(this.submission);
-    } catch (e) {
-      console.log(`Error occured while performing operation`, e);
-      Object.assign(this.submission, {
-        message: e.message,
-        status: SubmissionStatus.INTERNAL_SERVER_ERROR,
-      });
-      await this.submissionService.updateSubmission(this.submission);
-      this.cleanup();
+      return;
     }
+
+    console.log(`Submission Object after compilation:`, this.submission);
+
+    // Iterate over all test cases and run program for each test case and collect the output
+    for (let i = 0; i < this.submission.testCases.length; i++) {
+      fs.writeFileSync(this.stdinFile, this.submission.testCases[i].input);
+      fs.writeFileSync(this.expectedOutputFile, this.submission.testCases[i].output);
+
+      this.run();
+
+      this.verify();
+
+      time.push(this.submission.time);
+      memory.push(this.submission.memory);
+      result.push({
+        input: this.submission.testCases[i].input,
+        output: this.submission.stdout,
+        expectedOutput: this.submission.testCases[i].output,
+      });
+    }
+
+    // After all testcases run clean the code, testcases, compile.sh & other program files.
+    this.cleanup();
+
+    // Take average of time require to run program against all test cases
+    this.submission.time = parseFloat(
+      (time.reduce((a, b) => a + b, 0) / time.length).toFixed(4)
+    );
+
+    // Take average of memory require to run program against all test cases
+    this.submission.memory = memory.reduce((a, b) => a + b, 0) / memory.length;
+    this.submission.result = result;
+
+    this.submission.totalTestCases = this.submission.testCases.length;
+
+    let passedTestCases: number = 0;
+
+    // Calculate the number of passed testcases, comparing expected output vs actual output
+    this.submission.result.map((testCase) => {
+      if (testCase.output === testCase.expectedOutput) passedTestCases++;
+    });
+
+    this.submission.passedTestCases = passedTestCases;
+
+    this.submission.state = SubmissionState.SUCCESS;
+
+    console.log(`Final submission Object after run & verify: `, this.submission);
+
+    await this.submissionService.updateSubmission(this.submission);
   }
 
   /**
@@ -121,7 +120,7 @@ export class IsolateJob {
 
   private initializeWorkdir() {
     this.boxId = Math.floor(100 + Math.random() * 900);
-    this.workDir = execSync(`isolate --cg -b ${this.boxId} --init`).toString().trim();
+    this.workDir = execSync(`isolate -b ${this.boxId} --init`).toString().trim();
     this.boxDir = path.join(this.workDir, 'box');
     this.tmpDir = path.join(this.workDir, 'tmp');
     this.sourceFile = path.join(this.boxDir, this.submission.languageConfig.sourceFile);
@@ -155,7 +154,12 @@ export class IsolateJob {
     execSync(`sudo touch ${file} && sudo chown $(whoami):$(whoami) ${file}`);
   }
 
+  /**
+   * Method to Compile Code
+   * Compile code and create executable of program
+   */
   private compile(): 'success' | 'failure' {
+    // Interpreted language don't have compilation step so pass the compilation process with 'success' message
     if (!this.submission.languageConfig.compileCmd) {
       return 'success';
     }
@@ -173,7 +177,7 @@ export class IsolateJob {
     );
     this.initializeFile(compileOutputFile);
 
-    const command = `isolate --cg \
+    const command = `isolate \
       -s \
       -b ${this.boxId} \
       -M ${this.metadatFile} \
@@ -184,7 +188,7 @@ export class IsolateJob {
       -w ${this.submission.languageConfig.wallTimeLimit} \
       -p${this.submission.languageConfig.maxpProcessesAndOrThreads} \
       -k ${this.submission.languageConfig.stackLimit} \
-      --cg-mem=${this.submission.languageConfig.memoryLimit} \
+      -m ${this.submission.languageConfig.memoryLimit} \
       -f ${this.submission.languageConfig.maxFileSize} \
       -E HOME=/tmp \
       -E PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\" \
@@ -195,22 +199,7 @@ export class IsolateJob {
 
     command.replace(/\s+/g, ' ');
 
-    console.log(
-      `Compiling...`,
-      `Language: `,
-      this.submission.language,
-      `Source Code: `,
-      this.submission.sourceCode,
-      `Compile command: `,
-      command
-    );
-
-    try {
-      execSync(command);
-    } catch (error) {
-      console.log(error);
-      this.submission.status = SubmissionStatus.MEMORY_LIMIT_EXCEEDED;
-    }
+    execSync(command);
 
     // Read output/err while compiling the code from `compileOutputFile`
     const compileOutput =
@@ -254,16 +243,16 @@ export class IsolateJob {
   }
 
   private run() {
-    const command = `isolate --cg \
+    const command = `isolate \
       -s \
       -b ${this.boxId} \
       -M ${this.metadatFile} \
       -t ${this.submission.languageConfig.cpuTimeLimit} \
       -x ${this.submission.languageConfig.cpuExtraTime} \
       -w ${this.submission.languageConfig.wallTimeLimit} \
-      -p${this.submission.languageConfig.maxpProcessesAndOrThreads} \
       -k ${this.submission.languageConfig.stackLimit} \
-      --cg-mem=${this.submission.languageConfig.memoryLimit} \
+      -p${this.submission.languageConfig.maxpProcessesAndOrThreads} \
+      -m ${this.submission.languageConfig.memoryLimit} \
       -f ${this.submission.languageConfig.maxFileSize} \
       -E HOME=/tmp \
       -E PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\" \
@@ -275,21 +264,7 @@ export class IsolateJob {
 
     command.replace(/\s+/g, ' ');
 
-    console.log(
-      `Running...`,
-      `Language: `,
-      this.submission.language,
-      `Source Code: `,
-      this.submission.sourceCode,
-      `Run command: `,
-      command
-    );
-
-    try {
-      execSync(command);
-    } catch (error) {
-      console.log(error);
-    }
+    execSync(command);
   }
 
   /**

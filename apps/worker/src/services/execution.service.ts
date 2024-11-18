@@ -25,5 +25,7 @@ export class ExecutionService {
     };
 
     await this.isolateJob.perform(submission);
+
+    return;
   }
 }

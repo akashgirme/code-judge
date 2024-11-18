@@ -4,8 +4,9 @@ import { handleError } from 'apps/client/utils';
 import { useParams } from 'next/navigation';
 import { setRunResponse } from '../../services';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@code-judge/core-design';
+import { toast } from 'sonner';
 
 export const RunCode = () => {
   const [runId, setRunId] = useState<string | null>(null);
@@ -15,9 +16,6 @@ export const RunCode = () => {
 
   const dispatch = useAppDispatch();
   const { sourceCode, language } = useAppSelector((state) => state.submission);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-
-  const isButtonActive = isAuthenticated && Boolean(sourceCode);
 
   const [submit, { isLoading }] = useCreateRunMutation({
     fixedCacheKey: 'run',
@@ -31,43 +29,57 @@ export const RunCode = () => {
   );
 
   const pollWithBackoff = async (retries: number): Promise<void> => {
+    console.log('remaining retries: ', retries);
     if (retries === 0) {
       setRunId(null);
+      toast.error('Internal server error. Please try again.');
       return;
     }
 
-    const { data } = await refetch();
+    try {
+      const { data } = await refetch();
 
-    if (data) {
-      dispatch(setRunResponse(data));
-    }
+      console.log('data: ', data);
 
-    if (data?.state === 'Success') {
-      // dispatch(setRunResponse(data));
+      if (data) {
+        dispatch(setRunResponse(data));
+
+        // Check for terminal states
+        if (data.state === 'Success' || data.state === 'Error') {
+          setRunId(null);
+          return;
+        }
+      }
+
+      console.log(`Poll number ${7 - retries} completed`);
+
+      // Continue polling if we haven't reached a terminal state
+      if (runId && retries > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return pollWithBackoff(retries - 1);
+      }
+    } catch (error) {
+      handleError(error as Error);
       setRunId(null);
-      return;
-    }
-
-    //TODO: if state == 'Error' toast 'Server Error' in both run & submit
-
-    if (runId && retries > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return pollWithBackoff(retries - 1);
     }
   };
 
   const handleSubmit = async () => {
+    if (!sourceCode || sourceCode == '') {
+      toast.error('Code should not be empty.');
+      return;
+    }
     try {
       const { id } = await submit({
         createSubmissionDto: {
           problemId,
-          sourceCode: sourceCode ?? '',
+          sourceCode,
           language,
         },
       }).unwrap();
       setRunId(id);
-      // Wait 1 sec before fetching first status
-      setTimeout(() => pollWithBackoff(7), 1000);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await pollWithBackoff(7);
     } catch (error) {
       handleError(error as Error);
     }
@@ -77,7 +89,7 @@ export const RunCode = () => {
     <Button
       onClick={handleSubmit}
       variant="primary-outline"
-      isActive={isButtonActive}
+      isActive={true}
       isLoading={isLoading}
     >
       {isLoading ? 'Running...' : 'Run Code'}

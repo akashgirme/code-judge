@@ -8,7 +8,7 @@ import {
   CardTitle,
   Typography,
 } from '@code-judge/core-design';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, X, XCircle } from 'lucide-react';
 
 interface RunDetailsViewProps {
   data: RunStatusResponseDto;
@@ -18,18 +18,35 @@ interface RunDetailsViewProps {
 export const RunDetailsView: React.FC<RunDetailsViewProps> = ({ data, handleOnBack }) => {
   if (data.state !== 'Success') {
     return (
-      <>
-        <Button variant="link" onClick={handleOnBack}>
-          Back
+      <div className="space-y-4 p-4">
+        <Button
+          variant="ghost"
+          onClick={handleOnBack}
+          className="flex items-center gap-2 p-0 hover:bg-transparent -ml-4"
+        >
+          <X className="h-4 w-4" />
+          <span className="text-sm font-medium">Close</span>
         </Button>
-        <Alert>
-          <Typography className="flex items-center gap-2">{data.state}</Typography>
-          {data.state === 'Pending' && 'Your submission is in the queue...'}
-          {data.state === 'Started' && 'Starting to process your submission...'}
-          {data.state === 'Running' && 'Running your code against test cases...'}
-          {data.state === 'Error' && 'There was an error processing your submission.'}
-        </Alert>
-      </>
+        <div className="text-sm">
+          <div className="flex items-center gap-2">
+            {(data.state === 'Pending' ||
+              data.state === 'Started' ||
+              data.state === 'Running') && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+            {data.state === 'Error' && (
+              <AlertCircle className="h-4 w-4 text-destructive" />
+            )}
+            <span className="font-medium">{data.state}</span>
+          </div>
+          <p className="mt-1 text-muted-foreground">
+            {data.state === 'Pending' && 'Your submission is in the queue...'}
+            {data.state === 'Started' && 'Starting to process your submission...'}
+            {data.state === 'Running' && 'Running your code against test cases...'}
+            {data.state === 'Error' && 'There was an error processing your submission.'}
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -41,8 +58,9 @@ export const RunDetailsView: React.FC<RunDetailsViewProps> = ({ data, handleOnBa
   ) {
     return (
       <Card>
-        <Button variant="link" onClick={handleOnBack}>
-          Back
+        <Button variant="ghost" onClick={handleOnBack}>
+          <X className="h-4 w-4" />
+          <span className="text-sm font-medium">Close</span>
         </Button>
         <CardHeader className="border-b">
           <CardTitle className="text-destructive flex items-center gap-2">
@@ -64,8 +82,9 @@ export const RunDetailsView: React.FC<RunDetailsViewProps> = ({ data, handleOnBa
   if (data.status === 'Accepted' || data.status === 'Wrong Answer') {
     return (
       <Card>
-        <Button variant="link" onClick={handleOnBack}>
-          Back
+        <Button variant="ghost" onClick={handleOnBack}>
+          <X className="h-4 w-4" />
+          <span className="text-sm font-medium">Close</span>
         </Button>
         <CardHeader className="border-b">
           {data.status === 'Accepted' ? (
@@ -74,8 +93,8 @@ export const RunDetailsView: React.FC<RunDetailsViewProps> = ({ data, handleOnBa
               Congratulations!
             </CardTitle>
           ) : (
-            <CardTitle className="text-green-600 flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5" />
+            <CardTitle className="text-destructive flex items-center gap-2">
+              <X className="h-5 w-5" />
               Wrong Answer!
             </CardTitle>
           )}
@@ -85,8 +104,19 @@ export const RunDetailsView: React.FC<RunDetailsViewProps> = ({ data, handleOnBa
             {data.result.map((testCase: ResultDto, index) => (
               <div key={index} className="border-b last:border-0">
                 <div className="flex items-center gap-2 p-4 bg-muted/50">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  <span className="font-medium">Sample Test case {index}</span>
+                  {testCase.expectedOutput === testCase.output ? (
+                    <>
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <span className="font-medium">Sample Test case {index}</span>
+                    </>
+                  ) : (
+                    <>
+                      <X className="h-4 w-4 text-destructive" />
+                      <span className="font-medium text-destructive">
+                        Sample Test case {index}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="p-6 space-y-6">
                   <div>
@@ -124,8 +154,13 @@ export const RunDetailsView: React.FC<RunDetailsViewProps> = ({ data, handleOnBa
 
   return (
     <Card>
-      <Button variant="link" onClick={handleOnBack}>
-        Back
+      <Button
+        variant="ghost"
+        onClick={handleOnBack}
+        className="flex items-center gap-2 p-0 hover:bg-transparent -ml-4"
+      >
+        <X className="h-4 w-4" />
+        <span className="text-sm font-medium">Close</span>
       </Button>
       <Typography variant="body1">Status: {data.state}</Typography>
     </Card>
