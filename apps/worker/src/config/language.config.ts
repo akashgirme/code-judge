@@ -33,13 +33,13 @@ export const goLangConfig: LanguageConfig = {
   sourceFile: 'main.go',
   compileCmd: 'go build main.go',
   runCmd: './main',
-  cpuTimeLimit: 3,
+  cpuTimeLimit: 20,
   cpuExtraTime: 0,
-  wallTimeLimit: 3,
-  stackLimit: 1024 * 1024 * 200, // 200MB
-  maxpProcessesAndOrThreads: 10,
-  memoryLimit: 1024 * 1024 * 100, // 100MB
-  maxFileSize: 1024, // 1MB
+  wallTimeLimit: 25,
+  stackLimit: 1024 * 1024 * 1024, // 1GB
+  maxpProcessesAndOrThreads: 100,
+  memoryLimit: 1024 * 1024 * 1024, // 1GB
+  maxFileSize: 1024 * 50, // 50MB
 };
 
 export const javaConfig: LanguageConfig = {
@@ -47,24 +47,24 @@ export const javaConfig: LanguageConfig = {
   sourceFile: 'Main.java',
   compileCmd: 'java Main.java',
   runCmd: 'java Main',
-  cpuTimeLimit: 2,
+  cpuTimeLimit: 20,
   cpuExtraTime: 0,
-  wallTimeLimit: 2,
-  stackLimit: 1024 * 1024 * 200, // 200MB
-  maxpProcessesAndOrThreads: 10,
-  memoryLimit: 1024 * 1024 * 100, // 100MB
-  maxFileSize: 1024, // 1MB
+  wallTimeLimit: 25,
+  stackLimit: 1024 * 1024 * 1024 * 1, // 2GB
+  maxpProcessesAndOrThreads: 100,
+  memoryLimit: 1024 * 1024 * 512 * 1, // 2GB
+  maxFileSize: 1024 * 10, // 10MB
 };
 
 export const javaScriptConfig: LanguageConfig = {
   name: 'JavaScript (Node.js 20)',
   sourceFile: 'script.js',
   runCmd: 'node script.js',
-  cpuTimeLimit: 2, // 2 sec
+  cpuTimeLimit: 20, // 2 sec
   cpuExtraTime: 0,
-  wallTimeLimit: 2, // 2 sec
-  stackLimit: 1024 * 1024 * 200, // 200MB
-  maxpProcessesAndOrThreads: 10,
-  memoryLimit: 1024 * 1024 * 100, // 100MB
+  wallTimeLimit: 20, // 2 sec
+  stackLimit: 1024 * 1024 * 1024, // 1GB
+  maxpProcessesAndOrThreads: 100,
+  memoryLimit: 1024 * 1024 * 1024, // 1Gb
   maxFileSize: 1024, // 1MB
 };

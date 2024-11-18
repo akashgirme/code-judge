@@ -199,11 +199,17 @@ export class IsolateJob {
 
     command.replace(/\s+/g, ' ');
 
-    execSync(command);
+    try {
+      execSync(command);
+    } catch (e) {
+      console.log('Error while running compile cmd: ', e);
+    }
 
     // Read output/err while compiling the code from `compileOutputFile`
     const compileOutput =
       fs.readFileSync(compileOutputFile, { encoding: 'utf-8' })?.trim() || null;
+
+    console.log('compile Output: ', compileOutput);
 
     const metadata = this.getMetadata();
     this.resetMetadataFile();
@@ -214,6 +220,13 @@ export class IsolateJob {
       return 'failure';
     }
 
+    if (metadata.status === 'SG') {
+      this.submission.stderr = compileOutput;
+      this.submission.status = SubmissionStatus.INTERNAL_SERVER_ERROR;
+      this.submission.stderr = metadata.message;
+      return 'failure';
+    }
+
     /**
      * Check for `SIGSEGV` signal from metadata file,
      *If exists indicates that process is killed by control group due to `Memory limit is exceeds`.
@@ -221,6 +234,7 @@ export class IsolateJob {
     if (metadata.signal === 'SIGSEGV') {
       this.submission.stderr = 'Compilation memory limit exceeded.';
       this.submission.status = SubmissionStatus.COMPILE_ERROR;
+      this.submission.stderr = metadata.message;
 
       return 'failure';
     }
@@ -232,6 +246,7 @@ export class IsolateJob {
     if (metadata.status === 'TO') {
       this.submission.stderr = 'Compilation time limit exceeded.';
       this.submission.status = SubmissionStatus.COMPILE_ERROR;
+      this.submission.stderr = metadata.message;
 
       return 'failure';
     }
@@ -279,6 +294,10 @@ export class IsolateJob {
 
     let programStderr = readFileSync(this.stderrFile, { encoding: 'utf-8' });
     programStderr = programStderr?.trim() ?? null;
+
+    if (!programStderr) {
+      this.submission.stderr = metadata.message;
+    }
 
     this.submission.time = parseFloat(metadata.time);
     this.submission.wallTime = parseFloat(metadata['time-wall']);

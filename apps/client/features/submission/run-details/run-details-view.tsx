@@ -162,7 +162,17 @@ export const RunDetailsView: React.FC<RunDetailsViewProps> = ({ data, handleOnBa
         <X className="h-4 w-4" />
         <span className="text-sm font-medium">Close</span>
       </Button>
-      <Typography variant="body1">Status: {data.state}</Typography>
+      <CardTitle className="text-red-600 text-md text-destructive flex items-center gap-2 p-4">
+        <X className="h-4 w-4 text-destructive" />
+        {data.status}
+      </CardTitle>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <pre className="bg-muted/50 p-4 rounded-lg overflow-x-auto text-sm">
+            {data.error}
+          </pre>
+        </div>
+      </CardContent>
     </Card>
   );
 };
