@@ -1,5 +1,5 @@
 'use client';
-import { ProblemDto } from '@code-judge/api-hooks';
+import { ProblemDto } from '@algo-forge/api-hooks';
 import { ProblemDetails, ProblemHeroSection } from './components';
 import { Loading } from 'apps/client/components';
 

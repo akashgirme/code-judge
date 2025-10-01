@@ -1,7 +1,7 @@
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { RequestSignInOtpModel } from './request-sign-in-otp-logic';
-import { Button, EmailField, CardContent } from '@code-judge/core-design';
-import { useRequestSignInOtpMutation } from '@code-judge/api-hooks';
+import { Button, EmailField, CardContent } from '@algo-forge/core-design';
+import { useRequestSignInOtpMutation } from '@algo-forge/api-hooks';
 import { PageHeader } from 'apps/client/components';
 import { CreateAccountButton, OR, PolicyDisclaimer } from '../components';
 

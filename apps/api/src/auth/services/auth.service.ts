@@ -140,7 +140,7 @@ export class AuthService {
     //TODO: Queue sendMail job instead of awaiting here
     await this.mailService.sendMail({
       to: email,
-      subject: 'Verify your email for Code-Judge',
+      subject: 'Verify your email for algo-forge',
       htmlBody: verifyEmailWithOtpMjml,
       data: { firstName: username, otp },
     });
@@ -175,7 +175,7 @@ export class AuthService {
 
     await this.mailService.sendMail({
       to: email,
-      subject: 'Verify your email for Code-Judge',
+      subject: 'Verify your email for algo-forge',
       htmlBody: verifyEmailWithOtpMjml,
       data: { firstName: existingUser.username, otp },
     });
@@ -248,7 +248,7 @@ export class AuthService {
 
     await this.mailService.sendMail({
       to: email,
-      subject: 'Your Sign in OTP for Code-Judge',
+      subject: 'Your Sign in OTP for algo-forge',
       htmlBody: verifyEmailWithOtpMjml,
       data: { firstName: user.username, otp },
     });

@@ -1,4 +1,4 @@
-import { Languages } from '@code-judge/common';
+import { Languages } from '@algo-forge/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
 

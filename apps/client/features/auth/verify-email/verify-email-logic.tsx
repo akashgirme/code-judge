@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerifyEmailView } from './verify-email-view';
-import { otpValidations } from '@code-judge/core-design';
+import { otpValidations } from '@algo-forge/core-design';
 
 const VerifyEmailSchema = z.object({
   ...otpValidations,

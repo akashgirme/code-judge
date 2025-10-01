@@ -1,4 +1,4 @@
-import { SubmissionResponse } from '@code-judge/api-hooks';
+import { SubmissionResponse } from '@algo-forge/api-hooks';
 import {
   Badge,
   Button,
@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import {
   ArrowLeft,
   CheckCircle,

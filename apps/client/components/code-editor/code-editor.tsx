@@ -1,8 +1,8 @@
 import React, { CSSProperties } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import { Card } from '@code-judge/core-design';
+import { Card } from '@algo-forge/core-design';
 import { Editor } from '@monaco-editor/react';
-import { Languages } from '@code-judge/api-hooks';
+import { Languages } from '@algo-forge/api-hooks';
 
 interface CodeEditorProps {
   language: string;

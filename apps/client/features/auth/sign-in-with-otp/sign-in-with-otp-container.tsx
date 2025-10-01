@@ -1,7 +1,7 @@
 import {
   useRequestSignInOtpMutation,
   useSignInWithOtpMutation,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 
 import { SignInWithOtpLogic, SignInWithOtpModel } from './sign-in-with-otp-logic';
 import { useSearchParams } from 'next/navigation';

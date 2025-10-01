@@ -2,7 +2,7 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { modelKey, questionConfig } from './problem-tags-config';
 import { MultipleSelector, Option } from '../../../ui';
-import { useGetAllTagsQuery } from '@code-judge/api-hooks';
+import { useGetAllTagsQuery } from '@algo-forge/api-hooks';
 import { HelperText } from '../../../atoms';
 import { useMemo } from 'react';
 

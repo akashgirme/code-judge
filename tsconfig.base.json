@@ -15,10 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@code-judge/api-hooks": ["libs/api-hooks/src/index.ts"],
-      "@code-judge/common": ["libs/common/src/index.ts"],
-      "@code-judge/core-design": ["libs/core-design/src/index.ts"],
-      "@code-judge/ui": ["libs/ui/index.ts"]
+      "@algo-forge/api-hooks": ["libs/api-hooks/src/index.ts"],
+      "@algo-forge/common": ["libs/common/src/index.ts"],
+      "@algo-forge/core-design": ["libs/core-design/src/index.ts"],
+      "@algo-forge/ui": ["libs/ui/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

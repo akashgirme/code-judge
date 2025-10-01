@@ -1,7 +1,7 @@
 'use client';
 import { useParams, useRouter } from 'next/navigation';
 import { CreateTagLogic, CreateTagModel } from '../create-tag/create-tag-logic';
-import { useGetTagQuery, useUpdateTagMutation } from '@code-judge/api-hooks';
+import { useGetTagQuery, useUpdateTagMutation } from '@algo-forge/api-hooks';
 
 export const EditTagContainer = () => {
   const router = useRouter();

@@ -7,7 +7,7 @@ import {
   emailValidations,
   passwordValidations,
   usernameValidations,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 
 const SignUpSchema = z
   .object({

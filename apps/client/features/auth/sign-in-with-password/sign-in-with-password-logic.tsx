@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SignInWithPasswordView } from './sign-in-with-password-view';
-import { emailValidations, passwordValidationsLoose } from '@code-judge/core-design';
+import { emailValidations, passwordValidationsLoose } from '@algo-forge/core-design';
 
 const SignInSchema = z.object({
   ...emailValidations,

@@ -1,4 +1,4 @@
-import { OptionWrapper } from '@code-judge/core-design';
+import { OptionWrapper } from '@algo-forge/core-design';
 import { handleComingSoonAlert } from 'apps/client/utils';
 import React from 'react';
 import { Key } from 'iconoir-react';

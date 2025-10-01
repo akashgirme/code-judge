@@ -1,5 +1,5 @@
 import { SignInWithPasswordLogic, SignInModel } from './sign-in-with-password-logic';
-import { useSignInMutation } from '@code-judge/api-hooks';
+import { useSignInMutation } from '@algo-forge/api-hooks';
 import { useAuth } from '../hooks';
 import { handleError } from 'apps/client/utils/handle-error';
 

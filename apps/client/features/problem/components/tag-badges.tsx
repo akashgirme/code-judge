@@ -1,5 +1,5 @@
-import { Tag } from '@code-judge/api-hooks';
-import { Badge } from '@code-judge/core-design';
+import { Tag } from '@algo-forge/api-hooks';
+import { Badge } from '@algo-forge/core-design';
 
 interface TagBadgesProps {
   tags: Tag[];

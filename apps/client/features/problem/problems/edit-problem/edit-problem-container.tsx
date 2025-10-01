@@ -6,7 +6,7 @@ import {
 import {
   useGetProblemForAdminQuery,
   useUpdateProblemMutation,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 
 export const EditProblemContainer = () => {
   const router = useRouter();

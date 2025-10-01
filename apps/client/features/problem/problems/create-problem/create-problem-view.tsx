@@ -16,8 +16,8 @@ import {
   ProblemTagsField,
   ProblemTitleField,
   Typography,
-} from '@code-judge/core-design';
-import { useCreateProblemMutation } from '@code-judge/api-hooks';
+} from '@algo-forge/core-design';
+import { useCreateProblemMutation } from '@algo-forge/api-hooks';
 import { useParams } from 'next/navigation';
 import { Can } from 'apps/client/features/auth/ability/Can';
 import { Action, Subject } from 'apps/client/features/auth/ability/ability-factory';

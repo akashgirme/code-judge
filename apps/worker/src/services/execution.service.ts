@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { getLanguageConfig } from '../utils';
 import { SubmissionService } from './submission.service';
-import { SubmissionRequest, SubmissionResult, SubmissionState } from '@code-judge/common';
+import { SubmissionRequest, SubmissionResult, SubmissionState } from '@algo-forge/common';
 import { IsolateJob } from './isolate-job.service';
 import { Submission } from '../types';
 

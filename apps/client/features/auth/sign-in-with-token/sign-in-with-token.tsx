@@ -1,6 +1,6 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { useSignInWithTokenMutation } from '@code-judge/api-hooks';
+import { useSignInWithTokenMutation } from '@algo-forge/api-hooks';
 import { useAuth } from '../hooks';
 import { useOnboard } from '../onboard';
 

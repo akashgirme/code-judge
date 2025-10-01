@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Problem } from '../../problem/entities';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { Languages } from '@code-judge/common';
+import { Languages } from '@algo-forge/common';
 import { User } from '../../user/entities';
 import { Exclude } from 'class-transformer';
 

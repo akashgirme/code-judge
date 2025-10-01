@@ -1,4 +1,4 @@
-import { Switch, Typography } from '@code-judge/core-design';
+import { Switch, Typography } from '@algo-forge/core-design';
 import { Flask } from 'iconoir-react';
 
 export const SignInBeta = () => {

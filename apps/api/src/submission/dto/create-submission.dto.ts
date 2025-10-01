@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsEnum, IsNumber } from 'class-validator';
-import { Languages } from '@code-judge/common';
+import { Languages } from '@algo-forge/common';
 
 export class CreateSubmissionDto {
   @ApiProperty()

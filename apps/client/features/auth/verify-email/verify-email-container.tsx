@@ -1,7 +1,7 @@
 import {
   useResendVerificationEmailMutation,
   useVerifyEmailMutation,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 import { VerifyEmailLogic, VerifyEmailModel } from './verify-email-logic';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../hooks';

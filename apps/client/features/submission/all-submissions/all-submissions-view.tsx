@@ -6,9 +6,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { CheckCircle, Clock, FileCheck, MemoryStick, XCircle } from 'lucide-react';
-import { SubmissionResponse } from '@code-judge/api-hooks';
+import { SubmissionResponse } from '@algo-forge/api-hooks';
 import React, { useMemo } from 'react';
 import { useAppDispatch } from 'apps/client/app/store';
 import { setsubmissionId } from '../services';

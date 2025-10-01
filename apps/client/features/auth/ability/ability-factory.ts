@@ -6,7 +6,7 @@ import {
   createMongoAbility,
 } from '@casl/ability';
 
-import { UserRole } from '@code-judge/api-hooks';
+import { UserRole } from '@algo-forge/api-hooks';
 
 export enum Action {
   Manage = 'manage',

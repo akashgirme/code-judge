@@ -5,8 +5,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@code-judge/core-design';
-import { ProblemDifficulty, useGetProblemsQuery } from '@code-judge/api-hooks';
+} from '@algo-forge/core-design';
+import { ProblemDifficulty, useGetProblemsQuery } from '@algo-forge/api-hooks';
 import Link from 'next/link';
 
 export const PublicProblemsView = () => {

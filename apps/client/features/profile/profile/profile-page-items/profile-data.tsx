@@ -1,5 +1,5 @@
-import { User } from '@code-judge/api-hooks';
-import { Chip, Typography } from '@code-judge/core-design';
+import { User } from '@algo-forge/api-hooks';
+import { Chip, Typography } from '@algo-forge/core-design';
 import { UserAvatar } from 'apps/client/components';
 import Link from 'next/link';
 import React from 'react';

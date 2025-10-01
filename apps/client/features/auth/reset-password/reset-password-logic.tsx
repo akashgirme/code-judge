@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResetPasswordView } from './reset-password-view';
-import { passwordValidations, confirmPasswordValidations } from '@code-judge/core-design';
+import { passwordValidations, confirmPasswordValidations } from '@algo-forge/core-design';
 
 const ResetPasswordSchema = z
   .object({

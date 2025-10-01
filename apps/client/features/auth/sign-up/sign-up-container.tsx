@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { SignUpLogic, SignUpModel } from './sign-up-logic';
-import { useSignUpMutation } from '@code-judge/api-hooks';
+import { useSignUpMutation } from '@algo-forge/api-hooks';
 import { handleError, handleSuccess } from 'apps/client/utils';
 
 export const SignUpContainer = () => {

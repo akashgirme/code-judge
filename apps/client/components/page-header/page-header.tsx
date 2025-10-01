@@ -3,7 +3,7 @@ import {
   CardHeader,
   CardTitle,
   Typography,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { BackButton } from '../back-button';
 import { ReactNode } from 'react';
 import { HeaderData } from 'apps/client/constant';

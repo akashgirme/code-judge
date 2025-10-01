@@ -1,5 +1,5 @@
 'use client';
-import { Button } from '@code-judge/core-design';
+import { Button } from '@algo-forge/core-design';
 import { useTimer } from '../../hooks';
 import { RefreshDouble } from 'iconoir-react';
 

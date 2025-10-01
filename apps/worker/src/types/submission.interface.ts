@@ -1,7 +1,7 @@
 import { SubmissionType } from 'libs/common/src/enum/submission-type.enum';
 import { LanguageConfig } from './langauge-config.interface';
 import { TestCases } from 'libs/common/src/types/submission.interface';
-import { Languages, SubmissionState, SubmissionStatus } from '@code-judge/common';
+import { Languages, SubmissionState, SubmissionStatus } from '@algo-forge/common';
 import { Result } from './result.interface';
 
 export interface Submission {

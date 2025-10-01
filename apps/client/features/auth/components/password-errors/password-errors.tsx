@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { getErrors } from './get-errors';
 import { useMemo } from 'react';
-import { extractErrorMessages } from '@code-judge/core-design';
+import { extractErrorMessages } from '@algo-forge/core-design';
 
 export const PasswordErrors = () => {
   const {

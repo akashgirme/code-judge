@@ -1,7 +1,7 @@
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { EditProfileModel } from './edit-profile-logic';
-import { Button, FirstNameField, LastNameField } from '@code-judge/core-design';
-import { useEditProfileMutation } from '@code-judge/api-hooks';
+import { Button, FirstNameField, LastNameField } from '@algo-forge/core-design';
+import { useEditProfileMutation } from '@algo-forge/api-hooks';
 import { ProfileTopbar } from '../components';
 import { ProfileImg } from './components';
 

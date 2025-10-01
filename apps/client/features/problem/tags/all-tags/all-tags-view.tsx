@@ -6,8 +6,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@code-judge/core-design';
-import { useGetAllTagsQuery } from '@code-judge/api-hooks';
+} from '@algo-forge/core-design';
+import { useGetAllTagsQuery } from '@algo-forge/api-hooks';
 import Link from 'next/link';
 import { EditPencil } from 'iconoir-react';
 import { Can } from 'apps/client/features/auth/ability/Can';

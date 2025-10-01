@@ -1,20 +1,16 @@
-'use client';
 import { Inter, Roboto_Flex } from 'next/font/google';
-import { store, persistor } from './store';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 import { AppBar } from '../components';
+import StoreProvider from './store-provider';
 
-//Layout should be Server Component in order to use `export metadata`...
-// export const metadata: Metadata = {
-//   title: {
-//     default: 'Code Judge',
-//     template: `%s | Code Judge`,
-//   },
-// };
+export const metadata: Metadata = {
+  title: {
+    default: 'Algo Forge',
+    template: `%s | Algo Forge`,
+  },
+};
 
 const robotoFont = Roboto_Flex({
   subsets: ['latin'],
@@ -38,22 +34,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={` ${inter.className} ${robotoFont.variable} ${inter.variable}`}
       >
         <body style={{ height: '-webkit-fill-available' }} className="flex flex-col ">
-          <Provider store={store}>
-            <PersistGate persistor={persistor}>
-              <NextThemesProvider
-                attribute="class"
-                defaultTheme="light"
-                enableSystem={true}
-                disableTransitionOnChange
-              >
+          <NextThemesProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={true}
+            disableTransitionOnChange
+          >
+            <StoreProvider>
+              <>
                 <main className="flex-1">
                   <AppBar />
                   {children}
                 </main>
                 <Toaster />
-              </NextThemesProvider>
-            </PersistGate>
-          </Provider>
+              </>
+            </StoreProvider>
+          </NextThemesProvider>
         </body>
       </html>
     </>

@@ -12,7 +12,7 @@ import {
   problemStatusValidations,
   problemTagsValidations,
   problemTitleValidations,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { useLocalStorage } from 'apps/client/features/hooks/use-local-storage';
 import { useCallback, useEffect } from 'react';
 import { useParams } from 'next/navigation';

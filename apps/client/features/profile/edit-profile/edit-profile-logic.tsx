@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EditProfileView } from './edit-profile-view';
-import { firstNameValidations, lastNameValidations } from '@code-judge/core-design';
+import { firstNameValidations, lastNameValidations } from '@algo-forge/core-design';
 
 const EditProfileSchema = z.object({
   ...firstNameValidations,

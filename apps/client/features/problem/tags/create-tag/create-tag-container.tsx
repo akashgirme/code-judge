@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { CreateTagLogic, CreateTagModel } from './create-tag-logic';
-import { useCreateTagMutation } from '@code-judge/api-hooks';
+import { useCreateTagMutation } from '@algo-forge/api-hooks';
 import { handleError } from 'apps/client/utils';
 
 export const CreateTagContainer = () => {

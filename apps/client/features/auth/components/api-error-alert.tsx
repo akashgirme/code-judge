@@ -1,4 +1,4 @@
-import { Alert, AlertProps } from '@code-judge/core-design';
+import { Alert, AlertProps } from '@algo-forge/core-design';
 import { useMemo } from 'react';
 import { SerializedError } from '@reduxjs/toolkit';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';

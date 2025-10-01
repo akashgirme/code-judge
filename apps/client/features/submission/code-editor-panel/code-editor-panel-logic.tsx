@@ -9,7 +9,7 @@ import { debounce } from 'apps/client/utils';
 import {
   codeEditorValidations,
   selectLanguageValidations,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { CodeEditorPanelView } from './code-editor-panel-view';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
 import { setLanguage, setSourceCode } from '../services';

@@ -1,6 +1,6 @@
 'use client';
 import { useAppSelector } from 'apps/client/app/store';
-import { Button, Typography } from '@code-judge/core-design';
+import { Button, Typography } from '@algo-forge/core-design';
 import { Action, Can, Subject } from 'apps/client/features/auth';
 import { handleComingSoonAlert } from 'apps/client/utils/coming-soon-alert';
 import Link from 'next/link';
@@ -14,7 +14,7 @@ export function AppBar() {
       <div className="container flex h-14 items-center justify-between px-4">
         <Link href="/home" className="flex items-center gap-2">
           <Typography fontSize={'h4'} fontWeight={'bold'} className="text-foreground">
-            CodeJudge
+            Algo Forge
           </Typography>
         </Link>
 

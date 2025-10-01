@@ -1,4 +1,4 @@
-import { Typography } from '@code-judge/core-design';
+import { Typography } from '@algo-forge/core-design';
 import React, { FC } from 'react';
 import { ArrowLeft, Xmark } from 'iconoir-react';
 import { useMediaQuery } from '../../hooks';

@@ -11,7 +11,7 @@ import {
   persistStore,
 } from 'redux-persist';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { authReducer, apiQuery as api, UserRole } from '@code-judge/api-hooks';
+import { authReducer, apiQuery as api, UserRole } from '@algo-forge/api-hooks';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { createBlacklistFilter } from 'redux-persist-transform-filter';
 import { ability, defineAbilityForUser } from '../features/auth/ability/ability-factory';

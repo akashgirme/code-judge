@@ -1,4 +1,4 @@
-import { Card, cn } from '@code-judge/core-design';
+import { Card, cn } from '@algo-forge/core-design';
 
 interface AuthCardProps {
   children: React.ReactNode;

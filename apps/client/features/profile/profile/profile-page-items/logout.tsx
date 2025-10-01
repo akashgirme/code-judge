@@ -1,4 +1,4 @@
-import { Button } from '@code-judge/core-design';
+import { Button } from '@algo-forge/core-design';
 import { useAuth } from 'apps/client/features/auth';
 import React from 'react';
 

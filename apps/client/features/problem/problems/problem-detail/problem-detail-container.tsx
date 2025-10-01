@@ -1,9 +1,9 @@
-import { useGetProblemQuery } from '@code-judge/api-hooks';
+import { useGetProblemQuery } from '@algo-forge/api-hooks';
 import { ProblemDetailView } from './problem-detail-view';
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { Loading } from 'apps/client/components';
-import { Typography } from '@code-judge/core-design';
+import { Typography } from '@algo-forge/core-design';
 
 export const ProblemDetailContainer = () => {
   const { problemId: id } = useParams();

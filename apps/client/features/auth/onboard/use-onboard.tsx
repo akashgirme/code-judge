@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { OnboardModel } from './onboard-logic';
-import { useOnboardMutation } from '@code-judge/api-hooks';
+import { useOnboardMutation } from '@algo-forge/api-hooks';
 import { handleError } from 'apps/client/utils';
 
 export const useOnboard = () => {

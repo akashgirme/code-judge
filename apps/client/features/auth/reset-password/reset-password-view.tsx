@@ -5,9 +5,9 @@ import {
   CardContent,
   CreatePasswordField,
   ConfirmPasswordField,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { PasswordErrors } from '../components';
-import { useResetPasswordMutation } from '@code-judge/api-hooks';
+import { useResetPasswordMutation } from '@algo-forge/api-hooks';
 import { PageHeader } from 'apps/client/components';
 
 interface ResetPasswordViewProps {

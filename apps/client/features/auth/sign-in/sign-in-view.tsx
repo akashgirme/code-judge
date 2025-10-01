@@ -1,4 +1,4 @@
-import { Button, CardContent } from '@code-judge/core-design';
+import { Button, CardContent } from '@algo-forge/core-design';
 import { Mail, ChatBubbleEmpty } from 'iconoir-react';
 import { useRouter } from 'next/navigation';
 import {
@@ -27,7 +27,7 @@ export const SignInView = () => {
           title="Welcome Back!"
           description={
             <>
-              I&apos;m CodeJudge, Here to help you master problem solving. <br />
+              I&apos;m Algo Forge, Here to help you master problem solving. <br />
               Let&apos;s continue to challenge after you Login.
             </>
           }

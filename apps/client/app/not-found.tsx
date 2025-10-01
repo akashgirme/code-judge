@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { PageHeader } from '../components';
-import { Button } from '@code-judge/core-design';
+import { Button } from '@algo-forge/core-design';
 import { useRouter } from 'next/navigation';
 
 export default function Error({

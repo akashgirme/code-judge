@@ -1,4 +1,4 @@
-import { useWhoAmIQuery } from '@code-judge/api-hooks';
+import { useWhoAmIQuery } from '@algo-forge/api-hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

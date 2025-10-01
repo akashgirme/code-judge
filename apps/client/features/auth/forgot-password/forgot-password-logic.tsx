@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ForgotPasswordView } from './forgot-password-view';
-import { emailValidations } from '@code-judge/core-design';
+import { emailValidations } from '@algo-forge/core-design';
 
 const ForgotPasswordSchema = z.object({
   ...emailValidations,

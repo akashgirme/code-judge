@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'iconoir-react';
 
-import { Button } from '@code-judge/core-design';
+import { Button } from '@algo-forge/core-design';
 
 export const BackButton = ({ prevRoute = '/auth/sign-in' }: { prevRoute?: string }) => {
   const router = useRouter();

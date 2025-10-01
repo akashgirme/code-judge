@@ -1,4 +1,4 @@
-import { TextLinkButton } from '@code-judge/core-design';
+import { TextLinkButton } from '@algo-forge/core-design';
 import Link from 'next/link';
 export const ForgotPassword = () => (
   <TextLinkButton

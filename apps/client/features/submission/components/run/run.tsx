@@ -1,11 +1,11 @@
 'use client';
-import { useCreateRunMutation, useGetRunStatusQuery } from '@code-judge/api-hooks';
+import { useCreateRunMutation, useGetRunStatusQuery } from '@algo-forge/api-hooks';
 import { handleError } from 'apps/client/utils';
 import { useParams } from 'next/navigation';
 import { setRunResponse } from '../../services';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
 import { useEffect, useState } from 'react';
-import { Button } from '@code-judge/core-design';
+import { Button } from '@algo-forge/core-design';
 import { toast } from 'sonner';
 
 export const RunCode = () => {

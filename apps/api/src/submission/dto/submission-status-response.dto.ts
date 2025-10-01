@@ -1,4 +1,4 @@
-import { Languages, SubmissionState, SubmissionStatus } from '@code-judge/common';
+import { Languages, SubmissionState, SubmissionStatus } from '@algo-forge/common';
 import { ApiProperty } from '@nestjs/swagger';
 
 class ResultDto {

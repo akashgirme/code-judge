@@ -1,4 +1,4 @@
-import { SubmitStatusResponseDto } from '@code-judge/api-hooks';
+import { SubmitStatusResponseDto } from '@algo-forge/api-hooks';
 import {
   Alert,
   Button,
@@ -8,7 +8,7 @@ import {
   CardTitle,
   ScrollArea,
   Typography,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import {
   AlertCircle,
   CheckCircle2,

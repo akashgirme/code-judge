@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { FormProvider, UseFormReturn } from 'react-hook-form';
-import { CodeEditorField, SelectLanguageField } from '@code-judge/core-design';
+import { CodeEditorField, SelectLanguageField } from '@algo-forge/core-design';
 import { CodeEditorPanelModel } from './code-editor-panel-logic';
 import { useTheme } from 'next-themes';
 

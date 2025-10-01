@@ -1,4 +1,4 @@
-import { TextLinkButton, Typography } from '@code-judge/core-design';
+import { TextLinkButton, Typography } from '@algo-forge/core-design';
 import Link from 'next/link';
 
 export const PolicyDisclaimer = () => {
@@ -27,7 +27,7 @@ export const PolicyDisclaimer = () => {
         >
           Privacy Policy
         </TextLinkButton>{' '}
-        of CodeJudge.
+        of Algo Forge.
       </Typography>
     </div>
   );

@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateTagView } from './create-tag-view';
-import { tagNameValidations } from '@code-judge/core-design';
+import { tagNameValidations } from '@algo-forge/core-design';
 
 const CreateTagSchema = z.object({
   ...tagNameValidations,

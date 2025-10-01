@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from '@code-judge/core-design';
+import { MarkdownRenderer } from '@algo-forge/core-design';
 
 interface ProblemDetailsProps {
   description: string;

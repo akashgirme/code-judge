@@ -1,7 +1,7 @@
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { ForgotPasswordModel } from './forgot-password-logic';
-import { Button, EmailField, CardContent } from '@code-judge/core-design';
-import { useForgotPasswordMutation } from '@code-judge/api-hooks';
+import { Button, EmailField, CardContent } from '@algo-forge/core-design';
+import { useForgotPasswordMutation } from '@algo-forge/api-hooks';
 import { PageHeader } from 'apps/client/components';
 import { PolicyDisclaimer } from '../components';
 

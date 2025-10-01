@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { CreateProblemLogic, CreateProblemModel } from './create-problem-logic';
-import { useCreateProblemMutation } from '@code-judge/api-hooks';
+import { useCreateProblemMutation } from '@algo-forge/api-hooks';
 import { handleError } from 'apps/client/utils';
 
 export const CreateProblemContainer = () => {

@@ -8,7 +8,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { ProblemDetailContainer } from 'apps/client/features/problem';
 import {
   AllSubmissionsContainer,

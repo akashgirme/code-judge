@@ -1,5 +1,5 @@
 {
-  "name": "@code-judge/api-hooks",
+  "name": "@algo-forge/api-hooks",
   "version": "0.0.1",
   "main": "./index.js",
   "types": "./index.d.ts",

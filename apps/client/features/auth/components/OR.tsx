@@ -1,4 +1,4 @@
-import { Typography } from '@code-judge/core-design';
+import { Typography } from '@algo-forge/core-design';
 
 export const OR = () => {
   return (

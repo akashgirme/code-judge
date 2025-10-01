@@ -5,7 +5,7 @@ import {
   setCredentials,
   updateUser as updateUserInRedux,
   useLogoutMutation,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
 import { useRouter } from 'next/navigation';
 

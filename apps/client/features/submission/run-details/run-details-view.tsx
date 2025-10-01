@@ -1,4 +1,4 @@
-import { ResultDto, RunStatusResponseDto } from '@code-judge/api-hooks';
+import { ResultDto, RunStatusResponseDto } from '@algo-forge/api-hooks';
 import {
   Alert,
   Button,
@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
   Typography,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { AlertCircle, CheckCircle2, Loader2, X, XCircle } from 'lucide-react';
 
 interface RunDetailsViewProps {

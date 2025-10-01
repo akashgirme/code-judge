@@ -2,13 +2,13 @@
 import {
   useCreateSubmissionMutation,
   useGetSubmitStatusQuery,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 import { handleError } from 'apps/client/utils';
 import { useParams } from 'next/navigation';
 import { setSubmitResponse } from '../../services';
 import { useAppDispatch, useAppSelector } from 'apps/client/app/store';
 import { useState } from 'react';
-import { Button } from '@code-judge/core-design';
+import { Button } from '@algo-forge/core-design';
 import { toast } from 'sonner';
 
 export const SubmitCode = () => {

@@ -1,4 +1,4 @@
-import { Typography } from '@code-judge/core-design';
+import { Typography } from '@algo-forge/core-design';
 
 interface TitleSectionProps {
   title?: string;

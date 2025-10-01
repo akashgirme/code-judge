@@ -1,10 +1,10 @@
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { SignInWithOtpModel } from './sign-in-with-otp-logic';
-import { Button, OtpField, CardContent } from '@code-judge/core-design';
+import { Button, OtpField, CardContent } from '@algo-forge/core-design';
 import {
   useRequestSignInOtpMutation,
   useSignInWithOtpMutation,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 import { PageHeader } from 'apps/client/components';
 import { ResendOTPButton } from '../components';
 

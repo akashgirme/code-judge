@@ -1,4 +1,4 @@
-import { useWhoAmIQuery } from '@code-judge/api-hooks';
+import { useWhoAmIQuery } from '@algo-forge/api-hooks';
 import { useOnboardNavigation } from './use-onboard-navigation';
 import { Logout, ProfileData } from './profile-page-items';
 import { ProfileTopbar } from '../components';

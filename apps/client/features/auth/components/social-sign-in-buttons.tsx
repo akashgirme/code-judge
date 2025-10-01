@@ -1,7 +1,7 @@
 'use client';
-import { Button, Icon } from '@code-judge/core-design';
+import { Button, Icon } from '@algo-forge/core-design';
 import { useRouter } from 'next/navigation';
-import { GoogleIcon } from '@code-judge/core-design';
+import { GoogleIcon } from '@algo-forge/core-design';
 
 export const SocialSignInButtons = () => {
   const router = useRouter();

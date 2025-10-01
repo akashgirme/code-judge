@@ -1,4 +1,4 @@
-import { Languages } from '@code-judge/common';
+import { Languages } from '@algo-forge/common';
 import {
   cConfig,
   cppConfig,

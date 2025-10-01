@@ -23,7 +23,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { SubmissionRequest, SubmissionResult, SubmissionState } from '@code-judge/common';
+import { SubmissionRequest, SubmissionResult, SubmissionState } from '@algo-forge/common';
 import { SubmissionType } from 'libs/common/src/enum/submission-type.enum';
 
 @Injectable()

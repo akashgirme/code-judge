@@ -1,6 +1,6 @@
 import { handleError } from 'apps/client/utils/handle-error';
 import { ForgotPasswordLogic, ForgotPasswordModel } from './forgot-password-logic';
-import { useForgotPasswordMutation } from '@code-judge/api-hooks';
+import { useForgotPasswordMutation } from '@algo-forge/api-hooks';
 import { handleSuccess } from 'apps/client/utils/handle-success';
 
 export const ForgotPasswordContainer = () => {

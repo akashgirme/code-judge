@@ -9,9 +9,9 @@ import {
   CreatePasswordField,
   ConfirmPasswordField,
   UsernameField,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { OR, PasswordErrors, PolicyDisclaimer, SocialSignInButtons } from '../components';
-import { useSignUpMutation } from '@code-judge/api-hooks';
+import { useSignUpMutation } from '@algo-forge/api-hooks';
 import { PageHeader } from 'apps/client/components';
 
 interface SignUpViewProps {

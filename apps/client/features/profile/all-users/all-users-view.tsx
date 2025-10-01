@@ -6,8 +6,8 @@ import {
   TableHeader,
   TableRow,
   TextLinkButton,
-} from '@code-judge/core-design';
-import { useGetAllUsersQuery } from '@code-judge/api-hooks';
+} from '@algo-forge/core-design';
+import { useGetAllUsersQuery } from '@algo-forge/api-hooks';
 
 export const AllUsersView = () => {
   const { data, isFetching } = useGetAllUsersQuery({ pageIndex: 0, pageSize: 1000 });

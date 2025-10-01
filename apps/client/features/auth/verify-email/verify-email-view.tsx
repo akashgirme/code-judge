@@ -1,9 +1,9 @@
 'use client';
-import { Button, OtpField, CardContent } from '@code-judge/core-design';
+import { Button, OtpField, CardContent } from '@algo-forge/core-design';
 import {
   useResendVerificationEmailMutation,
   useVerifyEmailMutation,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { VerifyEmailModel } from './verify-email-logic';
 import { PageHeader } from 'apps/client/components';

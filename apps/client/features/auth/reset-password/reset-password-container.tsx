@@ -1,6 +1,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ResetPasswordLogic, ResetPasswordModel } from './reset-password-logic';
-import { useResetPasswordMutation } from '@code-judge/api-hooks';
+import { useResetPasswordMutation } from '@algo-forge/api-hooks';
 import { handleError, handleSuccess } from 'apps/client/utils';
 
 export const ResetPasswordContainer = () => {

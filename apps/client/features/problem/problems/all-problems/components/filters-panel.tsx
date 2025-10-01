@@ -8,10 +8,10 @@ import {
   problemStatusValidations,
   ProblemTagsField,
   ProblemTitleField,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Filter } from 'iconoir-react';
-import { GetProblemsForAdminApiArg } from '@code-judge/api-hooks';
+import { GetProblemsForAdminApiArg } from '@algo-forge/api-hooks';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Params } from 'apps/client/features/hooks';

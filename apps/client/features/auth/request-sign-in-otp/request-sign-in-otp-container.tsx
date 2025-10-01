@@ -1,4 +1,4 @@
-import { useRequestSignInOtpMutation } from '@code-judge/api-hooks';
+import { useRequestSignInOtpMutation } from '@algo-forge/api-hooks';
 
 import {
   RequestSignInOtpLogic,

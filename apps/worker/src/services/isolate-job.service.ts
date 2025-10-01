@@ -13,7 +13,7 @@ import * as fs from 'fs';
 import { existsSync, readFileSync } from 'fs';
 import { injectable } from 'tsyringe';
 import { SubmissionService } from './submission.service';
-import { SubmissionState, SubmissionStatus } from '@code-judge/common';
+import { SubmissionState, SubmissionStatus } from '@algo-forge/common';
 import { Result, Submission } from '../types';
 import path from 'path';
 

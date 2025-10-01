@@ -4,7 +4,7 @@ import {
   RunStatusResponseDto,
   SubmissionResponse,
   SubmitStatusResponseDto,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 
 export interface SubmissionState {
   submission: SubmissionResponse | null;

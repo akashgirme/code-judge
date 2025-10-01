@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { EditProfileLogic, EditProfileModel } from './edit-profile-logic';
-import { useEditProfileMutation, useWhoAmIQuery } from '@code-judge/api-hooks';
+import { useEditProfileMutation, useWhoAmIQuery } from '@algo-forge/api-hooks';
 import { handleError } from 'apps/client/utils';
 import { useAuth } from '../../auth';
 

@@ -1,4 +1,4 @@
-import { Alert, AlertProps } from '@code-judge/core-design';
+import { Alert, AlertProps } from '@algo-forge/core-design';
 
 export interface ApiSuccessAlertProps extends AlertProps {
   isSuccess: boolean;

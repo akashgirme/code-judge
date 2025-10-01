@@ -1,6 +1,6 @@
 'use client';
 import { Code2, Trophy, Users } from 'lucide-react';
-import { Button } from '@code-judge/core-design';
+import { Button } from '@algo-forge/core-design';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from 'apps/client/app/store';
 
@@ -36,7 +36,7 @@ export function Hero() {
                   <span className="text-primary-active block">Shape Your Future.</span>
                 </h1>
                 <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                  Join CodeJudge to enhance your programming skills, compete in
+                  Join Algo Forge to enhance your programming skills, compete in
                   challenges, and prove your expertise through real-world coding problems.
                 </p>
               </div>

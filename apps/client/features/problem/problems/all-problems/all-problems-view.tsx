@@ -7,12 +7,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@code-judge/core-design';
+} from '@algo-forge/core-design';
 import {
   GetProblemsForAdminApiArg,
   ProblemStatus,
   useGetProblemsForAdminQuery,
-} from '@code-judge/api-hooks';
+} from '@algo-forge/api-hooks';
 import Link from 'next/link';
 import { EditPencil } from 'iconoir-react';
 import { TagBadges } from '../../components/tag-badges';

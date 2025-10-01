@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
   TagNameField,
-} from '@code-judge/core-design';
-import { useCreateTagMutation } from '@code-judge/api-hooks';
+} from '@algo-forge/core-design';
+import { useCreateTagMutation } from '@algo-forge/api-hooks';
 import { useParams } from 'next/navigation';
 
 interface CreateTagViewProps {

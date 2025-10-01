@@ -1,5 +1,5 @@
-import { Badge, Card, Typography } from '@code-judge/core-design';
-import { ProblemDifficulty } from '@code-judge/api-hooks';
+import { Badge, Card, Typography } from '@algo-forge/core-design';
+import { ProblemDifficulty } from '@algo-forge/api-hooks';
 
 interface ProblemHeroSectionProps {
   title?: string;

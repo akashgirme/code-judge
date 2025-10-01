@@ -1,4 +1,4 @@
-import { Skeleton, Typography, cn } from '@code-judge/core-design';
+import { Skeleton, Typography, cn } from '@algo-forge/core-design';
 import { ReactNode } from 'react';
 import { NavArrowRight } from 'iconoir-react';
 

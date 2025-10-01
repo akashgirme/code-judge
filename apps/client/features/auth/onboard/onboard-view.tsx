@@ -6,8 +6,8 @@ import {
   CardContent,
   FirstNameField,
   LastNameField,
-} from '@code-judge/core-design';
-import { useOnboardMutation } from '@code-judge/api-hooks';
+} from '@algo-forge/core-design';
+import { useOnboardMutation } from '@algo-forge/api-hooks';
 import { PageHeader } from 'apps/client/components';
 import { useState } from 'react';
 

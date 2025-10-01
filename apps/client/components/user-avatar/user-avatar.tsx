@@ -1,5 +1,5 @@
 'use client';
-import { Avatar, AvatarFallback, Typography, cn } from '@code-judge/core-design';
+import { Avatar, AvatarFallback, Typography, cn } from '@algo-forge/core-design';
 import { useAuth } from 'apps/client/features/auth';
 
 interface UserAvatarProps {

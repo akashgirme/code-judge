@@ -4,8 +4,8 @@ import {
   EmailField,
   LoginPasswordField,
   CardContent,
-} from '@code-judge/core-design';
-import { useSignInMutation } from '@code-judge/api-hooks';
+} from '@algo-forge/core-design';
+import { useSignInMutation } from '@algo-forge/api-hooks';
 
 import { SignInModel } from './sign-in-with-password-logic';
 import { PageHeader } from 'apps/client/components';
