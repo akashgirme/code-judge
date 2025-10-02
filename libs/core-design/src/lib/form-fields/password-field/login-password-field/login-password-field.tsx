@@ -1,7 +1,7 @@
 'use client';
 import { useFormContext } from 'react-hook-form';
 import { modelKey, questionConfig } from '../password-config';
-import { SecretField } from '@code-judge/core-design';
+import { SecretField } from '@algo-forge/core-design';
 
 export const LoginPasswordField = () => {
   const {

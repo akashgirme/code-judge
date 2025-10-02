@@ -31,7 +31,7 @@ export const getTypeOrmConfig = async (
   };
 };
 
-//TODO: Issue with migration generation > unable to locate @code-judge/common lib
+//TODO: Issue with migration generation > unable to locate @algo-forge/common lib
 const datasource = new DataSource({
   ...commonTypeOrmConfig,
   extra: {

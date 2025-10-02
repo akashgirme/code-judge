@@ -1,7 +1,7 @@
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import { IsEnum, IsNumber } from 'class-validator';
 import { IntersectionType as ValidatorIntersectionType } from '@nestjs/mapped-types';
-import { Languages } from '@code-judge/common';
+import { Languages } from '@algo-forge/common';
 import { PaginationDto, SortingDto } from '../../common/dto';
 
 class SolutionQuery {

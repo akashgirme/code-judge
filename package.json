@@ -1,12 +1,12 @@
 {
-  "name": "@code-judge/source",
+  "name": "@algo-forge/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "start:api": "node ./dist/apps/api/main",
     "debug:api": "npx nx serve api --inspect",
     "dev:api": "npx nx serve api",
-    "start:client": "cd dist/apps/client && pnpm run start",
+    "start:client": "cd dist/apps/web && pnpm run start",
     "dev:client": "npx nx serve client",
     "start:worker": "node ./dist/apps/worker/main",
     "dev:worker": "npx nx serve worker",

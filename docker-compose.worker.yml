@@ -1,0 +1,13 @@
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker/Dockerfile.worker.dev
+    volumes:
+      - .:/app
+    env_file:
+      - .env.local 
+    environment:
+      - NODE_ENV=development
+    privileged: true
+    restart: always

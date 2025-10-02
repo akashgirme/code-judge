@@ -5,7 +5,7 @@ const { join } = require('path');
 module.exports = {
   darkMode: ['class'],
   content: [
-    join(__dirname, 'apps/client/**/*!(*.stories|*.spec).{ts,tsx,html}'),
+    join(__dirname, 'apps/web/**/*!(*.stories|*.spec).{ts,tsx,html}'),
     join(__dirname, 'libs/core-design/**/*!(*.stories|*.spec).{ts,tsx,html}'),
     ...createGlobPatternsForDependencies(__dirname),
   ],

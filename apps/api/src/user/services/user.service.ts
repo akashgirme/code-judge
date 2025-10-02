@@ -112,7 +112,7 @@ export class UserService {
 
     this.mailService.sendMail({
       to: updatedUser.email,
-      subject: 'Welcome to Code-Judge',
+      subject: 'Welcome to algo-forge',
       htmlBody: welcomeMjml,
       data: {
         firstName: updatedUser.firstName,

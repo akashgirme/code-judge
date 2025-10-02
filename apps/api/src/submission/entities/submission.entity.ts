@@ -2,7 +2,7 @@ import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Problem } from '../../problem/entities';
 import { User } from '../../user/entities';
-import { Languages, SubmissionStatus } from '@code-judge/common';
+import { Languages, SubmissionStatus } from '@algo-forge/common';
 import { Exclude } from 'class-transformer';
 
 @Entity()

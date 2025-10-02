@@ -1,7 +1,7 @@
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Editor } from '@monaco-editor/react';
-import { Language, Languages } from '@code-judge/api-hooks';
+import { Language, Languages } from '@algo-forge/api-hooks';
 import { modelKey } from './code-editor-config';
 
 interface CodeEditorProps {

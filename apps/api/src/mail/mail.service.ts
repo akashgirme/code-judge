@@ -31,7 +31,7 @@ export class MailService {
           Data: subject,
         },
       },
-      Source: `"Code-Judge" <${this.configService.get<string>('SES_EMAIL_SENDER')}>`,
+      Source: `"algo-forge" <${this.configService.get<string>('SES_EMAIL_SENDER')}>`,
     };
 
     try {

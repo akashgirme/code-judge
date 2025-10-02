@@ -9,7 +9,7 @@ export const verifyEmailWithOtpMjml = `
               {{otp}}
             </p>
             <p class='lead helvetica'>
-              is your code-judge sign in code.
+              is your algo-forge sign in code.
             </p>
             <p class='faded helvetica'>
               The verification code works for only 10 mins.<br />
