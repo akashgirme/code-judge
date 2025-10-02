@@ -1,0 +1,26 @@
+import { handleError } from 'apps/web/utils/handle-error';
+import { ForgotPasswordLogic, ForgotPasswordModel } from './forgot-password-logic';
+import { useForgotPasswordMutation } from '@algo-forge/api-hooks';
+import { handleSuccess } from 'apps/web/utils/handle-success';
+
+export const ForgotPasswordContainer = () => {
+  const [forgotPassword] = useForgotPasswordMutation({
+    fixedCacheKey: 'forgot-password',
+  });
+
+  const handleSubmit = async (data: ForgotPasswordModel) => {
+    const submitData = {
+      email: data.email,
+    };
+    forgotPassword({ forgotPasswordDto: submitData })
+      .unwrap()
+      .then(handleSuccess)
+      .catch(handleError);
+  };
+
+  const defaultValues = {
+    email: '',
+  };
+
+  return <ForgotPasswordLogic defaultValues={defaultValues} onSubmit={handleSubmit} />;
+};

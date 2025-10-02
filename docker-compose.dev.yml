@@ -16,7 +16,7 @@ services:
   client:
     build:
       context: .
-      dockerfile: docker/client/Dockerfile.client.dev
+      dockerfile: docker/client/Dockerfile.web.dev
     volumes:
       - .:/app
     ports:

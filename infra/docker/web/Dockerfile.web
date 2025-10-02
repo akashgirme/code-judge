@@ -1,0 +1,39 @@
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY package.json pnpm*.yaml ./
+
+RUN pnpm install
+
+COPY . .
+
+ARG NEXT_PUBLIC_API_SERVICE_URL
+ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
+
+RUN npx nx reset
+
+RUN npx nx build client
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY --from=build app/dist ./dist
+
+WORKDIR /app/dist/apps/web/
+
+RUN pnpm install --prod
+
+RUN pnpm add @next/bundle-analyzer
+
+ARG NEXT_PUBLIC_API_SERVICE_URL
+ENV NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
+
+EXPOSE 3000
+
+CMD [ "pnpm","run","start" ]
